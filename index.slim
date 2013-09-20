@@ -1,0 +1,428 @@
+doctype html
+html lang="en" ng-app="Museum"
+  head
+    meta charset="utf-8"
+    title IZI Prototype
+
+    link rel="stylesheet" href="css/bootstrap.css"
+    link rel="stylesheet" href="css/font-awesome.css"
+    link rel="stylesheet" href="css/jplayer.blue.monday.css"
+    link rel="stylesheet" href="css/toggle-switch.css"
+    link rel="stylesheet" href="css/prototype.css"
+
+  body ng-controller="IndexController"
+
+    .navigation.navbar-fixed-top
+
+      .museum_navigation_menu
+        .museum_navbar.row
+          .left_content
+            i.icon-external-link 
+            a.top_nav href="#"            
+              | Open in new Tab
+            i.icon-bar-chart
+            a.top_nav href="#"
+              | Statistic
+            i.icon-plus-sign
+            a.top_nav href="#"
+              | New museum
+            i.icon-plus-sign
+            a.top_nav href="#" 
+              | New Tour
+          .right_content.navbar-right
+            .searches
+              .search
+                i.icon-search
+                a href="#" 
+                  | {{museum_search || 'Search'}}
+              .search_input ng-show="museum_search_visible"
+                input.form-control type="text" placeholder="Search" ng-model="museum_search"
+                a.search_reset href='#' ng-click="museum_search=''"
+                  i.icon-remove-sign
+            .dropdown
+              a#visibility_filter.dropdown-toggle data-toggle="dropdown" href="#"
+                | {{user.mail}}
+                span.caret
+              ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
+                li role="presentation" ng-repeat="provider in user.providers"
+                  a role="menuitem" tabindex="-1" href="{{provider.link}}" 
+                    | {{provider.name}}
+                li.divider
+                li role="presentation" ng-repeat="provider in user.providers"
+                  a role="menuitem" tabindex="-1" href="{{provider.link}}" 
+                    | Edit {{provider.name}}
+                li.divider
+                li role="presentation"
+                  a role="menuitem" tabindex="-1" href="" Profile
+                li role="presentation"
+                  a role="menuitem" tabindex="-1" href="" Logout
+        
+        .museum_filters
+          a.active.time_changed href="#" ng-click="museum_type_filter = ''"
+            i.icon-time
+          a.type_museum href="#" ng-click="museum_type_filter = 'museum'"
+            i.icon-home
+          a.type_tour href="#" ng-click="museum_type_filter = 'tour'"
+            i.icon-map-marker
+        
+        ul.museum_list.row
+
+          li.museum ng-repeat='museum in museums | filter:museum_search | filter:{type:museum_type_filter}'
+            a href="#"
+              span class="package_status {{museum.packege_status}}"
+                i ng-class="{'icon-ok-sign':museum.packege_status=='generated', 'icon-refresh':museum.packege_status=='process'}"
+              img src="{{museum.image}}"
+              h4 
+                | {{museum.name}}, 
+                span 
+                  | {{museum.city}}
+
+      .navbar.navbar-default
+        .left_content
+          a.menu_opener href="#" ng-click="toggle_menu($event)"
+            i.icon-reorder
+          h1.museum_title 
+            | {{current_museum.name}}
+          .btn-group.language
+            button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
+              | English    
+              span.caret
+            ul.dropdown-menu role="menu"
+              li ng-repeat="story in current_museum.stories"
+                a href="#"
+                  | {{story.name}}
+              li.divider
+              li
+                a href="{{current_museum.new_story_link}}" New language
+          .btn-group
+        .right_content
+          span.autosaved_info Changes autosaved at 19:46
+          .btn-group
+            button.btn.btn-success type="button" Updateted to everyone
+            button.btn.btn-success.dropdown-toggle data-toggle="dropdown" type="button"
+              .extra
+                i.icon-globe
+              span.caret
+            ul.dropdown-menu role="menu"
+              li
+                a href="#" 1
+              li
+                a href="#" 2
+              li
+                a href="#" 3
+
+      .actions_bar
+        .left_content
+          button.btn.btn-warning.spacer#create_new_item type="button" New item 
+          .btn-group
+            button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
+              | Actions  
+              span.caret
+            ul.dropdown-menu role="menu"
+              li
+                a href="#" 1
+              li
+                a href="#" 2
+              li
+                a href="#" 3
+          .btn-group.spacer
+            button.btn.btn-default.undo type="button" 
+              i.icon-undo
+            button.btn.btn-default.redo type="button" 
+              i.icon-repeat
+
+        .right_content
+          span.limits.spacer
+            | All items: 
+            b 50-150
+            |  of 
+            b 304 
+          .btn-group.spacer
+            button.btn.btn-default.prev type="button" 
+              i.icon-chevron-left
+            button.btn.btn-default.next type="button" 
+              i.icon-chevron-right
+          input.form-control.search.spacer type="text" placeholder="Search"
+          button.btn.btn-default.filter_opener type="button" ng-click="toggle_filters($event)" Filters
+
+      .filters_bar
+        a.clear_fiters.spacer href="#" Clear filters
+
+        .dropdown
+          a#visibility_filter data-toggle="dropdown" href="#"
+            | Visibility in mobile application 
+            span.caret
+          ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
+            li role="presentation"
+              a role="menuitem" tabindex="-1" href="#" Action
+            li role="presentation"
+              a role="menuitem" tabindex="-1" href="#" Action
+            li role="presentation"
+              a role="menuitem" tabindex="-1" href="#" Action
+
+    .page-wrapper
+      .page
+
+        ul.exhibits
+
+          li#drop_down ng-controller="EditItemController"
+            .prev-ex
+            #images
+              .images-list.ui-sortable data-liftable="data-liftable" data-sort-url="/77/story_sets/5546/images/sort" style=""
+                h4.hidden-header.hidden
+                  | Shown images
+                  .help-tooltip
+                    i.icon-question-sign.icon.tip data-placement="right" title="The images from this list will be made visible in mobile app.&lt;br&gt;The list should contain no more than 16 images."
+                ul.images-displayed data-max-displayed="16"
+                  li#media_content_ids_38999 style="position: relative;"
+                    form#edit_image_38999.upload-form accept-charset="UTF-8" action="/77/story_sets/5546/images/38999" data-remote="true" enctype="multipart/form-data" method="post"
+                      div style="margin:0;padding:0;display:inline"
+                        input name="utf8" type="hidden" value="✓"
+                        input name="_method" type="hidden" value="put"
+                        input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="
+                      input#image_link.hide.fileupload data-accept="image" name="image[link]" type="file"
+                      a.thumbnail href="/77/story_sets/5546/images/38999/crop.json"
+                        img alt="" data-crop-url="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f.jpg" src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f_thumb.jpg"
+                      a.remove data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="/77/story_sets/5546/images/38999" rel="nofollow"
+                      .progress.progress-success.progress-striped.active.hide
+                        .bar
+                      a.browse.update
+                        | Update image
+                  li#media_content_ids_39000 style="position: relative;"
+                    form#edit_image_39000.upload-form accept-charset="UTF-8" action="/77/story_sets/5546/images/39000" data-remote="true" enctype="multipart/form-data" method="post"
+                      div style="margin:0;padding:0;display:inline"
+                        input name="utf8" type="hidden" value="✓"
+                        input name="_method" type="hidden" value="put"
+                        input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="
+                      input#image_link.hide.fileupload data-accept="image" name="image[link]" type="file"
+                      a.thumbnail href="/77/story_sets/5546/images/39000/crop.json"
+                        img alt="" data-crop-url="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/9efe1d5c-047c-4ae3-989c-62ac7af7206a.jpg" src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/9efe1d5c-047c-4ae3-989c-62ac7af7206a_thumb.jpg"
+                      a.remove data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="/77/story_sets/5546/images/39000" rel="nofollow"
+                      .progress.progress-success.progress-striped.active.hide
+                        .bar
+                      a.browse.update
+                        | Update image
+                h4.hidden-header.hidden
+                  | More images
+                  .help-tooltip
+                    i.icon-question-sign.icon.tip data-placement="right" title="The images from this list will not be visible in mobile app.&lt;br&gt;To make the image visible in mobile app, please,&lt;br&gt;move it to the upper list by holding down the left mouse button."
+                ul.images-hidden
+                  li.new
+                    a.upload-image href="/77/story_sets/5546/images/new"
+                      .picture
+                      .progress.progress-success.progress-striped.active.hide
+                        .bar style="width: 100%;"
+                      span.name
+                        | Upload image
+                        .help-tooltip
+                          i.icon-question-sign.icon.tip data-original-title="Upload exhibit photograph in JPEG or PNG format.&lt;br&gt;This image will be shown to the mobile application user on their smartphone or tablet.&lt;br&gt;Use high quality images that are not too large.&lt;br&gt;The most advantageous photograph proportions are 4:3." data-placement="right"
+              #crop_modal.modal.hide.crop-wrap
+                .modal-header
+                  button.close data-dismiss="modal"
+                  h3
+                    | Crop image
+                    .help-tooltip
+                      i.icon-question-sign.icon.tip data-placement="bottom" title="In this window you may crop the uploaded photograph. Remember that, on a smartphone screen, 4:3 proportioned photographs look the most appealing. The cropping frame has these proportions as the default."
+                .modal-body style="min-height: 0px;"
+                  .image-for-crop
+                    img src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f.jpg" style="display: block; visibility: hidden; width: 2304px; height: 1536px;"
+                .modal-footer
+                  a.btn.btn-primary.save-crop
+                    | Save
+                  a.btn data-dismiss="modal"
+                    | Cancel
+
+            .description
+              .close
+              switchpubitem ng-item="exhibit" ng-provider='$parent.provider'
+
+              a.delete_story data-toggle="modal" href="#delete_story"
+                i.icon-trash
+              .modal.fade id="delete_story" tabindex="-1" role="dialog" aria-hidden="true"
+                .modal-dialog
+                  .modal-content
+                    .modal-body
+                      form.form-horizontal
+                        .form-group
+                          label.control-label for="lang_en"
+                            input type="radio" name="language" value="en" id="lang_en"
+                            | Delete only English language
+                        .form-group
+                          label.control-label for="lang_all"
+                            input type="radio" name="language" value="all" id="lang_all"
+                            | Delete all languages
+                        .form-group
+                          label.control-label.lang_selected for="lang_selected"
+                            input type="radio" name="language" value="selected" id="lang_selected"
+                            | Delete only selected languages
+                        .other_variants
+                          .form-group
+                            label.control-label for="language_en"
+                              input type="checkbox" name="language_en" value="selected" id="language_en"
+                              | English
+                          .form-group
+                            label.control-label for="language_ru"
+                              input type="checkbox" name="language_ru" value="selected" id="language_ru"
+                              | Russian
+                          .form-group
+                            label.control-label for="language_it"
+                              input type="checkbox" name="language_it" value="selected" id="language_it"
+                              | Italian
+                          .form-group
+                            label.control-label for="language_fr"
+                              input type="checkbox" name="language_fr" value="selected" id="language_fr"
+                              | French
+                    .modal-footer
+                        button type="button" class="btn btn-default" data-dismiss="modal" Delete
+                        button type="button" class="btn btn-primary" data-dismiss="modal" Cancel
+              
+              tabset
+                tab heading="Media content"
+                  #media.row
+                    form.form-horizontal role="form"
+                      placeholderfield ng-item="exhibit" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup"
+                      placeholderfield ng-item="exhibit" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2"
+                      
+                      .form-group
+                        label.col-lg-2.control-label for="audio"
+                          | Audio
+                        .help
+                          i.icon-question-sign data-placement="bottom" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system."
+                        .col-lg-6
+                          #jquery_jplayer_1.jp-jplayer
+                          #jp_container_1.jp-audio
+                            .jp-type-single
+                              .jp-gui.jp-interface
+                                ul.jp-controls
+                                  li
+                                    a.jp-play href="javascript:;" tabindex="1"
+                                  li
+                                    a.jp-pause href="javascript:;" tabindex="1"
+                              .dropdown
+                                a#visibility_filter data-toggle="dropdown" href="#"
+                                  | Audioguide 01
+                                  span.caret
+                                ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
+                                  li role="presentation"
+                                    a role="menuitem" tabindex="-1" href="#" Replace
+                                  li role="presentation"
+                                    a role="menuitem" tabindex="-1" href="#" Download
+                              .jp-progress
+                                .jp-seek-bar
+                                  .jp-play-bar
+                              .jp-time-holder
+                                .jp-current-time
+                                .jp-duration
+                              .jp-no-solution
+                                span Update Required
+                                | To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your 
+                                a href="http://get.adobe.com/flashplayer/" target="_blank"
+
+                      placeholdertextarea ng-item="exhibit" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
+                      
+                      .form-group.last
+                        .pull-right.done_button
+                          a.btn.btn-default.done href="#" Done
+                tab heading="Quiz"
+                  #quiz.row
+                    .switch.ios
+                      input id="story_quiz_enabled" name="story_quiz_enabled" type="radio" checked=""
+                      label for="story_quiz_enabled" Enabled
+                      input id="story_quiz_disabled" name="story_quiz_enabled" type="radio"
+                      label for="story_quiz_disabled" Disable
+                      span.slide-button
+                    form.form-horizontal role="form"
+                      placeholderfield ng-item="exhibit.stories[0].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
+                      .error
+                        .controls
+                      .answers
+                        label.hidden.correct-label Correct answer
+
+                        quizanswer ng-item="answer" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-field="title" ng-repeat="answer in exhibit.stories[0].quiz.answers"
+
+                        / .form-group.string.optional.checkbox_added
+                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_0_content"
+                        /   .help
+                        /   input.coorect_answer_radio type="radio" name="correct_answer"
+                        /   .col-lg-5.trigger
+                        /     span.placeholder yes!
+                        /   .col-lg-5.triggered
+                        /     input#story_quiz_attributes_answers_attributes_0_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][0][content]" placeholder="Enter option" size="50" type="text" value="yes!"
+                        /   .save_status
+                        /     i.icon-ok-sign
+                        /     | saved
+                        / .form-group.string.optional.checkbox_added
+                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_1_content"
+                        /   .help
+                        /   input.coorect_answer_radio type="radio" name="correct_answer"
+                        /   .col-lg-5.trigger
+                        /     span.placeholder may be
+                        /   .col-lg-5.triggered
+                        /     input#story_quiz_attributes_answers_attributes_1_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][1][content]" placeholder="Enter option" size="50" type="text" value="may be"
+                        /   .save_status
+                        /     i.icon-ok-sign
+                        /     | saved
+                        / .form-group.string.optional.checkbox_added
+                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_2_content"
+                        /   .help
+                        /   input.coorect_answer_radio type="radio" name="correct_answer"
+                        /   .col-lg-5.trigger
+                        /     span.placeholder who can be sure now?
+                        /   .col-lg-5.triggered
+                        /     input#story_quiz_attributes_answers_attributes_2_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][2][content]" placeholder="Enter option" size="50" type="text" value="who can be sure now?"
+                        /   .save_status
+                        /     i.icon-ok-sign
+                        /     | saved
+                        / .form-group.string.optional.checkbox_added
+                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_3_content"
+                        /   .help
+                        /   input.coorect_answer_radio type="radio" name="correct_answer"
+                        /   .col-lg-5.trigger
+                        /     span.placeholder nope
+                        /   .col-lg-5.triggered
+                        /     input#story_quiz_attributes_answers_attributes_3_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][3][content]" placeholder="Enter option" size="50" type="text" value="nope"
+                        /   .save_status
+                        /     i.icon-ok-sign
+                        /     | saved
+                        
+                      placeholdertextarea ng-item="exhibit.stories[0].quiz" ng-id="quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
+
+                tab heading="QR-code"
+                  #qr_code.row
+                    .qr_image.col-lg-4
+                      img#qr alt="Qr_code" src="/img/qr_code.png"
+                    .well.col-lg-4
+                      a.btn.qr-code href="/1/story_sets/8/qr_code.html" target="_blank" Print QR-code
+                      br
+                        p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                tab heading="More"
+                  | hgsdfklghdfj kgkjdf hg
+
+            .next-ex
+
+          li.exhibit data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits" ng-class="{active: exhibit.active}" ng-click="open_exhibit_dropdown(exhibit)"
+            div class="opener {{exhibit.status}}"
+              .overlay
+              .checkbox
+                input type="checkbox"
+              .image
+                img src='{{exhibit.thumb}}'
+              .description
+                h4 
+                  | {{exhibit.number}} {{exhibit.name}}
+              .visibility ng-switch="" on="exhibit.publish_state"
+                i class="icon-globe placeholder" ng-switch-when="all"
+                i class="icon-user placeholder" ng-switch-when="passcode"
+                .on_hover
+                  switchpub ng-item="exhibit" ng-provider='provider'
+
+    script src="lib/angular/angular.js"
+    / script src="lib/angular/angular-resource.js"
+    script src="lib/ui-bootstrap-tpls-0.6.0.js"
+    script src="lib/ui-bootstrap-0.6.0.js"
+    script src="lib/jquery-1.10.2.js"
+    script src="js/app.js"
+    script src="js/services.js"
+    script src="js/controllers.js"
+    script src="js/filters.js"
+    script src="js/directives.js"
