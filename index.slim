@@ -336,55 +336,7 @@ html lang="en" ng-app="Museum"
                       .error
                         .controls
                       .answers
-                        label.hidden.correct-label Correct answer
-
-                        quizanswer ng-item="answer" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-field="title" ng-repeat="answer in exhibit.stories[0].quiz.answers"
-
-                        / .form-group.string.optional.checkbox_added
-                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_0_content"
-                        /   .help
-                        /   input.coorect_answer_radio type="radio" name="correct_answer"
-                        /   .col-lg-5.trigger
-                        /     span.placeholder yes!
-                        /   .col-lg-5.triggered
-                        /     input#story_quiz_attributes_answers_attributes_0_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][0][content]" placeholder="Enter option" size="50" type="text" value="yes!"
-                        /   .save_status
-                        /     i.icon-ok-sign
-                        /     | saved
-                        / .form-group.string.optional.checkbox_added
-                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_1_content"
-                        /   .help
-                        /   input.coorect_answer_radio type="radio" name="correct_answer"
-                        /   .col-lg-5.trigger
-                        /     span.placeholder may be
-                        /   .col-lg-5.triggered
-                        /     input#story_quiz_attributes_answers_attributes_1_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][1][content]" placeholder="Enter option" size="50" type="text" value="may be"
-                        /   .save_status
-                        /     i.icon-ok-sign
-                        /     | saved
-                        / .form-group.string.optional.checkbox_added
-                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_2_content"
-                        /   .help
-                        /   input.coorect_answer_radio type="radio" name="correct_answer"
-                        /   .col-lg-5.trigger
-                        /     span.placeholder who can be sure now?
-                        /   .col-lg-5.triggered
-                        /     input#story_quiz_attributes_answers_attributes_2_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][2][content]" placeholder="Enter option" size="50" type="text" value="who can be sure now?"
-                        /   .save_status
-                        /     i.icon-ok-sign
-                        /     | saved
-                        / .form-group.string.optional.checkbox_added
-                        /   label.string.optional.control-label.col-lg-2 for="story_quiz_attributes_answers_attributes_3_content"
-                        /   .help
-                        /   input.coorect_answer_radio type="radio" name="correct_answer"
-                        /   .col-lg-5.trigger
-                        /     span.placeholder nope
-                        /   .col-lg-5.triggered
-                        /     input#story_quiz_attributes_answers_attributes_3_content.string.optional.form-control name="story[quiz_attributes][answers_attributes][3][content]" placeholder="Enter option" size="50" type="text" value="nope"
-                        /   .save_status
-                        /     i.icon-ok-sign
-                        /     | saved
-                        
+                        quizanswer ng-item="answer" ng-collection="exhibit.stories[0].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-field="title" ng-repeat="answer in exhibit.stories[0].quiz.answers"
                       placeholdertextarea ng-item="exhibit.stories[0].quiz" ng-id="quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
 
                 tab heading="QR-code"

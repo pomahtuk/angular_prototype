@@ -338,7 +338,7 @@
                         <div class="controls"></div>
                       </div>
                       <div class="answers">
-                        <label class="hidden correct-label">Correct answer</label><quizanswer ng-field="title" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in exhibit.stories[0].quiz.answers"></quizanswer>
+                        <quizanswer ng-collection="exhibit.stories[0].quiz.answers" ng-field="title" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in exhibit.stories[0].quiz.answers"></quizanswer>
                       </div>
                       <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="exhibit.stories[0].quiz" ng-title="Description"></placeholdertextarea>
                     </form>

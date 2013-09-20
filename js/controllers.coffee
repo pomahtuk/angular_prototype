@@ -136,7 +136,7 @@ angular.module("Museum.controllers", [])
       image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
       thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
       publish_state: 'all'
-      statuses: {}
+      description: ''
       qr_code: {
         url: '/img/qr_code.png'
         print_link: 'http://localhost:8000/img/qr_code.png'
@@ -160,27 +160,26 @@ angular.module("Museum.controllers", [])
           quiz: {
             question: 'are you sure?'
             description: 'can you tell me?'
-            statuses: {}
             answers: [
               {
                 title: 'yes'
-                correct: true
-                statuses: {}
+                correct: false
+                id: 0
               }
               {
                 title: 'may be'
-                correct: false
-                statuses: {}
+                correct: true
+                id: 1
               }
               {
                 title: 'who cares?'
                 correct: false
-                statuses: {}
+                id: 2
               }
               {
                 title: 'nope'
                 correct: false
-                statuses: {}
+                id: 3
               }
             ]
           }
@@ -193,7 +192,7 @@ angular.module("Museum.controllers", [])
       image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
       thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
       publish_state: 'all'
-      statuses: {}
+      description: ''
       qr_code: {
         url: '/img/qr_code.png'
         print_link: 'http://localhost:8000/img/qr_code.png'
@@ -221,18 +220,22 @@ angular.module("Museum.controllers", [])
               {
                 title: 'yes'
                 correct: true
+                id: 0
               }
               {
                 title: 'may be'
                 correct: false
+                id: 1
               }
               {
                 title: 'who cares?'
                 correct: false
+                id: 2
               }
               {
                 title: 'nope'
                 correct: false
+                id: 3
               }
             ]
           }
@@ -246,7 +249,7 @@ angular.module("Museum.controllers", [])
       thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
       statsu: 'draft'
       publish_state: 'all'
-      statuses: {}
+      description: ''
       qr_code: {
         url: '/img/qr_code.png'
         print_link: 'http://localhost:8000/img/qr_code.png'
@@ -274,18 +277,22 @@ angular.module("Museum.controllers", [])
               {
                 title: 'yes'
                 correct: true
+                id: 0
               }
               {
                 title: 'may be'
                 correct: false
+                id: 1
               }
               {
                 title: 'who cares?'
                 correct: false
+                id: 2
               }
               {
                 title: 'nope'
                 correct: false
+                id: 3
               }
             ]
           }
@@ -398,7 +405,8 @@ angular.module("Museum.controllers", [])
 .controller('EditItemController', [ '$scope', '$http', '$filter', 'sharedProperties', ($scope, $http, $filter, sharedProperties) ->
   # TODO server sync
   $scope.exhibit = sharedProperties.getProperty('exhibit')
+
   $scope.$on 'exhibitChange', ->
     $scope.exhibit = sharedProperties.getProperty('exhibit')
-    console.log $scope.exhibit
+    # console.log $scope.exhibit
 ])

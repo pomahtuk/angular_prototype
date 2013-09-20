@@ -131,7 +131,7 @@
           image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
           thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
           publish_state: 'all',
-          statuses: {},
+          description: '',
           qr_code: {
             url: '/img/qr_code.png',
             print_link: 'http://localhost:8000/img/qr_code.png'
@@ -154,24 +154,23 @@
               quiz: {
                 question: 'are you sure?',
                 description: 'can you tell me?',
-                statuses: {},
                 answers: [
                   {
                     title: 'yes',
-                    correct: true,
-                    statuses: {}
+                    correct: false,
+                    id: 0
                   }, {
                     title: 'may be',
-                    correct: false,
-                    statuses: {}
+                    correct: true,
+                    id: 1
                   }, {
                     title: 'who cares?',
                     correct: false,
-                    statuses: {}
+                    id: 2
                   }, {
                     title: 'nope',
                     correct: false,
-                    statuses: {}
+                    id: 3
                   }
                 ]
               }
@@ -183,7 +182,7 @@
           image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
           thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
           publish_state: 'all',
-          statuses: {},
+          description: '',
           qr_code: {
             url: '/img/qr_code.png',
             print_link: 'http://localhost:8000/img/qr_code.png'
@@ -209,16 +208,20 @@
                 answers: [
                   {
                     title: 'yes',
-                    correct: true
+                    correct: true,
+                    id: 0
                   }, {
                     title: 'may be',
-                    correct: false
+                    correct: false,
+                    id: 1
                   }, {
                     title: 'who cares?',
-                    correct: false
+                    correct: false,
+                    id: 2
                   }, {
                     title: 'nope',
-                    correct: false
+                    correct: false,
+                    id: 3
                   }
                 ]
               }
@@ -231,7 +234,7 @@
           thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
           statsu: 'draft',
           publish_state: 'all',
-          statuses: {},
+          description: '',
           qr_code: {
             url: '/img/qr_code.png',
             print_link: 'http://localhost:8000/img/qr_code.png'
@@ -257,16 +260,20 @@
                 answers: [
                   {
                     title: 'yes',
-                    correct: true
+                    correct: true,
+                    id: 0
                   }, {
                     title: 'may be',
-                    correct: false
+                    correct: false,
+                    id: 1
                   }, {
                     title: 'who cares?',
-                    correct: false
+                    correct: false,
+                    id: 2
                   }, {
                     title: 'nope',
-                    correct: false
+                    correct: false,
+                    id: 3
                   }
                 ]
               }
@@ -413,8 +420,7 @@
     '$scope', '$http', '$filter', 'sharedProperties', function($scope, $http, $filter, sharedProperties) {
       $scope.exhibit = sharedProperties.getProperty('exhibit');
       return $scope.$on('exhibitChange', function() {
-        $scope.exhibit = sharedProperties.getProperty('exhibit');
-        return console.log($scope.exhibit);
+        return $scope.exhibit = sharedProperties.getProperty('exhibit');
       });
     }
   ]);

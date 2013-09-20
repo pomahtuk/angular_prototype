@@ -86,15 +86,8 @@ angular.module("Museum.directives", [])
       </ul>
     </div>
   """  
-  # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
-    scope.hidden_list = true
-    scope.$watch attrs.ngModel, (newValue, oldValue) ->
-      if newValue
-        for value, index in newValue
-          console.log value
-          # chart.series[index].setData value
-    , true
+    true
 
 .directive "switchpub", ->
   restrict: "E"
@@ -129,14 +122,8 @@ angular.module("Museum.directives", [])
       </ul>
     </div>
   """  
-  # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
-    scope.$watch attrs.ngModel, (newValue, oldValue) ->
-      if newValue
-        for value, index in newValue
-          console.log value
-          # chart.series[index].setData value
-    , true
+    true
 
 .directive "placeholderfield", ->
   restrict: "E"
@@ -155,10 +142,10 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <div class="col-lg-6 trigger" ng-show="!edit_mode">
+      <div class="col-lg-6 trigger" ng-hide="edit_mode || item[field].length == 0">
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-lg-6 triggered" ng-show="edit_mode">
+      <div class="col-lg-6 triggered" ng-show="edit_mode || item[field].length == 0">
         <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text"  ng-blur="item.statuses[field]='progress'">
       </div>
       <status-indicator ng-model="item" ng-field="field"></statusIndicator>
@@ -166,13 +153,7 @@ angular.module("Museum.directives", [])
   """  
   # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
-    scope.hidden_list = true
-    scope.$watch attrs.ngModel, (newValue, oldValue) ->
-      if newValue
-        for value, index in newValue
-          console.log value
-          # chart.series[index].setData value
-    , true
+    true
 
 .directive "placeholdertextarea", ->
   restrict: "E"
@@ -191,24 +172,19 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <div class="col-lg-6 trigger" ng-hide="edit_mode">
+      <div class="col-lg-6 trigger" ng-hide="edit_mode || item[field].length == 0">
         <span class="placeholder large" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-lg-6 triggered" ng-show="edit_mode">
+      <div class="col-lg-6 triggered" ng-show="edit_mode || item[field].length == 0">
         <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="item.statuses[field]='progress'">
         </textarea>
       </div>
       <status-indicator ng-model="item" ng-field="field"></statusIndicator>
     </div>
   """  
-  # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
-    scope.$watch attrs.ngModel, (newValue, oldValue) ->
-      if newValue
-        for value, index in newValue
-          console.log value
-          # chart.series[index].setData value
-    , true
+    # console.log scope.item[scope.field]
+    true
 
 .directive "quizanswer", ->
   restrict: "E"
@@ -217,31 +193,38 @@ angular.module("Museum.directives", [])
   require: "?ngModel"
   scope:
     item: '=ngItem'
-    help: '@ngHelp'
+    collection: '=ngCollection'
     id: '@ngId'
     title: '@ngTitle'
     field: '@ngField'
   template: """
     <div class="form-group string optional checkbox_added">
       <label class="string optional control-label col-lg-2" for="{{id}}"></label>
-      <input class="coorect_answer_radio" name="correct_answer" type="radio"> <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-      <div class="col-lg-5 trigger"  ng-hide="edit_mode">
+      <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item.id}}" ng-model="checked" ng-click="check_items(item)"> <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+      <div class="col-lg-5 trigger"  ng-hide="edit_mode || item[field].length == 0">
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-lg-5 triggered" ng-show="edit_mode">
+      <div class="col-lg-5 triggered" ng-show="edit_mode || item[field].length == 0">
         <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="item.statuses[field]='progress'">
       </div>
       <status-indicator ng-model="item" ng-field="field"></statusIndicator>
     </div>
   """  
-  # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
-    scope.hidden_list = true
-    scope.$watch attrs.ngModel, (newValue, oldValue) ->
+
+    scope.checked = 0
+
+    scope.check_items = (item) ->
+      for single_item in scope.collection
+        single_item.correct = false
+      item.correct = true
+      console.log item
+    true
+
+    scope.$watch 'collection', (newValue, oldValue) ->
       if newValue
-        for value, index in newValue
-          console.log value
-          # chart.series[index].setData value
+        for single_item in newValue
+          scope.checked = single_item.id if single_item.correct is true            
     , true
 
 .directive "statusIndicator", ->
@@ -261,7 +244,7 @@ angular.module("Museum.directives", [])
     </div>
   """
   link: (scope, element, attrs) ->
-    # console.log scope.item
+    scope.item.statuses = {} unless scope.item.statuses?
     scope.$watch 'item.statuses[field]', (newValue, oldValue) ->
       # code below just emulates work of server and some latency
       if newValue
