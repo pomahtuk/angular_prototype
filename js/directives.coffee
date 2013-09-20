@@ -110,7 +110,7 @@ angular.module("Museum.directives", [])
         <li ng-click="item.publish_state = 'all'">
           <i class="icon-globe"></i> Everyone
         </li>
-        <li  ng-click="item.publish_state = 'passcode'">
+        <li ng-click="item.publish_state = 'passcode'">
           <i class="icon-user"></i> Only users who have passcode
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">

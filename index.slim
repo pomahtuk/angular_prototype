@@ -342,9 +342,9 @@ html lang="en" ng-app="Museum"
                 tab heading="QR-code"
                   #qr_code.row
                     .qr_image.col-lg-4
-                      img#qr alt="Qr_code" src="/img/qr_code.png"
+                      img#qr alt="Qr_code" src="{{exhibit.qr_code.url}}"
                     .well.col-lg-4
-                      a.btn.qr-code href="/1/story_sets/8/qr_code.html" target="_blank" Print QR-code
+                      a.btn.qr-code href="{{exhibit.qr_code.print_link}}" target="_blank" Print QR-code
                       br
                         p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
                 tab heading="More"
@@ -352,14 +352,14 @@ html lang="en" ng-app="Museum"
 
             .next-ex
 
-          li.exhibit data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits" ng-class="{active: exhibit.active}" ng-click="open_exhibit_dropdown(exhibit)"
+          li.exhibit data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits" ng-class="{active: exhibit.active}"
             div class="opener {{exhibit.status}}"
               .overlay
               .checkbox
                 input type="checkbox"
-              .image
+              .image ng-click="open_dropdown($event)"
                 img src='{{exhibit.thumb}}'
-              .description
+              .description ng-click="open_dropdown($event)"
                 h4 
                   | {{exhibit.number}} {{exhibit.name}}
               .visibility ng-switch="" on="exhibit.publish_state"
@@ -373,6 +373,7 @@ html lang="en" ng-app="Museum"
     script src="lib/ui-bootstrap-tpls-0.6.0.js"
     script src="lib/ui-bootstrap-0.6.0.js"
     script src="lib/jquery-1.10.2.js"
+    script src="lib/jquery.scrollTo.js"
     script src="js/app.js"
     script src="js/services.js"
     script src="js/controllers.js"

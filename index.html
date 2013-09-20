@@ -346,10 +346,10 @@
                 </tab><tab heading="QR-code">
                   <div class="row" id="qr_code">
                     <div class="qr_image col-lg-4">
-                      <img alt="Qr_code" id="qr" src="/img/qr_code.png">
+                      <img alt="Qr_code" id="qr" src="{{exhibit.qr_code.url}}">
                     </div>
                     <div class="well col-lg-4">
-                      <a class="btn qr-code" href="/1/story_sets/8/qr_code.html" target="_blank">Print QR-code</a><br>
+                      <a class="btn qr-code" href="{{exhibit.qr_code.print_link}}" target="_blank">Print QR-code</a><br>
                         <p>
                           You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
                         </p>
@@ -360,16 +360,16 @@
             </div>
             <div class="next-ex"></div>
           </li>
-          <li class="exhibit" data-big-image="{{exhibit.image}}" ng-class="{active: exhibit.active}" ng-click="open_exhibit_dropdown(exhibit)" ng-repeat="exhibit in exhibits">
+          <li class="exhibit" data-big-image="{{exhibit.image}}" ng-class="{active: exhibit.active}" ng-repeat="exhibit in exhibits">
             <div class="opener {{exhibit.status}}">
               <div class="overlay"></div>
               <div class="checkbox">
                 <input type="checkbox">
               </div>
-              <div class="image">
+              <div class="image" ng-click="open_dropdown($event)">
                 <img src="{{exhibit.thumb}}">
               </div>
-              <div class="description">
+              <div class="description" ng-click="open_dropdown($event)">
                 <h4>
                   {{exhibit.number}} {{exhibit.name}}
                 </h4>
@@ -389,6 +389,7 @@
     <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
     <script src="lib/ui-bootstrap-0.6.0.js"></script>
     <script src="lib/jquery-1.10.2.js"></script>
+    <script src="lib/jquery.scrollTo.js"></script>
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>

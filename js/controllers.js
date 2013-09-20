@@ -40,6 +40,7 @@
 
   angular.module("Museum.controllers", []).controller('IndexController', [
     '$scope', '$http', '$filter', '$window', 'sharedProperties', function($scope, $http, $filter, $window, sharedProperties) {
+      var attachDropDown, closeDropDown, dropDown, dummy_focusout_process, findActive;
       $scope.museums = [
         {
           name: 'Imperial Peace Museum',
@@ -281,6 +282,177 @@
           ]
         }
       ];
+      dropDown = $('#drop_down').removeClass('hidden').hide();
+      findActive = function() {
+        return $('ul.exhibits li.exhibit.active');
+      };
+      dummy_focusout_process = function(active) {
+        var field, number, remove, _i, _len, _ref;
+        if (dropDown.find('#name').val() === '') {
+          remove = true;
+          _ref = dropDown.find('#media .form-control:not(#opas_number)');
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            field = _ref[_i];
+            field = $(field);
+            if (field.val() !== '') {
+              remove = false;
+            }
+          }
+          if (remove) {
+            return active.remove();
+          } else {
+            number = active.data('number');
+            $('ul.exhibits').append(modal_template(number));
+            $('#dummyModal').modal({
+              show: true,
+              backdrop: 'static'
+            });
+            $('#dummyModal').find('.btn-default').click(function() {
+              active.remove();
+              return $('#dummyModal, .modal-backdrop').remove();
+            });
+            return $('#dummyModal').find('.btn-primary').click(function() {
+              active.removeClass('dummy');
+              dropDown.find('#name').val("item_" + number);
+              active.find('.opener').removeClass('draft');
+              return $('#dummyModal, .modal-backdrop').remove();
+            });
+          }
+        }
+      };
+      closeDropDown = function() {
+        var active;
+        active = findActive();
+        if (active.hasClass('dummy')) {
+          dummy_focusout_process(active);
+        }
+        dropDown.hide();
+        return active.removeClass('active');
+      };
+      attachDropDown = function(li) {
+        var hasParent;
+        li = $(li);
+        hasParent = dropDown.hasClass('inited');
+        dropDown.show().insertAfter(lastOfLine(li));
+        if (!hasParent) {
+          dropDown.addClass('inited');
+          dropDown.find('a.done, .close').unbind('click').bind('click', function(e) {
+            e.preventDefault();
+            return closeDropDown();
+          });
+          dropDown.find('>.prev-ex').unbind('click').bind('click', function(e) {
+            var active, prev;
+            e.preventDefault();
+            active = findActive();
+            prev = active.prev('.exhibit');
+            if (prev.attr('id') === 'drop_down') {
+              prev = prev.prev();
+            }
+            if (prev.length > 0) {
+              return prev.find('.opener .description').click();
+            } else {
+              return active.siblings('.exhibit').last().find('.opener').click();
+            }
+          });
+          dropDown.find('>.next-ex').unbind('click').bind('click', function(e) {
+            var active, next;
+            e.preventDefault();
+            active = findActive();
+            next = active.next();
+            if (next.attr('id') === 'drop_down') {
+              next = next.next();
+            }
+            if (next.length > 0) {
+              return next.find('.opener .description').click();
+            } else {
+              return active.siblings('.exhibit').first().find('.opener').click();
+            }
+          });
+          dropDown.find('.label-content').unbind('click').bind('click', function(e) {
+            var elem, parent;
+            elem = $(this);
+            parent = elem.parents('.dropdown-menu').prev('.dropdown-toggle');
+            if (elem.hasClass('everyone')) {
+              return parent.html("<div class='extra'><i class='icon-globe'></i></div> Published <span class='caret'></span>");
+            } else {
+              return parent.html("<div class='extra'><i class='icon-user'></i></div> Publish <span class='caret'></span>");
+            }
+          });
+          dropDown.find('#delete_story input[type=radio]').unbind('change').bind('change', function() {
+            var container, elem;
+            elem = $(this);
+            container = $('#delete_story');
+            if (elem.attr('id') === 'lang_selected') {
+              if (elem.is(':checked')) {
+                return $('#delete_story .other_variants').slideDown(150);
+              }
+            } else {
+              return $('#delete_story .other_variants').slideUp(150);
+            }
+          });
+          $('#story_quiz_enabled, #story_quiz_disabled').unbind('change').bind('change', function() {
+            var elem, quiz;
+            elem = $(this);
+            quiz = dropDown.find('.form-wrap');
+            console.log(elem.val());
+            if (elem.attr('id') === 'story_quiz_enabled') {
+              $('label[for=story_quiz_enabled]').text('Enabled');
+              $('label[for=story_quiz_disabled]').text('Disable');
+              return true;
+            } else {
+              $('label[for=story_quiz_disabled]').text('Disabled');
+              $('label[for=story_quiz_enabled]').text('Enable');
+              return true;
+            }
+          });
+          return dropDown.find('a.delete_story').unbind('click').bind('click', function(e) {
+            var elem;
+            elem = $(this);
+            if (elem.hasClass('no_margin')) {
+              e.preventDefault();
+              e.stopPropagation();
+              return closeDropDown();
+            }
+          });
+        }
+      };
+      $scope.open_dropdown = function(event) {
+        var clicked, close, delete_story, done, item_publish_settings, number, previous;
+        clicked = $(event.target).parents('li');
+        if (clicked.hasClass('active')) {
+          closeDropDown();
+          return false;
+        }
+        previous = findActive();
+        if (previous.hasClass('dummy')) {
+          dummy_focusout_process(previous);
+        }
+        previous.removeClass('active');
+        clicked.addClass('active');
+        dropDown.find('h2').text(clicked.find('h4').text());
+        if (!isSameLine(clicked, previous)) {
+          attachDropDown(clicked);
+          $('body').scrollTo(clicked, 500, 150);
+        }
+        item_publish_settings = dropDown.find('.item_publish_settings');
+        done = dropDown.find('.done');
+        close = dropDown.find('.close');
+        delete_story = dropDown.find('.delete_story');
+        if (clicked.hasClass('dummy')) {
+          number = clicked.data('number');
+          $('#opas_number').val(number).blur();
+          $('#name').focus();
+          item_publish_settings.hide();
+          done.hide();
+          close.show();
+          return delete_story.addClass('no_margin');
+        } else {
+          item_publish_settings.show();
+          done.show();
+          close.hide();
+          return delete_story.removeClass('no_margin');
+        }
+      };
       $scope.museum_type_filter = '';
       $scope.grid = function() {
         var collection, tileListMargin, tileSpace, tileWidth;
@@ -366,7 +538,7 @@
           });
         }
       };
-      $scope.toggle_filters = function(elem) {
+      return $scope.toggle_filters = function(elem) {
         var filters_bar, nav;
         elem = $(elem.target);
         filters_bar = $('.filters_bar');
@@ -398,21 +570,6 @@
             }, 200);
           }
           return elem.addClass('active');
-        }
-      };
-      return $scope.open_exhibit_dropdown = function(elem) {
-        var exhibit, _i, _len, _ref;
-        if (elem.active) {
-          elem.active = false;
-          return $scope.active_exhibit = null;
-        } else {
-          _ref = $scope.exhibits;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            exhibit = _ref[_i];
-            exhibit.active = false;
-          }
-          elem.active = true;
-          return sharedProperties.setProperty('exhibit', elem);
         }
       };
     }
