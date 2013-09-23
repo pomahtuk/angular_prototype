@@ -129,7 +129,6 @@ angular.module("Museum.directives", [])
 .directive "placeholderfield", ->
   restrict: "E"
   replace: true
-  transclude: true
   require: "?ngModel"
   scope:
     item: '=ngItem'
@@ -147,15 +146,17 @@ angular.module("Museum.directives", [])
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-lg-6 triggered" ng-show="edit_mode">
-        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="item.statuses[field]='progress'">
+        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="status='progress'">
       </div>
-      <status-indicator ng-model="item" ng-field="field"></statusIndicator>
+      <status-indicator ng-binding="status"></statusIndicator>
     </div>
-  """  
+  """ 
+  controller : ($scope, $element, $attrs) ->
+    $scope.item.statuses = {} unless $scope.item.statuses?
+    $scope.status = $scope.item.statuses[$scope.item.field]
   # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
     scope.edit_mode = false
-
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true
@@ -166,7 +167,6 @@ angular.module("Museum.directives", [])
 .directive "placeholdertextarea", ->
   restrict: "E"
   replace: true
-  transclude: true
   require: "?ngModel"
   scope:
     item: '=ngItem'
@@ -184,12 +184,15 @@ angular.module("Museum.directives", [])
         <span class="placeholder large" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-lg-6 triggered" ng-show="edit_mode">
-        <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="item.statuses[field]='progress'">
+        <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="status='progress'">
         </textarea>
       </div>
-      <status-indicator ng-model="item" ng-field="field"></statusIndicator>
+      <status-indicator ng-binding="status"></statusIndicator>
     </div>
-  """  
+  """ 
+  controller : ($scope, $element, $attrs) ->
+    $scope.item.statuses = {} unless $scope.item.statuses?
+    $scope.status = $scope.item.statuses[$scope.item.field]
   link: (scope, element, attrs) ->
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
@@ -201,7 +204,6 @@ angular.module("Museum.directives", [])
 .directive "quizanswer", ->
   restrict: "E"
   replace: true
-  transclude: true
   require: "?ngModel"
   scope:
     item: '=ngItem'
@@ -217,22 +219,21 @@ angular.module("Museum.directives", [])
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-lg-5 triggered" ng-show="edit_mode">
-        <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="item.statuses[field]='progress'">
+        <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="status='progress'">
       </div>
-      <status-indicator ng-model="item" ng-field="field"></statusIndicator>
+      <status-indicator ng-binding="status"></statusIndicator>
     </div>
-  """  
-  link: (scope, element, attrs) ->
-
-    scope.checked = 0
-
-    scope.check_items = (item) ->
-      for single_item in scope.collection
+  """
+  controller : ($scope, $element, $attrs) ->
+    $scope.item.statuses = {} unless $scope.item.statuses?
+    $scope.status = $scope.item.statuses[$scope.item.field]
+    $scope.check_items = (item) ->
+      for single_item in $scope.collection
         single_item.correct = false
       item.correct = true
-      console.log item
     true
-
+  link: (scope, element, attrs) ->
+    scope.checked = 0
     scope.$watch 'collection', (newValue, oldValue) ->
       if newValue
         for single_item in newValue
@@ -247,38 +248,35 @@ angular.module("Museum.directives", [])
 .directive "statusIndicator", ->
   restrict: "E"
   replace: true
-  transclude: true
   require: "?ngModel"
   scope:
-    item: '=ngModel'
+    item: '=ngBinding'
     field: '=ngField'
   template: """
     <div class="statuses">
-      <div class='preloader' ng-show="item.statuses[field]=='progress'"></div>
-      <div class="save_status" ng-show="item.statuses[field]=='done'">
+      <div class='preloader' ng-show="item=='progress'"></div>
+      <div class="save_status" ng-show="item=='done'">
         <i class="icon-ok-sign"></i>saved
       </div>
     </div>
   """
   link: (scope, element, attrs) ->
-    scope.item.statuses = {} unless scope.item.statuses?
-    scope.$watch 'item.statuses[field]', (newValue, oldValue) ->
+    scope.$watch 'item', (newValue, oldValue) ->
       # code below just emulates work of server and some latency
       if newValue
         if newValue is 'progress'
           setTimeout ->
-            scope.$apply scope.item.statuses[scope.field] = 'done'
+            scope.$apply scope.item = 'done'
           , 500
         if newValue is 'done'
           setTimeout ->
-            scope.$apply scope.item.statuses[scope.field] = ''
+            scope.$apply scope.item = ''
           , 700
     , true
 
 .directive "audioplayer", ->
   restrict: "E"
   replace: true
-  transclude: true
   require: "?ngModel"
   scope:
     item: '=ngItem'
@@ -339,7 +337,7 @@ angular.module("Museum.directives", [])
       <div class="col-lg-6 triggered" ng-show="edit_mode">
         <input type="file" id="exampleInputFile">
       </div>
-      <status-indicator ng-model="item" ng-field="field"></statusIndicator>
+      <status-indicator ng-binding="item" ng-field="field"></statusIndicator>
     </div>
   """
   link: (scope, element, attrs) ->

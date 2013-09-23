@@ -75,7 +75,6 @@
     return {
       restrict: "E",
       replace: true,
-      transclude: true,
       require: "?ngModel",
       scope: {
         item: '=ngItem',
@@ -84,7 +83,13 @@
         title: '@ngTitle',
         field: '@ngField'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-lg-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode\">\n    <input class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" focus-me=\"edit_mode\" type=\"text\" ng-blur=\"item.statuses[field]='progress'\">\n  </div>\n  <status-indicator ng-model=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group\">\n  <label class=\"col-lg-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode\">\n    <input class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" focus-me=\"edit_mode\" type=\"text\" ng-blur=\"status='progress'\">\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      controller: function($scope, $element, $attrs) {
+        if ($scope.item.statuses == null) {
+          $scope.item.statuses = {};
+        }
+        return $scope.status = $scope.item.statuses[$scope.item.field];
+      },
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
         scope.$watch('item[field]', function(newValue, oldValue) {
@@ -101,7 +106,6 @@
     return {
       restrict: "E",
       replace: true,
-      transclude: true,
       require: "?ngModel",
       scope: {
         item: '=ngItem',
@@ -110,7 +114,13 @@
         title: '@ngTitle',
         field: '@ngField'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-lg-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode\">\n    <span class=\"placeholder large\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode\">\n    <textarea class=\"form-control\" id=\"{{id}}\" focus-me=\"edit_mode\" ng-model=\"item[field]\" ng-blur=\"item.statuses[field]='progress'\">\n    </textarea>\n  </div>\n  <status-indicator ng-model=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group\">\n  <label class=\"col-lg-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode\">\n    <span class=\"placeholder large\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode\">\n    <textarea class=\"form-control\" id=\"{{id}}\" focus-me=\"edit_mode\" ng-model=\"item[field]\" ng-blur=\"status='progress'\">\n    </textarea>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      controller: function($scope, $element, $attrs) {
+        if ($scope.item.statuses == null) {
+          $scope.item.statuses = {};
+        }
+        return $scope.status = $scope.item.statuses[$scope.item.field];
+      },
       link: function(scope, element, attrs) {
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
@@ -126,7 +136,6 @@
     return {
       restrict: "E",
       replace: true,
-      transclude: true,
       require: "?ngModel",
       scope: {
         item: '=ngItem',
@@ -135,20 +144,25 @@
         title: '@ngTitle',
         field: '@ngField'
       },
-      template: "<div class=\"form-group string optional checkbox_added\">\n  <label class=\"string optional control-label col-lg-2\" for=\"{{id}}\"></label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item.id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\"> <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!! -->\n  <div class=\"col-lg-5 trigger\"  ng-hide=\"edit_mode\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-5 triggered\" ng-show=\"edit_mode\">\n    <input class=\"form-control\" id=\"{{id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" focus-me=\"edit_mode\" ng-blur=\"item.statuses[field]='progress'\">\n  </div>\n  <status-indicator ng-model=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
-      link: function(scope, element, attrs) {
-        scope.checked = 0;
-        scope.check_items = function(item) {
+      template: "<div class=\"form-group string optional checkbox_added\">\n  <label class=\"string optional control-label col-lg-2\" for=\"{{id}}\"></label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item.id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\"> <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!! -->\n  <div class=\"col-lg-5 trigger\"  ng-hide=\"edit_mode\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-5 triggered\" ng-show=\"edit_mode\">\n    <input class=\"form-control\" id=\"{{id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" focus-me=\"edit_mode\" ng-blur=\"status='progress'\">\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      controller: function($scope, $element, $attrs) {
+        if ($scope.item.statuses == null) {
+          $scope.item.statuses = {};
+        }
+        $scope.status = $scope.item.statuses[$scope.item.field];
+        $scope.check_items = function(item) {
           var single_item, _i, _len, _ref;
-          _ref = scope.collection;
+          _ref = $scope.collection;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             single_item = _ref[_i];
             single_item.correct = false;
           }
-          item.correct = true;
-          return console.log(item);
+          return item.correct = true;
         };
-        true;
+        return true;
+      },
+      link: function(scope, element, attrs) {
+        scope.checked = 0;
         scope.$watch('collection', function(newValue, oldValue) {
           var single_item, _i, _len, _results;
           if (newValue) {
@@ -175,27 +189,23 @@
     return {
       restrict: "E",
       replace: true,
-      transclude: true,
       require: "?ngModel",
       scope: {
-        item: '=ngModel',
+        item: '=ngBinding',
         field: '=ngField'
       },
-      template: "<div class=\"statuses\">\n  <div class='preloader' ng-show=\"item.statuses[field]=='progress'\"></div>\n  <div class=\"save_status\" ng-show=\"item.statuses[field]=='done'\">\n    <i class=\"icon-ok-sign\"></i>saved\n  </div>\n</div>",
+      template: "<div class=\"statuses\">\n  <div class='preloader' ng-show=\"item=='progress'\"></div>\n  <div class=\"save_status\" ng-show=\"item=='done'\">\n    <i class=\"icon-ok-sign\"></i>saved\n  </div>\n</div>",
       link: function(scope, element, attrs) {
-        if (scope.item.statuses == null) {
-          scope.item.statuses = {};
-        }
-        return scope.$watch('item.statuses[field]', function(newValue, oldValue) {
+        return scope.$watch('item', function(newValue, oldValue) {
           if (newValue) {
             if (newValue === 'progress') {
               setTimeout(function() {
-                return scope.$apply(scope.item.statuses[scope.field] = 'done');
+                return scope.$apply(scope.item = 'done');
               }, 500);
             }
             if (newValue === 'done') {
               return setTimeout(function() {
-                return scope.$apply(scope.item.statuses[scope.field] = '');
+                return scope.$apply(scope.item = '');
               }, 700);
             }
           }
@@ -206,7 +216,6 @@
     return {
       restrict: "E",
       replace: true,
-      transclude: true,
       require: "?ngModel",
       scope: {
         item: '=ngItem',
@@ -215,7 +224,7 @@
         title: '@ngTitle',
         field: '@ngField'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-lg-2 control-label\" for=\"audio\">Audio</label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_1\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_1\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"dropdown\">\n          <a data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">Audioguide 01<span class=\"caret\"></span></a>\n          <ul aria-labelledby=\"visibility_filter\" class=\"dropdown-menu\" role=\"menu\">\n            <li role=\"presentation\">\n            <a href=\"#\" role=\"menuitem\" tabindex=\"-1\">Replace</a>\n            </li>\n            <li role=\"presentation\">\n            <a href=\"#\" role=\"menuitem\" tabindex=\"-1\">Download</a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode\">\n    <input type=\"file\" id=\"exampleInputFile\">\n  </div>\n  <status-indicator ng-model=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group\">\n  <label class=\"col-lg-2 control-label\" for=\"audio\">Audio</label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_1\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_1\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"dropdown\">\n          <a data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">Audioguide 01<span class=\"caret\"></span></a>\n          <ul aria-labelledby=\"visibility_filter\" class=\"dropdown-menu\" role=\"menu\">\n            <li role=\"presentation\">\n            <a href=\"#\" role=\"menuitem\" tabindex=\"-1\">Replace</a>\n            </li>\n            <li role=\"presentation\">\n            <a href=\"#\" role=\"menuitem\" tabindex=\"-1\">Download</a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode\">\n    <input type=\"file\" id=\"exampleInputFile\">\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
         $("#jquery_jplayer_1").jPlayer({

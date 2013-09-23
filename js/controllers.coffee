@@ -427,8 +427,10 @@ angular.module("Museum.controllers", [])
     for exhibit in $scope.exhibits
       exhibit.active = false
     elem.active = true
+    ##########################
     $scope.exhibit_index = elem.index
     console.log $scope.exhibits[$scope.exhibit_index]
+    ##########################
     sharedProperties.setProperty('exhibit', elem)
 
     previous = findActive()
@@ -495,12 +497,10 @@ angular.module("Museum.controllers", [])
     $scope.museum_list_prepare()
   , 100
 
-  # $scope.current_exhibit = $scope.exhibits[0]
-
   sharedProperties.setProperty('exhibit', $scope.exhibits[0])
-
+  ##########################
   $scope.exhibit_index = 0
-
+  ##########################
   angular.element($window).bind "resize", ->
     $scope.grid()
     $scope.museum_list_prepare()
@@ -656,16 +656,6 @@ angular.module("Museum.controllers", [])
       elem.addClass 'active'
 
 ])
-
-# .controller('ModalInstanceCtrl', [ '$scope', '$modalInstance', 'items', ($scope, $modalInstance, items) ->
-#   $scope.items = items
-#   $scope.selected = item: $scope.items[0]
-#   $scope.ok = ->
-#     $modalInstance.close $scope.selected.item
-
-#   $scope.cancel = ->
-#     $modalInstance.dismiss "cancel"
-# ])
 
 # Controller for editing museum
 .controller('EditItemController', [ '$scope', '$http', '$filter', 'sharedProperties', '$modal', '$log', ($scope, $http, $filter, sharedProperties, $modal, $log) ->
