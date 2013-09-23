@@ -635,28 +635,6 @@ ul.exhibits
         color: #000
         text-decoration: none
 
-    #delete_story
-      .modal-dialog
-        width: 350px
-        .btn
-          margin-left: 5px
-        .modal-body
-          padding-bottom: 0px
-          label
-            font-weight: normal
-            text-align: left
-            padding: 0px 0px 0px 20px
-            line-height: 34px
-
-            input
-              margin-right: 5px
-              vertical-align: center
-              position: relative
-              top: 2px
-          .other_variants
-            margin-left: 20px
-            display: none
-
     #tabs_content
       margin-top: 20px
 
@@ -936,6 +914,10 @@ textarea
   top: 50%
   position: absolute
 
+.modal-backdrop, .modal-backdrop.fade.in
+  opacity: 0.8
+  filter: alpha(opacity=80)
+
 .tab-content
   padding-top: 20px
 
@@ -946,6 +928,31 @@ textarea
   top: 50%
   position: absolute
 
+.modal
+  display: block
+
 // .fade.in
 //   opacity: 1
 //   background: rgba(0,0,0, 0.5)
+
+
+.modal-dialog#delete_story
+  width: 350px
+  .btn
+    margin-left: 5px
+  .modal-body
+    padding-bottom: 0px
+    label
+      font-weight: normal
+      text-align: left
+      padding: 0px 0px 0px 20px
+      line-height: 34px
+
+      input
+        margin-right: 5px
+        vertical-align: center
+        position: relative
+        top: 2px
+    .other_variants
+      margin-left: 20px
+      display: none

@@ -105,7 +105,7 @@
       </div>
       <div class="actions_bar">
         <div class="left_content">
-          <button class="btn btn-warning spacer" id="create_new_item" type="button">New item </button>
+          <button class="btn btn-warning spacer" id="create_new_item" ng-click="create_new_item()" type="button">New item </button>
           <div class="btn-group">
             <button class="btn btn-default dropdown-toggle spacer" data-toggle="dropdown" type="button">Actions  <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
@@ -153,7 +153,7 @@
     <div class="page-wrapper">
       <div class="page">
         <ul class="exhibits">
-          <li id="drop_down" ng-controller="EditItemController">
+          <li id="drop_down">
             <div class="prev-ex"></div>
             <div id="images">
               <div class="images-list ui-sortable" data-liftable="data-liftable" data-sort-url="/77/story_sets/5546/images/sort" style="">
@@ -231,10 +231,10 @@
               </div>
             </div>
             <div class="description">
-              <div class="close"></div>
-              <switchpubitem ng-item="exhibit" ng-provider="$parent.provider"></switchpubitem><a class="delete_story" data-toggle="modal" href="#delete_story"><i class="icon-trash"></i></a>
-              <div aria-hidden="true" class="modal fade" id="delete_story" role="dialog" tabindex="-1">
-                <div class="modal-dialog">
+              <div class="close" ng-show="exhibits[exhibit_index].publish_state == draft"></div>
+              <switchpubitem ng-item="exhibits[exhibit_index]" ng-provider="provider"></switchpubitem><a class="delete_story" href="#delete_story" ng-click="modal_open()"><i class="icon-trash"></i></a>
+              <script id="myModalContent.html" type="text/ng-template">
+                <div class="modal-dialog" id="delete_story">
                   <div class="modal-content">
                     <div class="modal-body">
                       <form class="form-horizontal">
@@ -268,58 +268,11 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </script>
               <tabset><tab heading="Media content">
                   <div class="row" id="media">
                     <form class="form-horizontal" role="form">
-                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="exhibit" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="exhibit" ng-title="Name"></placeholderfield>
-                      <div class="form-group">
-                        <label class="col-lg-2 control-label" for="audio">Audio</label>
-                        <div class="help">
-                          <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
-                        </div>
-                        <div class="col-lg-6">
-                          <div class="jp-jplayer" id="jquery_jplayer_1"></div>
-                          <div class="jp-audio" id="jp_container_1">
-                            <div class="jp-type-single">
-                              <div class="jp-gui jp-interface">
-                                <ul class="jp-controls">
-                                  <li>
-                                    <a class="jp-play" href="javascript:;" tabindex="1"></a>
-                                  </li>
-                                  <li>
-                                    <a class="jp-pause" href="javascript:;" tabindex="1"></a>
-                                  </li>
-                                </ul>
-                              </div>
-                              <div class="dropdown">
-                                <a data-toggle="dropdown" href="#" id="visibility_filter">Audioguide 01<span class="caret"></span></a>
-                                <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
-                                  <li role="presentation">
-                                    <a href="#" role="menuitem" tabindex="-1">Replace</a>
-                                  </li>
-                                  <li role="presentation">
-                                    <a href="#" role="menuitem" tabindex="-1">Download</a>
-                                  </li>
-                                </ul>
-                              </div>
-                              <div class="jp-progress">
-                                <div class="jp-seek-bar">
-                                  <div class="jp-play-bar"></div>
-                                </div>
-                              </div>
-                              <div class="jp-time-holder">
-                                <div class="jp-current-time"></div>
-                                <div class="jp-duration"></div>
-                              </div>
-                              <div class="jp-no-solution">
-                                <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank"></a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="exhibit" ng-title="Description"></placeholdertextarea>
+                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="exhibits[exhibit_index]" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="exhibits[exhibit_index]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="exhibits[exhibit_index].stories[0]" ng-title="Audio"></audioplayer><placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="exhibits[exhibit_index]" ng-title="Description"></placeholdertextarea>
                       <div class="form-group last">
                         <div class="pull-right done_button">
                           <a class="btn btn-default done" href="#">Done</a>
@@ -333,23 +286,23 @@
                       <input checked="" id="story_quiz_enabled" name="story_quiz_enabled" type="radio"><label for="story_quiz_enabled">Enabled</label><input id="story_quiz_disabled" name="story_quiz_enabled" type="radio"><label for="story_quiz_disabled">Disable</label><span class="slide-button"></span>
                     </div>
                     <form class="form-horizontal" role="form">
-                      <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="exhibit.stories[0].quiz" ng-title="Question"></placeholderfield>
+                      <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="exhibits[exhibit_index].stories[0].quiz" ng-title="Question"></placeholderfield>
                       <div class="error">
                         <div class="controls"></div>
                       </div>
                       <div class="answers">
-                        <quizanswer ng-collection="exhibit.stories[0].quiz.answers" ng-field="title" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in exhibit.stories[0].quiz.answers"></quizanswer>
+                        <quizanswer ng-collection="exhibits[exhibit_index].stories[0].quiz.answers" ng-field="title" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in exhibits[exhibit_index].stories[0].quiz.answers"></quizanswer>
                       </div>
-                      <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="exhibit.stories[0].quiz" ng-title="Description"></placeholdertextarea>
+                      <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="exhibits[exhibit_index].stories[0].quiz" ng-title="Description"></placeholdertextarea>
                     </form>
                   </div>
                 </tab><tab heading="QR-code">
                   <div class="row" id="qr_code">
                     <div class="qr_image col-lg-4">
-                      <img alt="Qr_code" id="qr" src="{{exhibit.qr_code.url}}">
+                      <img alt="Qr_code" id="qr" src="{{exhibits[exhibit_index].qr_code.url}}">
                     </div>
                     <div class="well col-lg-4">
-                      <a class="btn qr-code" href="{{exhibit.qr_code.print_link}}" target="_blank">Print QR-code</a><br>
+                      <a class="btn qr-code" href="{{exhibits[exhibit_index].qr_code.print_link}}" target="_blank">Print QR-code</a><br>
                         <p>
                           You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
                         </p>
@@ -366,10 +319,10 @@
               <div class="checkbox">
                 <input type="checkbox">
               </div>
-              <div class="image" ng-click="open_dropdown($event)">
+              <div class="image" ng-click="open_dropdown($event, exhibit)">
                 <img src="{{exhibit.thumb}}">
               </div>
-              <div class="description" ng-click="open_dropdown($event)">
+              <div class="description" ng-click="open_dropdown($event, exhibit)">
                 <h4>
                   {{exhibit.number}} {{exhibit.name}}
                 </h4>
@@ -382,6 +335,28 @@
               </div>
             </div>
           </li>
+          <li class="exhibit dummy" data-big-image="/img/img-bg.png" ng-show="new_item_creation">
+            <div class="opener draft">
+              <div class="overlay"></div>
+              <div class="checkbox">
+                <input type="checkbox">
+              </div>
+              <div class="image" ng-click="open_dropdown($event, new_exhibit)">
+                <img src="/img/img-bg.png">
+              </div>
+              <div class="description" ng-click="open_dropdown($event, new_exhibit)">
+                <h4>
+                  {{new_exhibit.number}} {{new_exhibit.name}}
+                </h4>
+              </div>
+              <div class="visibility" ng-switch="" on="new_exhibit.publish_state">
+                <i class="icon-globe placeholder" ng-switch-when="all"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>
+                <div class="on_hover">
+                  <switchpub ng-item="new_exhibit" ng-provider="provider"></switchpub>
+                </div>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -390,6 +365,7 @@
     <script src="lib/ui-bootstrap-0.6.0.js"></script>
     <script src="lib/jquery-1.10.2.js"></script>
     <script src="lib/jquery.scrollTo.js"></script>
+    <script src="lib/jquery.jplayer.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>

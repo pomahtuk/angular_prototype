@@ -131,6 +131,7 @@ angular.module("Museum.controllers", [])
 
   $scope.exhibits = [
     {
+      index: 0
       name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
       number: '1'
       image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
@@ -156,7 +157,7 @@ angular.module("Museum.controllers", [])
           language: 'ru'
           name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
           description: 'test description'
-          audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+          audio: ''
           quiz: {
             question: 'are you sure?'
             description: 'can you tell me?'
@@ -187,8 +188,9 @@ angular.module("Museum.controllers", [])
       ]
     }
     {
-      name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-      number: '1'
+      index: 1
+      name: 'двунадесятыми праздниками'
+      number: '2'
       image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
       thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
       publish_state: 'all'
@@ -243,8 +245,9 @@ angular.module("Museum.controllers", [])
       ]
     }
     {
-      name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-      number: '1'
+      index: 2
+      name: 'Владимирская, с двунадесятыми'
+      number: '3'
       image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
       thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
       statsu: 'draft'
@@ -301,6 +304,12 @@ angular.module("Museum.controllers", [])
     }
   ]
 
+  # $scope.new_exhibit = {
+  #   name: 'newly created exhibit'
+  #   number: '11'
+  #   publish_state: 'draft'
+  # }
+
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
   findActive = -> $('ul.exhibits li.exhibit.active')
@@ -313,13 +322,13 @@ angular.module("Museum.controllers", [])
         if field.val() isnt ''
           remove = false
       if remove
-        active.remove()
+        $scope.new_item_creation = false
       else
         number = active.data('number')
         $('ul.exhibits').append modal_template(number)
         $('#dummyModal').modal { show: true, backdrop: 'static' }
         $('#dummyModal').find('.btn-default').click ->
-          active.remove()
+          $scope.new_item_creation = false
           $('#dummyModal, .modal-backdrop').remove()
         $('#dummyModal').find('.btn-primary').click ->
           active.removeClass('dummy')
@@ -351,7 +360,7 @@ angular.module("Museum.controllers", [])
         e.preventDefault()
         active = findActive()
         prev = active.prev('.exhibit')
-        if prev.attr('id') == 'drop_down'
+        if prev.attr('id') == 'drop_down' || prev.hasClass 'dummy'
           prev = prev.prev()
         if prev.length > 0
           prev.find('.opener .description').click()
@@ -362,7 +371,7 @@ angular.module("Museum.controllers", [])
         e.preventDefault()
         active = findActive()
         next = active.next()
-        if next.attr('id') == 'drop_down'
+        if next.attr('id') == 'drop_down'  || next.hasClass 'dummy'
           next = next.next()
         if next.length > 0
           next.find('.opener .description').click()
@@ -408,11 +417,19 @@ angular.module("Museum.controllers", [])
           e.stopPropagation()
           closeDropDown()
 
-  $scope.open_dropdown = (event) ->
+  $scope.open_dropdown = (event, elem) ->
+
     clicked = $(event.target).parents('li')
     if clicked.hasClass('active')
       closeDropDown()
       return false
+
+    for exhibit in $scope.exhibits
+      exhibit.active = false
+    elem.active = true
+    $scope.exhibit_index = elem.index
+    console.log $scope.exhibits[$scope.exhibit_index]
+    sharedProperties.setProperty('exhibit', elem)
 
     previous = findActive()
 
@@ -447,7 +464,6 @@ angular.module("Museum.controllers", [])
       close.hide()
       delete_story.removeClass('no_margin')
 
-
   $scope.museum_type_filter = ''
 
   $scope.grid = ->
@@ -479,7 +495,11 @@ angular.module("Museum.controllers", [])
     $scope.museum_list_prepare()
   , 100
 
+  # $scope.current_exhibit = $scope.exhibits[0]
+
   sharedProperties.setProperty('exhibit', $scope.exhibits[0])
+
+  $scope.exhibit_index = 0
 
   angular.element($window).bind "resize", ->
     $scope.grid()
@@ -503,6 +523,103 @@ angular.module("Museum.controllers", [])
     width = $('body').width() - 700
     if width > 150
       input.animate {width: "#{width}px"}, 300
+
+  $scope.new_item_creation = false
+
+  get_number = ->
+    Math.round Math.random() * 10 + 11
+
+  get_lang = ->
+    'ru'
+
+  $scope.create_new_item = () ->
+    unless $scope.new_item_creation is true
+      $scope.new_exhibit = {
+        name: ''
+        number: get_number()
+        image: ''
+        thumb: ''
+        publish_state: 'draft'
+        description: ''
+        qr_code: {
+          url: ''
+          print_link: ''
+        }
+        images: [
+          {
+            image: ''
+            thumb: ''
+          }
+          {
+            image: ''
+            thumb: ''
+          }
+        ]
+        stories: [
+          {
+            language: get_lang()
+            name: ''
+            description: ''
+            audio: ''
+            quiz: {
+              question: ''
+              description: ''
+              answers: [
+                {
+                  title: ''
+                  correct: true
+                  id: 0
+                }
+                {
+                  title: ''
+                  correct: false
+                  id: 1
+                }
+                {
+                  title: ''
+                  correct: false
+                  id: 2
+                }
+                {
+                  title: ''
+                  correct: false
+                  id: 3
+                }
+              ]
+            }
+          }
+        ]
+      }
+      $scope.new_item_creation = true
+      e = {}
+      e.target = $('li.exhibit.dummy > .opener.draft')
+      $scope.open_dropdown(e, $scope.new_exhibit)
+
+  # $('#create_new_item').click ->
+  #   exhibits =  $('ul.exhibits')
+  #   return false if exhibits.find('li.dummy').length > 0
+
+  #   number = get_number()
+
+  #   dummy_item = $ new_template(number)
+  #   exhibits.append dummy_item
+
+  #   assign_click()
+
+  #   collection = $('.exhibits>li.exhibit')
+  #   tileGrid(collection, tileWidth, tileSpace, tileListMargin)
+
+  #   exhibits.find('li.dummy').find('.opener .description').click()
+  #   dropDown.find('#name').blur ->
+  #     elem = $ @
+  #     if elem.val() isnt ''
+  #       active = findActive()
+  #       active.removeClass('dummy').find('.opener').removeClass 'draft'
+  #       dropDown.find('.item_publish_settings').show()
+  #       dropDown.find('.done').show()
+  #       dropDown.find('.close').hide()
+  #       dropDown.find('.delete_story').removeClass('no_margin')
+  #   false
 
   $scope.toggle_menu = (elem) ->
     elem = $ elem.target
@@ -539,12 +656,45 @@ angular.module("Museum.controllers", [])
       elem.addClass 'active'
 
 ])
+
+# .controller('ModalInstanceCtrl', [ '$scope', '$modalInstance', 'items', ($scope, $modalInstance, items) ->
+#   $scope.items = items
+#   $scope.selected = item: $scope.items[0]
+#   $scope.ok = ->
+#     $modalInstance.close $scope.selected.item
+
+#   $scope.cancel = ->
+#     $modalInstance.dismiss "cancel"
+# ])
+
 # Controller for editing museum
-.controller('EditItemController', [ '$scope', '$http', '$filter', 'sharedProperties', ($scope, $http, $filter, sharedProperties) ->
+.controller('EditItemController', [ '$scope', '$http', '$filter', 'sharedProperties', '$modal', '$log', ($scope, $http, $filter, sharedProperties, $modal, $log) ->
   # TODO server sync
   $scope.exhibit = sharedProperties.getProperty('exhibit')
+  $scope.items = ["item1", "item2", "item3"]
+  $scope.modal_open = ->
+    modalInstance = $modal.open(
+      templateUrl: "myModalContent.html"
+      controller: ModalInstanceCtrl
+      resolve:
+        items: ->
+          $scope.items
+    )
+    modalInstance.result.then ((selectedItem) ->
+      $scope.selected = selectedItem
+    ), ->
+      $log.info "Modal dismissed at: " + new Date()
 
   $scope.$on 'exhibitChange', ->
+    # $.extend true, $scope.exhibit, sharedProperties.getProperty('exhibit')
     $scope.exhibit = sharedProperties.getProperty('exhibit')
-    # console.log $scope.exhibit
 ])
+
+@ModalInstanceCtrl = ($scope, $modalInstance, items) ->
+  $scope.items = items
+  $scope.selected = item: $scope.items[0]
+  $scope.ok = ->
+    $modalInstance.close $scope.selected.item
+
+  $scope.cancel = ->
+    $modalInstance.dismiss "cancel"

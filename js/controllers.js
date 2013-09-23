@@ -40,7 +40,7 @@
 
   angular.module("Museum.controllers", []).controller('IndexController', [
     '$scope', '$http', '$filter', '$window', 'sharedProperties', function($scope, $http, $filter, $window, sharedProperties) {
-      var attachDropDown, closeDropDown, dropDown, dummy_focusout_process, findActive;
+      var attachDropDown, closeDropDown, dropDown, dummy_focusout_process, findActive, get_lang, get_number;
       $scope.museums = [
         {
           name: 'Imperial Peace Museum',
@@ -127,8 +127,61 @@
       };
       $scope.exhibits = [
         {
+          index: 0,
           name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
           number: '1',
+          image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+          thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+          publish_state: 'all',
+          description: '',
+          qr_code: {
+            url: '/img/qr_code.png',
+            print_link: 'http://localhost:8000/img/qr_code.png'
+          },
+          images: [
+            {
+              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+            }, {
+              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+            }
+          ],
+          stories: [
+            {
+              language: 'ru',
+              name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+              description: 'test description',
+              audio: '',
+              quiz: {
+                question: 'are you sure?',
+                description: 'can you tell me?',
+                answers: [
+                  {
+                    title: 'yes',
+                    correct: false,
+                    id: 0
+                  }, {
+                    title: 'may be',
+                    correct: true,
+                    id: 1
+                  }, {
+                    title: 'who cares?',
+                    correct: false,
+                    id: 2
+                  }, {
+                    title: 'nope',
+                    correct: false,
+                    id: 3
+                  }
+                ]
+              }
+            }
+          ]
+        }, {
+          index: 1,
+          name: 'двунадесятыми праздниками',
+          number: '2',
           image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
           thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
           publish_state: 'all',
@@ -158,57 +211,6 @@
                 answers: [
                   {
                     title: 'yes',
-                    correct: false,
-                    id: 0
-                  }, {
-                    title: 'may be',
-                    correct: true,
-                    id: 1
-                  }, {
-                    title: 'who cares?',
-                    correct: false,
-                    id: 2
-                  }, {
-                    title: 'nope',
-                    correct: false,
-                    id: 3
-                  }
-                ]
-              }
-            }
-          ]
-        }, {
-          name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
-          number: '1',
-          image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
-          thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
-          publish_state: 'all',
-          description: '',
-          qr_code: {
-            url: '/img/qr_code.png',
-            print_link: 'http://localhost:8000/img/qr_code.png'
-          },
-          images: [
-            {
-              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
-              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-            }, {
-              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
-              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-            }
-          ],
-          stories: [
-            {
-              language: 'ru',
-              name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
-              description: 'test description',
-              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
-              quiz: {
-                question: 'are you sure?',
-                description: 'can you tell me?',
-                answers: [
-                  {
-                    title: 'yes',
                     correct: true,
                     id: 0
                   }, {
@@ -229,8 +231,9 @@
             }
           ]
         }, {
-          name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
-          number: '1',
+          index: 2,
+          name: 'Владимирская, с двунадесятыми',
+          number: '3',
           image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
           thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
           statsu: 'draft',
@@ -299,7 +302,7 @@
             }
           }
           if (remove) {
-            return active.remove();
+            return $scope.new_item_creation = false;
           } else {
             number = active.data('number');
             $('ul.exhibits').append(modal_template(number));
@@ -308,7 +311,7 @@
               backdrop: 'static'
             });
             $('#dummyModal').find('.btn-default').click(function() {
-              active.remove();
+              $scope.new_item_creation = false;
               return $('#dummyModal, .modal-backdrop').remove();
             });
             return $('#dummyModal').find('.btn-primary').click(function() {
@@ -345,7 +348,7 @@
             e.preventDefault();
             active = findActive();
             prev = active.prev('.exhibit');
-            if (prev.attr('id') === 'drop_down') {
+            if (prev.attr('id') === 'drop_down' || prev.hasClass('dummy')) {
               prev = prev.prev();
             }
             if (prev.length > 0) {
@@ -359,7 +362,7 @@
             e.preventDefault();
             active = findActive();
             next = active.next();
-            if (next.attr('id') === 'drop_down') {
+            if (next.attr('id') === 'drop_down' || next.hasClass('dummy')) {
               next = next.next();
             }
             if (next.length > 0) {
@@ -416,13 +419,22 @@
           });
         }
       };
-      $scope.open_dropdown = function(event) {
-        var clicked, close, delete_story, done, item_publish_settings, number, previous;
+      $scope.open_dropdown = function(event, elem) {
+        var clicked, close, delete_story, done, exhibit, item_publish_settings, number, previous, _i, _len, _ref;
         clicked = $(event.target).parents('li');
         if (clicked.hasClass('active')) {
           closeDropDown();
           return false;
         }
+        _ref = $scope.exhibits;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          exhibit = _ref[_i];
+          exhibit.active = false;
+        }
+        elem.active = true;
+        $scope.exhibit_index = elem.index;
+        console.log($scope.exhibits[$scope.exhibit_index]);
+        sharedProperties.setProperty('exhibit', elem);
         previous = findActive();
         if (previous.hasClass('dummy')) {
           dummy_focusout_process(previous);
@@ -485,6 +497,7 @@
         return $scope.museum_list_prepare();
       }, 100);
       sharedProperties.setProperty('exhibit', $scope.exhibits[0]);
+      $scope.exhibit_index = 0;
       angular.element($window).bind("resize", function() {
         $scope.grid();
         return $scope.museum_list_prepare();
@@ -516,6 +529,74 @@
           }, 300);
         }
       });
+      $scope.new_item_creation = false;
+      get_number = function() {
+        return Math.round(Math.random() * 10 + 11);
+      };
+      get_lang = function() {
+        return 'ru';
+      };
+      $scope.create_new_item = function() {
+        var e;
+        if ($scope.new_item_creation !== true) {
+          $scope.new_exhibit = {
+            name: '',
+            number: get_number(),
+            image: '',
+            thumb: '',
+            publish_state: 'draft',
+            description: '',
+            qr_code: {
+              url: '',
+              print_link: ''
+            },
+            images: [
+              {
+                image: '',
+                thumb: ''
+              }, {
+                image: '',
+                thumb: ''
+              }
+            ],
+            stories: [
+              {
+                language: get_lang(),
+                name: '',
+                description: '',
+                audio: '',
+                quiz: {
+                  question: '',
+                  description: '',
+                  answers: [
+                    {
+                      title: '',
+                      correct: true,
+                      id: 0
+                    }, {
+                      title: '',
+                      correct: false,
+                      id: 1
+                    }, {
+                      title: '',
+                      correct: false,
+                      id: 2
+                    }, {
+                      title: '',
+                      correct: false,
+                      id: 3
+                    }
+                  ]
+                }
+              }
+            ]
+          };
+          $scope.new_item_creation = true;
+          e = {};
+          e.target = $('li.exhibit.dummy > .opener.draft');
+          return $scope.open_dropdown(e, $scope.new_exhibit);
+        }
+      };
       $scope.toggle_menu = function(elem) {
         var museum_nav, nav, padding;
         elem = $(elem.target);
@@ -574,12 +655,43 @@
       };
     }
   ]).controller('EditItemController', [
-    '$scope', '$http', '$filter', 'sharedProperties', function($scope, $http, $filter, sharedProperties) {
+    '$scope', '$http', '$filter', 'sharedProperties', '$modal', '$log', function($scope, $http, $filter, sharedProperties, $modal, $log) {
       $scope.exhibit = sharedProperties.getProperty('exhibit');
+      $scope.items = ["item1", "item2", "item3"];
+      $scope.modal_open = function() {
+        var modalInstance;
+        modalInstance = $modal.open({
+          templateUrl: "myModalContent.html",
+          controller: ModalInstanceCtrl,
+          resolve: {
+            items: function() {
+              return $scope.items;
+            }
+          }
+        });
+        return modalInstance.result.then((function(selectedItem) {
+          return $scope.selected = selectedItem;
+        }), function() {
+          return $log.info("Modal dismissed at: " + new Date());
+        });
+      };
       return $scope.$on('exhibitChange', function() {
         return $scope.exhibit = sharedProperties.getProperty('exhibit');
       });
     }
   ]);
+
+  this.ModalInstanceCtrl = function($scope, $modalInstance, items) {
+    $scope.items = items;
+    $scope.selected = {
+      item: $scope.items[0]
+    };
+    $scope.ok = function() {
+      return $modalInstance.close($scope.selected.item);
+    };
+    return $scope.cancel = function() {
+      return $modalInstance.dismiss("cancel");
+    };
+  };
 
 }).call(this);

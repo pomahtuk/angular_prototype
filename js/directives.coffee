@@ -8,6 +8,7 @@ angular.module("Museum.directives", [])
 .directive "ngBlur", ->
   (scope, elem, attrs) ->
     elem.bind "blur", ->
+      # console.log scope
       scope.$apply attrs.ngBlur
 
 .directive "ngFocus", ($timeout) ->
@@ -142,17 +143,24 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <div class="col-lg-6 trigger" ng-hide="edit_mode || item[field].length == 0">
+      <div class="col-lg-6 trigger" ng-hide="edit_mode">
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-lg-6 triggered" ng-show="edit_mode || item[field].length == 0">
-        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text"  ng-blur="item.statuses[field]='progress'">
+      <div class="col-lg-6 triggered" ng-show="edit_mode">
+        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="item.statuses[field]='progress'">
       </div>
       <status-indicator ng-model="item" ng-field="field"></statusIndicator>
     </div>
   """  
   # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
+    scope.edit_mode = false
+
+    scope.$watch 'item[field]', (newValue, oldValue) ->
+      unless newValue
+        scope.edit_mode = true
+      else
+        scope.edit_mode = false
     true
 
 .directive "placeholdertextarea", ->
@@ -172,10 +180,10 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <div class="col-lg-6 trigger" ng-hide="edit_mode || item[field].length == 0">
+      <div class="col-lg-6 trigger" ng-hide="edit_mode">
         <span class="placeholder large" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-lg-6 triggered" ng-show="edit_mode || item[field].length == 0">
+      <div class="col-lg-6 triggered" ng-show="edit_mode">
         <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="item.statuses[field]='progress'">
         </textarea>
       </div>
@@ -183,7 +191,11 @@ angular.module("Museum.directives", [])
     </div>
   """  
   link: (scope, element, attrs) ->
-    # console.log scope.item[scope.field]
+    scope.$watch 'item[field]', (newValue, oldValue) ->
+      unless newValue
+        scope.edit_mode = true
+      else
+        scope.edit_mode = false
     true
 
 .directive "quizanswer", ->
@@ -201,10 +213,10 @@ angular.module("Museum.directives", [])
     <div class="form-group string optional checkbox_added">
       <label class="string optional control-label col-lg-2" for="{{id}}"></label>
       <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item.id}}" ng-model="checked" ng-click="check_items(item)"> <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-      <div class="col-lg-5 trigger"  ng-hide="edit_mode || item[field].length == 0">
+      <div class="col-lg-5 trigger"  ng-hide="edit_mode">
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-lg-5 triggered" ng-show="edit_mode || item[field].length == 0">
+      <div class="col-lg-5 triggered" ng-show="edit_mode">
         <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="item.statuses[field]='progress'">
       </div>
       <status-indicator ng-model="item" ng-field="field"></statusIndicator>
@@ -225,6 +237,11 @@ angular.module("Museum.directives", [])
       if newValue
         for single_item in newValue
           scope.checked = single_item.id if single_item.correct is true            
+
+    scope.$watch 'item[field]', (newValue, oldValue) ->
+      unless newValue
+        scope.edit_mode = true 
+
     , true
 
 .directive "statusIndicator", ->
@@ -257,3 +274,88 @@ angular.module("Museum.directives", [])
             scope.$apply scope.item.statuses[scope.field] = ''
           , 700
     , true
+
+.directive "audioplayer", ->
+  restrict: "E"
+  replace: true
+  transclude: true
+  require: "?ngModel"
+  scope:
+    item: '=ngItem'
+    help: '@ngHelp'
+    id: '@ngId'
+    title: '@ngTitle'
+    field: '@ngField'
+  template: """
+    <div class="form-group">
+      <label class="col-lg-2 control-label" for="audio">Audio</label>
+      <div class="help">
+        <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
+      </div>
+      <div class="col-lg-6 trigger" ng-hide="edit_mode">
+        <div class="jp-jplayer" id="jquery_jplayer_1">
+        </div>
+        <div class="jp-audio" id="jp_container_1">
+          <div class="jp-type-single">
+            <div class="jp-gui jp-interface">
+              <ul class="jp-controls">
+                <li>
+                <a class="jp-play" href="javascript:;" tabindex="1"></a>
+                </li>
+                <li>
+                <a class="jp-pause" href="javascript:;" tabindex="1"></a>
+                </li>
+              </ul>
+            </div>
+            <div class="dropdown">
+              <a data-toggle="dropdown" href="#" id="visibility_filter">Audioguide 01<span class="caret"></span></a>
+              <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
+                <li role="presentation">
+                <a href="#" role="menuitem" tabindex="-1">Replace</a>
+                </li>
+                <li role="presentation">
+                <a href="#" role="menuitem" tabindex="-1">Download</a>
+                </li>
+              </ul>
+            </div>
+            <div class="jp-progress">
+              <div class="jp-seek-bar">
+                <div class="jp-play-bar">
+                </div>
+              </div>
+            </div>
+            <div class="jp-time-holder">
+              <div class="jp-current-time">
+              </div>
+              <div class="jp-duration">
+              </div>
+            </div>
+            <div class="jp-no-solution">
+              <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 triggered" ng-show="edit_mode">
+        <input type="file" id="exampleInputFile">
+      </div>
+      <status-indicator ng-model="item" ng-field="field"></statusIndicator>
+    </div>
+  """
+  link: (scope, element, attrs) ->
+    scope.edit_mode = false
+    $("#jquery_jplayer_1").jPlayer
+      swfPath: "/js"
+      wmode: "window"
+      preload: "auto"
+      smoothPlayBar: true
+      keyEnabled: true
+      supplied: "oga"
+    scope.$watch 'item[field]', (newValue, oldValue) ->
+      unless newValue
+        scope.edit_mode = true
+      else
+        scope.edit_mode = false
+        $("#jquery_jplayer_1").jPlayer "setMedia",
+          oga:newValue
+    true
