@@ -305,6 +305,7 @@
                 quiz: {
                   question: 'are you sure?',
                   description: 'can you tell me?',
+                  state: 'published',
                   answers: [
                     {
                       title: 'yes',
@@ -361,6 +362,7 @@
                 quiz: {
                   question: 'are you sure?',
                   description: 'can you tell me?',
+                  state: 'published',
                   answers: [
                     {
                       title: 'yes',
@@ -418,6 +420,7 @@
                 quiz: {
                   question: 'are you sure?',
                   description: 'can you tell me?',
+                  state: 'published',
                   answers: [
                     {
                       title: 'yes',
@@ -494,7 +497,7 @@
         var active;
         active = findActive();
         if (active.hasClass('dummy')) {
-          dummy_focusout_process(active);
+          $scope.dummy_focusout_process(active);
         }
         dropDown.hide();
         return active.removeClass('active');
@@ -538,33 +541,10 @@
               return active.siblings('.exhibit').first().find('.opener').click();
             }
           });
-          dropDown.find('.label-content').unbind('click').bind('click', function(e) {
-            var elem, parent;
-            elem = $(this);
-            parent = elem.parents('.dropdown-menu').prev('.dropdown-toggle');
-            if (elem.hasClass('everyone')) {
-              return parent.html("<div class='extra'><i class='icon-globe'></i></div> Published <span class='caret'></span>");
-            } else {
-              return parent.html("<div class='extra'><i class='icon-user'></i></div> Publish <span class='caret'></span>");
-            }
-          });
-          dropDown.find('#delete_story input[type=radio]').unbind('change').bind('change', function() {
-            var container, elem;
-            elem = $(this);
-            container = $('#delete_story');
-            if (elem.attr('id') === 'lang_selected') {
-              if (elem.is(':checked')) {
-                return $('#delete_story .other_variants').slideDown(150);
-              }
-            } else {
-              return $('#delete_story .other_variants').slideUp(150);
-            }
-          });
           $('#story_quiz_enabled, #story_quiz_disabled').unbind('change').bind('change', function() {
             var elem, quiz;
             elem = $(this);
             quiz = dropDown.find('.form-wrap');
-            console.log(elem.val());
             if (elem.attr('id') === 'story_quiz_enabled') {
               $('label[for=story_quiz_enabled]').text('Enabled');
               $('label[for=story_quiz_disabled]').text('Disable');
@@ -587,7 +567,7 @@
         }
       };
       $scope.open_dropdown = function(event, elem) {
-        var clicked, close, delete_story, done, item_publish_settings, number, previous, _j, _len1, _ref1;
+        var clicked, delete_story, item_publish_settings, number, previous, _j, _len1, _ref1;
         clicked = $(event.target).parents('li');
         if (clicked.hasClass('active')) {
           $scope.closeDropDown();
@@ -602,31 +582,24 @@
         $scope.active_exhibit = elem;
         previous = findActive();
         if (previous.hasClass('dummy')) {
-          dummy_focusout_process(previous);
+          $scope.dummy_focusout_process(previous);
         }
         previous.removeClass('active');
         clicked.addClass('active');
-        dropDown.find('h2').text(clicked.find('h4').text());
         if (!isSameLine(clicked, previous)) {
           $scope.attachDropDown(clicked);
           $('body').scrollTo(clicked, 500, 150);
         }
         item_publish_settings = dropDown.find('.item_publish_settings');
-        done = dropDown.find('.done');
-        close = dropDown.find('.close');
         delete_story = dropDown.find('.delete_story');
         if (clicked.hasClass('dummy')) {
           number = clicked.data('number');
           $('#opas_number').val(number).blur();
           $('#name').focus();
           item_publish_settings.hide();
-          done.hide();
-          close.show();
           return delete_story.addClass('no_margin');
         } else {
           item_publish_settings.show();
-          done.show();
-          close.hide();
           return delete_story.removeClass('no_margin');
         }
       };
@@ -734,6 +707,7 @@
             quiz: {
               question: '',
               description: '',
+              state: 'limited',
               answers: [
                 {
                   title: '',
@@ -981,6 +955,14 @@
           return form.find(':file').trigger('click');
         }
       };
+      $scope.quiz_state = function(form) {
+        if (form.$valid) {
+          console.log('wow!');
+        } else {
+          console.log('nope:(');
+        }
+        return true;
+      };
       $scope.$on('save_dummy', function() {
         $scope.new_exhibit.publish_state = 'passcode';
         $scope.exhibits.push($scope.new_exhibit);
@@ -1005,6 +987,7 @@
                 quiz: {
                   question: 'are you sure?',
                   description: 'can you tell me?',
+                  state: 'limited',
                   answers: [
                     {
                       title: 'yes',
@@ -1071,6 +1054,7 @@
               quiz: {
                 question: 'are you sure?',
                 description: 'can you tell me?',
+                state: 'limited',
                 answers: [
                   {
                     title: 'yes',

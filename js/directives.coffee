@@ -150,7 +150,7 @@ angular.module("Museum.directives", [])
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-xs-6 triggered" ng-show="edit_mode || empty_val">
-        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="status_process()">
+        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="status_process()" required>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
@@ -192,11 +192,11 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <div class="col-xs-6 trigger" ng-hide="edit_mode || empty_val">
+      <div class="col-lg-6 trigger" ng-hide="edit_mode || empty_val">
         <span class="placeholder large" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
-      <div class="col-xs-6 triggered" ng-show="edit_mode || empty_val">
-        <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="status_process()">
+      <div class="col-lg-6 triggered" ng-show="edit_mode || empty_val">
+        <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="status_process()" required>
         </textarea>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
@@ -237,7 +237,7 @@ angular.module("Museum.directives", [])
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-xs-5 triggered" ng-show="edit_mode || empty_val">
-        <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="status_process()">
+        <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="status_process()" required>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>

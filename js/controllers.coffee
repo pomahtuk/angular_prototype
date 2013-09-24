@@ -259,6 +259,7 @@ angular.module("Museum.controllers", [])
               quiz: {
                 question: 'are you sure?'
                 description: 'can you tell me?'
+                state: 'published'
                 answers: [
                   {
                     title: 'yes'
@@ -320,6 +321,7 @@ angular.module("Museum.controllers", [])
               quiz: {
                 question: 'are you sure?'
                 description: 'can you tell me?'
+                state: 'published'
                 answers: [
                   {
                     title: 'yes'
@@ -382,6 +384,7 @@ angular.module("Museum.controllers", [])
               quiz: {
                 question: 'are you sure?'
                 description: 'can you tell me?'
+                state: 'published'
                 answers: [
                   {
                     title: 'yes'
@@ -456,7 +459,7 @@ angular.module("Museum.controllers", [])
   $scope.closeDropDown = ->
     active = findActive()
     if active.hasClass 'dummy'
-      dummy_focusout_process(active)
+      $scope.dummy_focusout_process(active)
     dropDown.hide()
     active.removeClass('active')
 
@@ -495,36 +498,17 @@ angular.module("Museum.controllers", [])
         else
           active.siblings('.exhibit').first().find('.opener').click()
 
-      dropDown.find('.label-content').unbind('click').bind 'click', (e) ->
-        elem = $ @
-        parent = elem.parents('.dropdown-menu').prev('.dropdown-toggle')
-        if elem.hasClass 'everyone'
-          parent.html "<div class='extra'><i class='icon-globe'></i></div> Published <span class='caret'></span>"
-        else
-          parent.html "<div class='extra'><i class='icon-user'></i></div> Publish <span class='caret'></span>"
-
-      dropDown.find('#delete_story input[type=radio]').unbind('change').bind 'change', ->
-        elem = $ @
-        container = $('#delete_story')
-        if elem.attr('id') is 'lang_selected'
-          if elem.is(':checked')
-            $('#delete_story .other_variants').slideDown(150)
-        else
-          $('#delete_story .other_variants').slideUp(150)
 
       $('#story_quiz_enabled, #story_quiz_disabled').unbind('change').bind 'change', ->
         elem = $ @
         quiz = dropDown.find('.form-wrap')
-        console.log elem.val()
         if elem.attr('id') is 'story_quiz_enabled'
           $('label[for=story_quiz_enabled]').text('Enabled')
           $('label[for=story_quiz_disabled]').text('Disable')
-          #should someway publish model
           true
         else
           $('label[for=story_quiz_disabled]').text('Disabled')
           $('label[for=story_quiz_enabled]').text('Enable')
-          #should someway unpublish model
           true
 
       dropDown.find('a.delete_story').unbind('click').bind 'click', (e) ->
@@ -549,20 +533,16 @@ angular.module("Museum.controllers", [])
     previous = findActive()
 
     if previous.hasClass 'dummy'
-      dummy_focusout_process previous
+      $scope.dummy_focusout_process previous
 
     previous.removeClass('active')
     clicked.addClass('active')
-
-    dropDown.find('h2').text(clicked.find('h4').text())
 
     unless isSameLine(clicked, previous)
       $scope.attachDropDown clicked
       $('body').scrollTo(clicked, 500, 150)
    
     item_publish_settings = dropDown.find('.item_publish_settings')
-    done = dropDown.find('.done')
-    close = dropDown.find('.close')
     delete_story = dropDown.find('.delete_story')
 
     if clicked.hasClass 'dummy'
@@ -570,13 +550,9 @@ angular.module("Museum.controllers", [])
       $('#opas_number').val(number).blur()
       $('#name').focus()
       item_publish_settings.hide()
-      done.hide()
-      close.show()
       delete_story.addClass('no_margin')
     else
       item_publish_settings.show()
-      done.show()
-      close.hide()
       delete_story.removeClass('no_margin')
 
   $scope.museum_type_filter = ''
@@ -676,6 +652,7 @@ angular.module("Museum.controllers", [])
         quiz: {
           question: ''
           description: ''
+          state: 'limited'
           answers: [
             {
               title: ''
@@ -864,6 +841,15 @@ angular.module("Museum.controllers", [])
     unless elem.hasClass('disabled')
       form.find(':file').trigger 'click'
 
+  $scope.quiz_state = (form) ->
+    # console.log form
+    if form.$valid
+      console.log 'wow!'
+    else
+      console.log 'nope:('
+    # console.log $scope.active_exhibit.stories[$scope.current_museum.language].quiz.state
+    true
+
   $scope.$on 'save_dummy', ->
     $scope.new_exhibit.publish_state = 'passcode'
     $scope.exhibits.push $scope.new_exhibit
@@ -883,6 +869,7 @@ angular.module("Museum.controllers", [])
             quiz: {
               question: 'are you sure?'
               description: 'can you tell me?'
+              state: 'limited'
               answers: [
                 {
                   title: 'yes'
@@ -947,6 +934,7 @@ angular.module("Museum.controllers", [])
           quiz: {
             question: 'are you sure?'
             description: 'can you tell me?'
+            state: 'limited'
             answers: [
               {
                 title: 'yes'

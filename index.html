@@ -290,19 +290,14 @@
                   <div class="row" id="media">
                     <form class="form-horizontal" role="form">
                       <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit" ng-title="Description"></placeholdertextarea>
-                      <div class="form-group last">
-                        <div class="pull-right done_button">
-                          <a class="btn btn-default done" href="#">Done</a>
-                        </div>
-                      </div>
                     </form>
                   </div>
                 </tab><tab heading="Quiz">
                   <div class="row" id="quiz">
-                    <div class="switch ios">
-                      <input checked="" id="story_quiz_enabled" name="story_quiz_enabled" type="radio"><label for="story_quiz_enabled">Enabled</label><input id="story_quiz_disabled" name="story_quiz_enabled" type="radio"><label for="story_quiz_disabled">Disable</label><span class="slide-button"></span>
-                    </div>
-                    <form class="form-horizontal" role="form">
+                    <form class="form-horizontal" name="quizform" role="form">
+                      <div class="switch ios">
+                        <input checked="" id="story_quiz_enabled" name="story_quiz_enabled" ng-change="quiz_state(quizform)" ng-model="active_exhibit.stories[current_museum.language].quiz.state" type="radio" value="published"><label for="story_quiz_enabled">Enabled</label><input id="story_quiz_disabled" name="story_quiz_enabled" ng-change="quiz_state(quizform)" ng-model="active_exhibit.stories[current_museum.language].quiz.state" type="radio" value="limited"><label for="story_quiz_disabled">Disable</label><span class="slide-button"></span>
+                      </div>
                       <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Question"></placeholderfield>
                       <div class="error">
                         <div class="controls"></div>
@@ -354,11 +349,11 @@
           </li>
           <li class="exhibit dummy" data-big-image="/img/img-bg.png" ng-show="new_item_creation">
             <div class="opener draft">
-              <div class="overlay"></div>
+              <div class="overlay" ng-click="open_dropdown($event, new_exhibit)"></div>
               <div class="checkbox">
                 <input type="checkbox">
               </div>
-              <div class="image" ng-click="open_dropdown($event, new_exhibit)">
+              <div class="image">
                 <img src="/img/img-bg.png">
               </div>
               <div class="description" ng-click="open_dropdown($event, new_exhibit)">

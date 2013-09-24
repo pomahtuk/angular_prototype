@@ -294,18 +294,15 @@ html lang="en" ng-app="Museum"
 
                       placeholdertextarea ng-item="active_exhibit" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
                       
-                      .form-group.last
-                        .pull-right.done_button
-                          a.btn.btn-default.done href="#" Done
                 tab heading="Quiz"
                   #quiz.row
-                    .switch.ios
-                      input id="story_quiz_enabled" name="story_quiz_enabled" type="radio" checked=""
-                      label for="story_quiz_enabled" Enabled
-                      input id="story_quiz_disabled" name="story_quiz_enabled" type="radio"
-                      label for="story_quiz_disabled" Disable
-                      span.slide-button
-                    form.form-horizontal role="form"
+                    form.form-horizontal role="form" name="quizform"
+                      .switch.ios
+                        input id="story_quiz_enabled" name="story_quiz_enabled" value="published" type="radio" checked="" ng-model="active_exhibit.stories[current_museum.language].quiz.state" ng-change="quiz_state(quizform)"
+                        label for="story_quiz_enabled" Enabled
+                        input id="story_quiz_disabled" name="story_quiz_enabled" value="limited" type="radio" ng-model="active_exhibit.stories[current_museum.language].quiz.state" ng-change="quiz_state(quizform)"
+                        label for="story_quiz_disabled" Disable
+                        span.slide-button
                       placeholderfield ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
                       .error
                         .controls
@@ -344,10 +341,10 @@ html lang="en" ng-app="Museum"
 
           li.exhibit.dummy data-big-image='/img/img-bg.png' ng-show="new_item_creation"
             div class="opener draft"
-              .overlay
+              .overlay ng-click="open_dropdown($event, new_exhibit)"
               .checkbox
                 input type="checkbox"
-              .image ng-click="open_dropdown($event, new_exhibit)"
+              .image
                 img src='/img/img-bg.png'
               .description ng-click="open_dropdown($event, new_exhibit)"
                 h4 
