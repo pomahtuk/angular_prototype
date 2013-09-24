@@ -25,6 +25,9 @@ $conflictColor: #b94a48
 $noConflictColor: #444
 
 .status-select-dropdown
+  padding: 10px
+  width: 270px
+
   .status-select
     padding: 0.5em 1em 0em 1em
 
@@ -34,6 +37,9 @@ $noConflictColor: #444
     .control-label
       font-weight: normal
 
+  li
+    cursor: pointer
+
   .other_list
     padding-left: 10px
 
@@ -41,9 +47,12 @@ $noConflictColor: #444
     list-style: none
     text-align: left
     padding: 0px
-    margin: 0px 0px 0px 10px
+    margin: 5px 0px 0px 0px
     span
       padding: 0px
+
+    li
+      cursor: auto
 
 .conflict-icon
   &.entypo-icon
@@ -500,10 +509,17 @@ ul.exhibits
           .dropdown-toggle
             max-height: 34px
 
-          .dropdown-menu li a 
-            position: relative
-            display: block
-            height: 25px
+          .dropdown-menu 
+            padding: 10px
+            min-width: 300px
+
+            li
+              cursor: pointer
+
+            li a 
+              position: relative
+              display: block
+              height: 25px
 
             i
               font-size: 20px
@@ -618,7 +634,6 @@ ul.exhibits
       right: 0
       top: 12px
       width: 60px
-      display: none
 
     .delete_story
       float: right
@@ -666,7 +681,6 @@ ul.exhibits
 
       .save_status
         line-height: 34px
-        /*display: none*/
         color: #888
 
         i
@@ -680,6 +694,11 @@ ul.exhibits
         .placeholder
           padding-left: 13px
           min-width: 300px
+          display: block
+          max-height: 34px
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
 
         .large
           width: 100%
@@ -701,10 +720,8 @@ ul.exhibits
           cursor: pointer
 
       .triggered
-        /*display: none*/
 
         & > *
-          // margin-left: -13px
           min-width: 300px
 
         textarea
@@ -955,4 +972,4 @@ textarea
         top: 2px
     .other_variants
       margin-left: 20px
-      display: none
+      /*display: none*/

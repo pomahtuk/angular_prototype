@@ -68,10 +68,10 @@
             {{current_museum.name}}
           </h1>
           <div class="btn-group language">
-            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">English    <span class="caret"></span></button>
+            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{{translations[current_museum.language]}}  <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
               <li ng-repeat="story in current_museum.stories">
-                <a href="#">{{story.name}}</a>
+                <a href="#" ng-click="current_museum.language = story.language">{{story.name}}</a>
               </li>
               <li class="divider"></li>
               <li>
@@ -152,6 +152,25 @@
     </div>
     <div class="page-wrapper">
       <div class="page">
+        <script id="myDummyModalContent.html" type="text/ng-template">
+          <div class="modal-dialog" id="dummyModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button aria-hidden="true" class="close" data-dismiss="modal" type="button"></button>
+                  <h4 class="modal-title">
+                    Name of exhibit is empty
+                  </h4>
+                </div>
+                <div class="modal-body row">
+                  <div class="pull-right">
+                    <button class="btn btn-default" ng-click="discard()" type="button">Discard item</button><button class="btn btn-primary" ng-click="save_as()" type="button">Save as "item_{{exhibit.number}}"</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </script>
         <ul class="exhibits">
           <li id="drop_down">
             <div class="prev-ex"></div>
@@ -164,28 +183,16 @@
                   </div>
                 </h4>
                 <ul class="images-displayed" data-max-displayed="16">
-                  <li id="media_content_ids_38999" style="position: relative;">
-                    <form accept-charset="UTF-8" action="/77/story_sets/5546/images/38999" class="upload-form" data-remote="true" enctype="multipart/form-data" id="edit_image_38999" method="post">
+                  <li id="media_content_ids_{{image.id}}" ng-repeat="image in active_exhibit.images">
+                    <form accept-charset="UTF-8" action="{{image.edit_url}}" class="upload-form" data-remote="true" enctype="multipart/form-data" id="edit_image_38999" method="post">
                       <div style="margin:0;padding:0;display:inline">
                         <input name="utf8" type="hidden" value="✓"><input name="_method" type="hidden" value="put"><input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E=">
                       </div>
-                      <input class="hide fileupload" data-accept="image" id="image_link" name="image[link]" type="file"><a class="thumbnail" href="/77/story_sets/5546/images/38999/crop.json"><img alt="" data-crop-url="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f.jpg" src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f_thumb.jpg"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="/77/story_sets/5546/images/38999" rel="nofollow"></a>
+                      <input class="hide fileupload" data-accept="image" id="image_link" name="image[link]" type="file"><a class="thumbnail" href="{{image.edit_url}}/crop.json"><img alt="" data-crop-url="{{image.image}}" src="{{image.thumb}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="{{image.edit_url}}" ng-click="delete_image($event)" rel="nofollow">×</a>
                       <div class="progress progress-success progress-striped active hide">
                         <div class="bar"></div>
                       </div>
-                      <a class="browse update">Update image</a>
-                    </form>
-                  </li>
-                  <li id="media_content_ids_39000" style="position: relative;">
-                    <form accept-charset="UTF-8" action="/77/story_sets/5546/images/39000" class="upload-form" data-remote="true" enctype="multipart/form-data" id="edit_image_39000" method="post">
-                      <div style="margin:0;padding:0;display:inline">
-                        <input name="utf8" type="hidden" value="✓"><input name="_method" type="hidden" value="put"><input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E=">
-                      </div>
-                      <input class="hide fileupload" data-accept="image" id="image_link" name="image[link]" type="file"><a class="thumbnail" href="/77/story_sets/5546/images/39000/crop.json"><img alt="" data-crop-url="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/9efe1d5c-047c-4ae3-989c-62ac7af7206a.jpg" src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/9efe1d5c-047c-4ae3-989c-62ac7af7206a_thumb.jpg"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="/77/story_sets/5546/images/39000" rel="nofollow"></a>
-                      <div class="progress progress-success progress-striped active hide">
-                        <div class="bar"></div>
-                      </div>
-                      <a class="browse update">Update image</a>
+                      <a class="browse update" ng-click="change_image($event)">Update image</a>
                     </form>
                   </li>
                 </ul>
@@ -196,8 +203,20 @@
                   </div>
                 </h4>
                 <ul class="images-hidden">
+                  <li id="media_content_ids_" style="display: none;">
+                    <form accept-charset="UTF-8" action="/77/story_sets/4246/images" class="upload-form" data-remote="true" enctype="multipart/form-data" id="new_image" method="post">
+                      <div style="margin:0;padding:0;display:inline">
+                        <input name="utf8" type="hidden" value="✓"><input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="></input>
+                      </div>
+                      <input class="hide fileupload" data-accept="image" id="image_link" name="image[link]" type="file"><a class="thumbnail" href="/77/story_sets/4246/images//crop.json"><img alt="" src="/assets/img-bg-cb04c4d3300cab558fdc85722ad21ac6.png">
+                            <div class="progress progress-success progress-striped active hide">
+                              <div class="bar"></div>
+                            </div>
+                          </img></a><a class="browse update" ng-click="change_image($event)">Upload image</a></input>
+                    </form>
+                  </li>
                   <li class="new">
-                    <a class="upload-image" href="/77/story_sets/5546/images/new">
+                    <a class="upload-image" href="/77/story_sets/5546/images/new" ng-click="upload_image($event)">
                       <div class="picture"></div>
                       <div class="progress progress-success progress-striped active hide">
                         <div class="bar" style="width: 100%;"></div>
@@ -231,40 +250,38 @@
               </div>
             </div>
             <div class="description">
-              <div class="close" ng-show="exhibits[exhibit_index].publish_state == draft"></div>
-              <switchpubitem ng-item="exhibits[exhibit_index]" ng-provider="provider"></switchpubitem><a class="delete_story" href="#delete_story" ng-click="modal_open()"><i class="icon-trash"></i></a>
+              <div class="close"></div>
+              <switchpubitem ng-item="active_exhibit" ng-museum="current_museum" ng-provider="provider" translations="translations"></switchpubitem><a class="delete_story" href="#delete_story" ng-click="delete_modal_open()"><i class="icon-trash"></i></a>
               <script id="myModalContent.html" type="text/ng-template">
                 <div class="modal-dialog" id="delete_story">
                   <div class="modal-content">
                     <div class="modal-body">
                       <form class="form-horizontal">
-                        <div class="form-group">
-                          <label class="control-label" for="lang_en"><input id="lang_en" name="language" type="radio" value="en">Delete only English language</label>
-                        </div>
-                        <div class="form-group">
-                          <label class="control-label" for="lang_all"><input id="lang_all" name="language" type="radio" value="all">Delete all languages</label>
-                        </div>
-                        <div class="form-group">
-                          <label class="control-label lang_selected" for="lang_selected"><input id="lang_selected" name="language" type="radio" value="selected">Delete only selected languages</label>
-                        </div>
-                        <div class="other_variants">
+                        <div class="only_one" ng-show="only_one">
                           <div class="form-group">
-                            <label class="control-label" for="language_en"><input id="language_en" name="language_en" type="checkbox" value="selected">English</label>
+                            <label class="control-label" for="lang_def_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()"><input checked="checked" class="hidden" id="lang_def_{{modal_options.current_language.language}}" name="language" type="radio" value="en">Delete item completely?</label>
+                          </div>
+                        </div>
+                        <div class="multiply" ng-hide="only_one">
+                          <div class="form-group">
+                            <label class="control-label" for="lang_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()"><input checked="checked" id="lang_{{modal_options.current_language.language}}" name="language" type="radio" value="en">Delete only {{modal_options.current_language.name}} language</label>
                           </div>
                           <div class="form-group">
-                            <label class="control-label" for="language_ru"><input id="language_ru" name="language_ru" type="checkbox" value="selected">Russian</label>
+                            <label class="control-label" for="lang_all" ng-click="show_langs = false; mark_all()"><input id="lang_all" name="language" type="radio" value="all">Delete all languages</label>
                           </div>
                           <div class="form-group">
-                            <label class="control-label" for="language_it"><input id="language_it" name="language_it" type="checkbox" value="selected">Italian</label>
+                            <label class="control-label lang_selected" for="lang_selected" ng-click="show_langs = true"><input id="lang_selected" name="language" type="radio" value="selected">Delete only selected languages</label>
                           </div>
-                          <div class="form-group">
-                            <label class="control-label" for="language_fr"><input id="language_fr" name="language_fr" type="checkbox" value="selected">French</label>
+                        </div>
+                        <div class="other_variants" ng-show="show_langs">
+                          <div class="form-group" ng-repeat=" language in modal_options.languages">
+                            <label class="control-label" for="language_{{language.language}}"><input id="language_{{language.language}}" name="languages[]" ng-change="lang_proc()" ng-checked="language.checked" ng-model="language.checked" type="checkbox" value="{{language.language}}">{{language.name}}</label>
                           </div>
                         </div>
                       </form>
                     </div>
                     <div class="modal-footer">
-                      <button class="btn btn-default" data-dismiss="modal" type="button">Delete</button><button class="btn btn-primary" data-dismiss="modal" type="button">Cancel</button>
+                      <button class="btn btn-default" ng-click="ok()" type="button">Delete</button><button class="btn btn-primary" ng-click="cancel()" type="button">Cancel</button>
                     </div>
                   </div>
                 </div>
@@ -272,7 +289,7 @@
               <tabset><tab heading="Media content">
                   <div class="row" id="media">
                     <form class="form-horizontal" role="form">
-                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="exhibits[exhibit_index]" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="exhibits[exhibit_index]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="exhibits[exhibit_index].stories[0]" ng-title="Audio"></audioplayer><placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="exhibits[exhibit_index]" ng-title="Description"></placeholdertextarea>
+                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit" ng-title="Description"></placeholdertextarea>
                       <div class="form-group last">
                         <div class="pull-right done_button">
                           <a class="btn btn-default done" href="#">Done</a>
@@ -286,23 +303,23 @@
                       <input checked="" id="story_quiz_enabled" name="story_quiz_enabled" type="radio"><label for="story_quiz_enabled">Enabled</label><input id="story_quiz_disabled" name="story_quiz_enabled" type="radio"><label for="story_quiz_disabled">Disable</label><span class="slide-button"></span>
                     </div>
                     <form class="form-horizontal" role="form">
-                      <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="exhibits[exhibit_index].stories[0].quiz" ng-title="Question"></placeholderfield>
+                      <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Question"></placeholderfield>
                       <div class="error">
                         <div class="controls"></div>
                       </div>
                       <div class="answers">
-                        <quizanswer ng-collection="exhibits[exhibit_index].stories[0].quiz.answers" ng-field="title" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in exhibits[exhibit_index].stories[0].quiz.answers"></quizanswer>
+                        <quizanswer ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-field="title" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers"></quizanswer>
                       </div>
-                      <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="exhibits[exhibit_index].stories[0].quiz" ng-title="Description"></placeholdertextarea>
+                      <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Description"></placeholdertextarea>
                     </form>
                   </div>
                 </tab><tab heading="QR-code">
                   <div class="row" id="qr_code">
                     <div class="qr_image col-lg-4">
-                      <img alt="Qr_code" id="qr" src="{{exhibits[exhibit_index].qr_code.url}}">
+                      <img alt="Qr_code" id="qr" src="{{active_exhibit.qr_code.url}}">
                     </div>
                     <div class="well col-lg-4">
-                      <a class="btn qr-code" href="{{exhibits[exhibit_index].qr_code.print_link}}" target="_blank">Print QR-code</a><br>
+                      <a class="btn qr-code" href="{{active_exhibit.qr_code.print_link}}" target="_blank">Print QR-code</a><br>
                         <p>
                           You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
                         </p>
@@ -324,13 +341,13 @@
               </div>
               <div class="description" ng-click="open_dropdown($event, exhibit)">
                 <h4>
-                  {{exhibit.number}} {{exhibit.name}}
+                  {{exhibit.number}} {{exhibit.stories[current_museum.language].name}}
                 </h4>
               </div>
-              <div class="visibility" ng-switch="" on="exhibit.publish_state">
+              <div class="visibility" ng-switch="" on="exhibit.stories[current_museum.language].publish_state">
                 <i class="icon-globe placeholder" ng-switch-when="all"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>
                 <div class="on_hover">
-                  <switchpub ng-item="exhibit" ng-provider="provider"></switchpub>
+                  <switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider="provider"></switchpub>
                 </div>
               </div>
             </div>
@@ -346,13 +363,13 @@
               </div>
               <div class="description" ng-click="open_dropdown($event, new_exhibit)">
                 <h4>
-                  {{new_exhibit.number}} {{new_exhibit.name}}
+                  {{new_exhibit.number}} {{exhibit.stories[current_museum.language].name}}
                 </h4>
               </div>
-              <div class="visibility" ng-switch="" on="new_exhibit.publish_state">
+              <div class="visibility" ng-switch="" on="new_exhibit.stories[current_museum.language].publish_state">
                 <i class="icon-globe placeholder" ng-switch-when="all"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>
                 <div class="on_hover">
-                  <switchpub ng-item="new_exhibit" ng-provider="provider"></switchpub>
+                  <switchpub ng-item="new_exhibit.stories[current_museum.language]" ng-provider="provider"></switchpub>
                 </div>
               </div>
             </div>
@@ -361,11 +378,18 @@
       </div>
     </div>
     <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/angular-cookies.js"></script>
     <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
     <script src="lib/ui-bootstrap-0.6.0.js"></script>
+    <script src="lib/angularLocalStorage.js"></script>
     <script src="lib/jquery-1.10.2.js"></script>
     <script src="lib/jquery.scrollTo.js"></script>
     <script src="lib/jquery.jplayer.min.js"></script>
+    <script src="lib/jQuery-File-Upload/vendor/jquery.ui.widget.js"></script>
+    <script src="lib/jQuery-File-Upload/jquery.iframe-transport.js"></script>
+    <script src="lib/jQuery-File-Upload/jquery.fileupload.js"></script>
+    <script src="lib/jQuery-File-Upload/jquery.fileupload-fp.js"></script>
+    <script src="lib/jQuery-File-Upload/locale.js"></script>
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>

@@ -85,11 +85,11 @@ html lang="en" ng-app="Museum"
             | {{current_museum.name}}
           .btn-group.language
             button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
-              | English    
+              | {{translations[current_museum.language]}}  
               span.caret
             ul.dropdown-menu role="menu"
               li ng-repeat="story in current_museum.stories"
-                a href="#"
+                a href="#" ng-click="current_museum.language = story.language"
                   | {{story.name}}
               li.divider
               li
@@ -163,6 +163,19 @@ html lang="en" ng-app="Museum"
     .page-wrapper
       .page
 
+        script type="text/ng-template" id="myDummyModalContent.html"
+          .modal-dialog#dummyModal
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  button.close aria-hidden="true" data-dismiss="modal" type="button"
+                  h4.modal-title Name of exhibit is empty
+                .modal-body.row
+                  .pull-right
+                    button.btn.btn-default type="button" ng-click="discard()" Discard item
+                    button.btn.btn-primary type="button" ng-click="save_as()" Save as "item_{{exhibit.number}}"
+
+
         ul.exhibits
 
           li#drop_down 
@@ -175,41 +188,40 @@ html lang="en" ng-app="Museum"
                   .help-tooltip
                     i.icon-question-sign.icon.tip data-placement="right" title="The images from this list will be made visible in mobile app.&lt;br&gt;The list should contain no more than 16 images."
                 ul.images-displayed data-max-displayed="16"
-                  li#media_content_ids_38999 style="position: relative;"
-                    form#edit_image_38999.upload-form accept-charset="UTF-8" action="/77/story_sets/5546/images/38999" data-remote="true" enctype="multipart/form-data" method="post"
+                  li id="media_content_ids_{{image.id}}" ng-repeat="image in active_exhibit.images"
+                    form#edit_image_38999.upload-form accept-charset="UTF-8" action="{{image.edit_url}}" data-remote="true" enctype="multipart/form-data" method="post"
                       div style="margin:0;padding:0;display:inline"
                         input name="utf8" type="hidden" value="✓"
                         input name="_method" type="hidden" value="put"
                         input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="
                       input#image_link.hide.fileupload data-accept="image" name="image[link]" type="file"
-                      a.thumbnail href="/77/story_sets/5546/images/38999/crop.json"
-                        img alt="" data-crop-url="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f.jpg" src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f_thumb.jpg"
-                      a.remove data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="/77/story_sets/5546/images/38999" rel="nofollow"
+                      a.thumbnail href="{{image.edit_url}}/crop.json"
+                        img alt="" data-crop-url="{{image.image}}" src="{{image.thumb}}"
+                      a.remove data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="{{image.edit_url}}" ng-click="delete_image($event)" rel="nofollow" ×
                       .progress.progress-success.progress-striped.active.hide
                         .bar
-                      a.browse.update
+                      a.browse.update ng-click="change_image($event)"
                         | Update image
-                  li#media_content_ids_39000 style="position: relative;"
-                    form#edit_image_39000.upload-form accept-charset="UTF-8" action="/77/story_sets/5546/images/39000" data-remote="true" enctype="multipart/form-data" method="post"
-                      div style="margin:0;padding:0;display:inline"
-                        input name="utf8" type="hidden" value="✓"
-                        input name="_method" type="hidden" value="put"
-                        input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="
-                      input#image_link.hide.fileupload data-accept="image" name="image[link]" type="file"
-                      a.thumbnail href="/77/story_sets/5546/images/39000/crop.json"
-                        img alt="" data-crop-url="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/9efe1d5c-047c-4ae3-989c-62ac7af7206a.jpg" src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/9efe1d5c-047c-4ae3-989c-62ac7af7206a_thumb.jpg"
-                      a.remove data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="/77/story_sets/5546/images/39000" rel="nofollow"
-                      .progress.progress-success.progress-striped.active.hide
-                        .bar
-                      a.browse.update
-                        | Update image
+
                 h4.hidden-header.hidden
                   | More images
                   .help-tooltip
                     i.icon-question-sign.icon.tip data-placement="right" title="The images from this list will not be visible in mobile app.&lt;br&gt;To make the image visible in mobile app, please,&lt;br&gt;move it to the upper list by holding down the left mouse button."
                 ul.images-hidden
+                  li#media_content_ids_ style="display: none;"
+                    form#new_image.upload-form accept-charset="UTF-8" action="/77/story_sets/4246/images" data-remote="true" enctype="multipart/form-data" method="post"
+                      div style="margin:0;padding:0;display:inline"
+                        input name="utf8" type="hidden" value="✓"
+                          input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="
+                      input#image_link.hide.fileupload data-accept="image" name="image[link]" type="file"
+                        a.thumbnail href="/77/story_sets/4246/images//crop.json"
+                          img alt="" src="/assets/img-bg-cb04c4d3300cab558fdc85722ad21ac6.png"
+                            .progress.progress-success.progress-striped.active.hide
+                              .bar
+                        a.browse.update ng-click="change_image($event)"
+                          | Upload image
                   li.new
-                    a.upload-image href="/77/story_sets/5546/images/new"
+                    a.upload-image href="/77/story_sets/5546/images/new" ng-click="upload_image($event)"
                       .picture
                       .progress.progress-success.progress-striped.active.hide
                         .bar style="width: 100%;"
@@ -217,6 +229,7 @@ html lang="en" ng-app="Museum"
                         | Upload image
                         .help-tooltip
                           i.icon-question-sign.icon.tip data-original-title="Upload exhibit photograph in JPEG or PNG format.&lt;br&gt;This image will be shown to the mobile application user on their smartphone or tablet.&lt;br&gt;Use high quality images that are not too large.&lt;br&gt;The most advantageous photograph proportions are 4:3." data-placement="right"
+
               #crop_modal.modal.hide.crop-wrap
                 .modal-header
                   button.close data-dismiss="modal"
@@ -234,58 +247,52 @@ html lang="en" ng-app="Museum"
                     | Cancel
 
             .description
-              .close ng-show="exhibits[exhibit_index].publish_state == draft"
-              switchpubitem ng-item="exhibits[exhibit_index]" ng-provider='provider'
+              .close
+              switchpubitem ng-item="active_exhibit" ng-provider='provider' ng-museum="current_museum" translations="translations"
 
-              a.delete_story ng-click="modal_open()" href="#delete_story" 
+              a.delete_story ng-click="delete_modal_open()" href="#delete_story" 
                 i.icon-trash
               script type="text/ng-template" id="myModalContent.html"
                 .modal-dialog#delete_story
                   .modal-content
                     .modal-body
                       form.form-horizontal
-                        .form-group
-                          label.control-label for="lang_en"
-                            input type="radio" name="language" value="en" id="lang_en"
-                            | Delete only English language
-                        .form-group
-                          label.control-label for="lang_all"
-                            input type="radio" name="language" value="all" id="lang_all"
-                            | Delete all languages
-                        .form-group
-                          label.control-label.lang_selected for="lang_selected"
-                            input type="radio" name="language" value="selected" id="lang_selected"
-                            | Delete only selected languages
-                        .other_variants
+                        .only_one ng-show="only_one"
                           .form-group
-                            label.control-label for="language_en"
-                              input type="checkbox" name="language_en" value="selected" id="language_en"
-                              | English
+                            label.control-label for="lang_def_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
+                              input type="radio" class="hidden" name="language" value="en" id="lang_def_{{modal_options.current_language.language}}" checked="checked"
+                              | Delete item completely?
+                        .multiply ng-hide="only_one"
                           .form-group
-                            label.control-label for="language_ru"
-                              input type="checkbox" name="language_ru" value="selected" id="language_ru"
-                              | Russian
+                            label.control-label for="lang_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
+                              input type="radio" name="language" value="en" id="lang_{{modal_options.current_language.language}}" checked="checked"
+                              | Delete only {{modal_options.current_language.name}} language
                           .form-group
-                            label.control-label for="language_it"
-                              input type="checkbox" name="language_it" value="selected" id="language_it"
-                              | Italian
+                            label.control-label for="lang_all" ng-click="show_langs = false; mark_all()"
+                              input type="radio" name="language" value="all" id="lang_all"
+                              | Delete all languages
                           .form-group
-                            label.control-label for="language_fr"
-                              input type="checkbox" name="language_fr" value="selected" id="language_fr"
-                              | French
+                            label.control-label.lang_selected for="lang_selected" ng-click="show_langs = true"
+                              input type="radio" name="language" value="selected" id="lang_selected"
+                              | Delete only selected languages
+                        .other_variants ng-show="show_langs"
+                          .form-group ng-repeat=" language in modal_options.languages"
+                            label.control-label for="language_{{language.language}}"
+                              input type="checkbox" ng-model="language.checked" ng-checked="language.checked" ng-change="lang_proc()" name="languages[]" value="{{language.language}}" id="language_{{language.language}}"
+                              | {{language.name}}
                     .modal-footer
-                        button type="button" class="btn btn-default" data-dismiss="modal" Delete
-                        button type="button" class="btn btn-primary" data-dismiss="modal" Cancel
+                        button type="button" class="btn btn-default"ng-click="ok()" Delete
+                        button type="button" class="btn btn-primary"ng-click="cancel()" Cancel
               
               tabset
                 tab heading="Media content"
                   #media.row
                     form.form-horizontal role="form"
-                      placeholderfield ng-item="exhibits[exhibit_index]" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup"
-                      placeholderfield ng-item="exhibits[exhibit_index]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2"
-                      audioplayer ng-item="exhibits[exhibit_index].stories[0]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
+                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup"
+                      placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2"
+                      audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
 
-                      placeholdertextarea ng-item="exhibits[exhibit_index]" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
+                      placeholdertextarea ng-item="active_exhibit" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
                       
                       .form-group.last
                         .pull-right.done_button
@@ -299,19 +306,19 @@ html lang="en" ng-app="Museum"
                       label for="story_quiz_disabled" Disable
                       span.slide-button
                     form.form-horizontal role="form"
-                      placeholderfield ng-item="exhibits[exhibit_index].stories[0].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
+                      placeholderfield ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
                       .error
                         .controls
                       .answers
-                        quizanswer ng-item="answer" ng-collection="exhibits[exhibit_index].stories[0].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-field="title" ng-repeat="answer in exhibits[exhibit_index].stories[0].quiz.answers"
-                      placeholdertextarea ng-item="exhibits[exhibit_index].stories[0].quiz" ng-id="quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
+                        quizanswer ng-item="answer" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-field="title" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers"
+                      placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
 
                 tab heading="QR-code"
                   #qr_code.row
                     .qr_image.col-lg-4
-                      img#qr alt="Qr_code" src="{{exhibits[exhibit_index].qr_code.url}}"
+                      img#qr alt="Qr_code" src="{{active_exhibit.qr_code.url}}"
                     .well.col-lg-4
-                      a.btn.qr-code href="{{exhibits[exhibit_index].qr_code.print_link}}" target="_blank" Print QR-code
+                      a.btn.qr-code href="{{active_exhibit.qr_code.print_link}}" target="_blank" Print QR-code
                       br
                         p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
                 tab heading="More"
@@ -328,12 +335,12 @@ html lang="en" ng-app="Museum"
                 img src='{{exhibit.thumb}}'
               .description ng-click="open_dropdown($event, exhibit)"
                 h4 
-                  | {{exhibit.number}} {{exhibit.name}}
-              .visibility ng-switch="" on="exhibit.publish_state"
+                  | {{exhibit.number}} {{exhibit.stories[current_museum.language].name}}
+              .visibility ng-switch="" on="exhibit.stories[current_museum.language].publish_state"
                 i class="icon-globe placeholder" ng-switch-when="all"
                 i class="icon-user placeholder" ng-switch-when="passcode"
                 .on_hover
-                  switchpub ng-item="exhibit" ng-provider='provider'
+                  switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider'
 
           li.exhibit.dummy data-big-image='/img/img-bg.png' ng-show="new_item_creation"
             div class="opener draft"
@@ -344,21 +351,29 @@ html lang="en" ng-app="Museum"
                 img src='/img/img-bg.png'
               .description ng-click="open_dropdown($event, new_exhibit)"
                 h4 
-                  | {{new_exhibit.number}} {{new_exhibit.name}}
-              .visibility ng-switch="" on="new_exhibit.publish_state"
+                  | {{new_exhibit.number}} {{exhibit.stories[current_museum.language].name}}
+              .visibility ng-switch="" on="new_exhibit.stories[current_museum.language].publish_state"
                 i class="icon-globe placeholder" ng-switch-when="all"
                 i class="icon-user placeholder" ng-switch-when="passcode"
                 .on_hover
-                  switchpub ng-item="new_exhibit" ng-provider='provider'
+                  switchpub ng-item="new_exhibit.stories[current_museum.language]" ng-provider='provider'
 
 
     script src="lib/angular/angular.js"
-    / script src="lib/angular/angular-resource.js"
+    script src="lib/angular/angular-cookies.js"
     script src="lib/ui-bootstrap-tpls-0.6.0.js"
     script src="lib/ui-bootstrap-0.6.0.js"
+    script src="lib/angularLocalStorage.js"
+    / jquery part
     script src="lib/jquery-1.10.2.js"
     script src="lib/jquery.scrollTo.js"
     script src="lib/jquery.jplayer.min.js"
+    script src="lib/jQuery-File-Upload/vendor/jquery.ui.widget.js"
+    script src="lib/jQuery-File-Upload/jquery.iframe-transport.js"
+    script src="lib/jQuery-File-Upload/jquery.fileupload.js"
+    script src="lib/jQuery-File-Upload/jquery.fileupload-fp.js"
+    script src="lib/jQuery-File-Upload/locale.js"
+    / app part
     script src="js/app.js"
     script src="js/services.js"
     script src="js/controllers.js"
