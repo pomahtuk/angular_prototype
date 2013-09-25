@@ -17,9 +17,9 @@
  */
 /* Hide by default
  */
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003193}}
-.switch .slide-button,
-.toggle span span {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003197}}
+.switch-toggle a,
+.switch-light span span {
   display: none;
 }
 
@@ -27,67 +27,68 @@
  * so we only target browsers with support for media queries.
  */
 @media only screen {
-  /* Checkbox toggle
+  /* Checkbox switch
    */
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003204}}
-  .toggle {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003208}}
+  .switch-light {
     display: block;
     height: 30px;
     /* Outline the toggles when the inputs are focused
      */
     position: relative;
+    overflow: visible;
     padding: 0;
     margin-left: 100px;
-    /* Position the label over all the elements, except the slide-button
+    /* Position the label over all the elements, except the slide-button (<a>)
      * Clicking anywhere on the label will change the switch-state
      */
     /* Don't hide the input from screen-readers and keyboard access
      */
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000322}}
-  .toggle * {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000322}}
+  .switch-light * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000326}}
-  .toggle .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000326}}
+  .switch-light a {
     display: block;
     -webkit-transition: all 0.3s ease-out;
     -moz-transition: all 0.3s ease-out;
     -o-transition: all 0.3s ease-out;
     transition: all 0.3s ease-out;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000333}}
-  .toggle label,
-  .toggle > span {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000333}}
+  .switch-light label,
+  .switch-light > span {
     line-height: 30px;
     vertical-align: middle;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000341}}
-  .toggle input:focus ~ .slide-button,
-  .toggle input:focus + label {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000341}}
+  .switch-light input:focus ~ a,
+  .switch-light input:focus + label {
     outline: 1px dotted #888;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000360}}
-  .toggle label {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000361}}
+  .switch-light label {
     position: relative;
     z-index: 3;
     display: block;
     width: 100%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000370}}
-  .toggle input {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000371}}
+  .switch-light input {
     position: absolute;
     opacity: 0;
     z-index: 5;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000375}}
-  .toggle input:checked ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000376}}
+  .switch-light input:checked ~ a {
     right: 0%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000381}}
-  .toggle > span {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000382}}
+  .switch-light > span {
     position: absolute;
     left: -100px;
     width: 100%;
@@ -95,8 +96,8 @@
     padding-right: 100px;
     text-align: left;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000391}}
-  .toggle > span span {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000392}}
+  .switch-light > span span {
     position: absolute;
     top: 0;
     left: 0;
@@ -106,12 +107,12 @@
     margin-left: 100px;
     text-align: center;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003103}}
-  .toggle > span span:last-child {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003104}}
+  .switch-light > span span:last-child {
     left: 50%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003110}}
-  .toggle .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003111}}
+  .switch-light a {
     position: absolute;
     right: 50%;
     top: 0;
@@ -124,48 +125,50 @@
 
   /* Radio switch
    */
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003210}}
-  .switch {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003214}}
+  .switch-toggle {
     display: block;
     height: 30px;
     /* Outline the toggles when the inputs are focused
      */
     position: relative;
-    padding: 0;
+    /* For callout panels in foundation
+     */
+    padding: 0 !important;
     /* Generate styles for the multiple states */
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000322}}
-  .switch * {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000322}}
+  .switch-toggle * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000326}}
-  .switch .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000326}}
+  .switch-toggle a {
     display: block;
     -webkit-transition: all 0.3s ease-out;
     -moz-transition: all 0.3s ease-out;
     -o-transition: all 0.3s ease-out;
     transition: all 0.3s ease-out;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000333}}
-  .switch label,
-  .switch > span {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000333}}
+  .switch-toggle label,
+  .switch-toggle > span {
     line-height: 30px;
     vertical-align: middle;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\0000341}}
-  .switch input:focus ~ .slide-button,
-  .switch input:focus + label {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\0000341}}
+  .switch-toggle input:focus ~ a,
+  .switch-toggle input:focus + label {
     outline: 1px dotted #888;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003133}}
-  .switch input {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003137}}
+  .switch-toggle input {
     position: absolute;
     opacity: 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003138}}
-  .switch label {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003142}}
+  .switch-toggle label {
     position: relative;
     z-index: 2;
     float: left;
@@ -174,8 +177,8 @@
     margin: 0;
     text-align: center;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003150}}
-  .switch .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003154}}
+  .switch-toggle a {
     position: absolute;
     top: 0;
     left: 0;
@@ -184,59 +187,59 @@
     width: 50%;
     height: 100%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003161}}
-  .switch input:last-of-type:checked ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003165}}
+  .switch-toggle input:last-of-type:checked ~ a {
     left: 50%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003172}}
-  .switch.switch-3 label,
-  .switch.switch-3 .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003176}}
+  .switch-toggle.switch-3 label,
+  .switch-toggle.switch-3 a {
     width: 33.33333%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003178}}
-  .switch.switch-3 input:checked:nth-of-type(2) ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003182}}
+  .switch-toggle.switch-3 input:checked:nth-of-type(2) ~ a {
     left: 33.33333%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003183}}
-  .switch.switch-3 input:checked:last-of-type ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003187}}
+  .switch-toggle.switch-3 input:checked:last-of-type ~ a {
     left: 66.66667%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003172}}
-  .switch.switch-4 label,
-  .switch.switch-4 .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003176}}
+  .switch-toggle.switch-4 label,
+  .switch-toggle.switch-4 a {
     width: 25%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003178}}
-  .switch.switch-4 input:checked:nth-of-type(2) ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003182}}
+  .switch-toggle.switch-4 input:checked:nth-of-type(2) ~ a {
     left: 25%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003178}}
-  .switch.switch-4 input:checked:nth-of-type(3) ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003182}}
+  .switch-toggle.switch-4 input:checked:nth-of-type(3) ~ a {
     left: 50%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003183}}
-  .switch.switch-4 input:checked:last-of-type ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003187}}
+  .switch-toggle.switch-4 input:checked:last-of-type ~ a {
     left: 75%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003172}}
-  .switch.switch-5 label,
-  .switch.switch-5 .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003176}}
+  .switch-toggle.switch-5 label,
+  .switch-toggle.switch-5 a {
     width: 20%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003178}}
-  .switch.switch-5 input:checked:nth-of-type(2) ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003182}}
+  .switch-toggle.switch-5 input:checked:nth-of-type(2) ~ a {
     left: 20%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003178}}
-  .switch.switch-5 input:checked:nth-of-type(3) ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003182}}
+  .switch-toggle.switch-5 input:checked:nth-of-type(3) ~ a {
     left: 40%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003178}}
-  .switch.switch-5 input:checked:nth-of-type(4) ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003182}}
+  .switch-toggle.switch-5 input:checked:nth-of-type(4) ~ a {
     left: 60%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003183}}
-  .switch.switch-5 input:checked:last-of-type ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003187}}
+  .switch-toggle.switch-5 input:checked:last-of-type ~ a {
     left: 80%;
   }
 
@@ -245,7 +248,7 @@
    * Based on the "Sort Switches / Toggles (PSD)" by Ormal Clarck
    * http://www.premiumpixels.com/freebies/sort-switches-toggles-psd/
    */
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003220}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003224}}
   .candy {
     background-color: #2d3035;
     border-radius: 3px;
@@ -253,24 +256,23 @@
     font-weight: bold;
     text-align: center;
     text-shadow: 1px 1px 1px #191b1e;
-    -webkit-box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 0px rgba(255, 255, 255, 0.2);
-    -moz-box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 0px rgba(255, 255, 255, 0.2);
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 0px rgba(255, 255, 255, 0.2);
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003234}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003236}}
   .candy label {
+    color: #fff;
     -webkit-transition: color 0.2s ease-out;
     -moz-transition: color 0.2s ease-out;
     -o-transition: color 0.2s ease-out;
     transition: color 0.2s ease-out;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003238}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003241}}
   .candy input:checked + label {
     color: #333;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003243}}
-  .candy .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003246}}
+  .candy a {
     border: 1px solid #333;
     background-color: #70c66b;
     border-radius: 3px;
@@ -279,42 +281,42 @@
     background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
     background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
     background-image: linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
-    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.45);
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.45);
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003258}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003259}}
   .candy > span {
     color: #333;
     text-shadow: none;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003264}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003265}}
   .candy span {
     color: #fff;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003268}}
-  .candy.blue .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003269}}
+  .candy.blue a {
     background-color: #38a3d4;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003272}}
-  .candy.yellow .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003273}}
+  .candy.yellow a {
     background-color: #f5e560;
   }
 
   /* Android Theme
    */
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003279}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003280}}
   .android {
     background-color: #464747;
     border-radius: 1px;
     color: #fff;
-    -webkit-box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
-    -moz-box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
     box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
-    /* Selected ON toggle
+    /* Selected ON switch-light
      */
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003289}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003286}}
+  .android label {
+    color: #fff;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003292}}
   .android > span span {
     opacity: 0;
     -webkit-transition: all 0.1s;
@@ -322,32 +324,30 @@
     -o-transition: all 0.1s;
     transition: all 0.1s;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003294}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003297}}
   .android > span span:first-of-type {
     opacity: 1;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003299}}
-  .android .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003302}}
+  .android a {
     background-color: #666;
     border-radius: 1px;
-    -webkit-box-shadow: inset rgba(255, 255, 255, 0.2) 0 1px 0, rgba(0, 0, 0, 0.3) 0 1px 0;
-    -moz-box-shadow: inset rgba(255, 255, 255, 0.2) 0 1px 0, rgba(0, 0, 0, 0.3) 0 1px 0;
-    box-shadow: inset rgba(255, 255, 255, 0.2) 0 1px 0, rgba(0, 0, 0, 0.3) 0 1px 0;
+    box-shadow: inset rgba(255, 255, 255, 0.2) 0 1px 0, inset rgba(0, 0, 0, 0.3) 0 -1px 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003313}}
-  .android.toggle input:checked ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003314}}
+  .android.switch-light input:checked ~ a {
     background-color: #0E88B1;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003318}}
-  .android.toggle input:checked ~ span span:first-of-type {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003319}}
+  .android.switch-light input:checked ~ span span:first-of-type {
     opacity: 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003322}}
-  .android.toggle input:checked ~ span span:last-of-type {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003323}}
+  .android.switch-light input:checked ~ span span:last-of-type {
     opacity: 1;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003331}}
-  .android.switch,
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003332}}
+  .android.switch-toggle,
   .android > span span {
     font-size: 85%;
     text-transform: uppercase;
@@ -355,12 +355,12 @@
 
   /* iOS Theme
    */
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003345}}
-  .ios.toggle {
-    color: lightgrey;
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003346}}
+  .ios.switch-light {
+    color: #868686;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003348}}
-  .ios.toggle .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003349}}
+  .ios.switch-light a {
     left: 0;
     width: 30px;
     background-color: white;
@@ -370,27 +370,25 @@
     -moz-transition: all 0.3s ease-out;
     -o-transition: all 0.3s ease-out;
     transition: all 0.3s ease-out;
-    -webkit-box-shadow: inset 0 -3px 3px rgba(0, 0, 0, 0.025), 0 1px 4px rgba(0, 0, 0, 0.15), 0 4px 4px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: inset 0 -3px 3px rgba(0, 0, 0, 0.025), 0 1px 4px rgba(0, 0, 0, 0.15), 0 4px 4px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 -3px 3px rgba(0, 0, 0, 0.025), 0 1px 4px rgba(0, 0, 0, 0.15), 0 4px 4px rgba(0, 0, 0, 0.1);
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003364}}
-  .ios.toggle > span span {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003363}}
+  .ios.switch-light > span span {
     width: 100%;
     left: 0;
     opacity: 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003369}}
-  .ios.toggle > span span:first-of-type {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003368}}
+  .ios.switch-light > span span:first-of-type {
     opacity: 1;
     padding-left: 30px;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003374}}
-  .ios.toggle > span span:last-of-type {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003373}}
+  .ios.switch-light > span span:last-of-type {
     padding-right: 30px;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003379}}
-  .ios.toggle > span:before {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003378}}
+  .ios.switch-light > span:before {
     content: '';
     display: block;
     width: 100%;
@@ -405,43 +403,36 @@
     -moz-transition: all 0.5s ease-out;
     -o-transition: all 0.5s ease-out;
     transition: all 0.5s ease-out;
-    -webkit-box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
-    -moz-box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
     box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003400}}
-  .ios.toggle input:checked ~ .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003397}}
+  .ios.switch-light input:checked ~ a {
     left: 100%;
     margin-left: -30px;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003405}}
-  .ios.toggle input:checked ~ span:before {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003402}}
+  .ios.switch-light input:checked ~ span:before {
     border-color: #53d76a;
-    -webkit-box-shadow: inset 0 0 0 30px #53d76a;
-    -moz-box-shadow: inset 0 0 0 30px #53d76a;
     box-shadow: inset 0 0 0 30px #53d76a;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003412}}
-  .ios.toggle input:checked ~ span span:first-of-type {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003409}}
+  .ios.switch-light input:checked ~ span span:first-of-type {
     opacity: 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003416}}
-  .ios.toggle input:checked ~ span span:last-of-type {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003413}}
+  .ios.switch-light input:checked ~ span span:last-of-type {
     opacity: 1;
     color: white;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003426}}
-  .ios.switch {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003423}}
+  .ios.switch-toggle {
     background-color: #fafafa;
     border: 1px solid lightgrey;
     border-radius: 30px;
-    color: #868686;
-    -webkit-box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
-    -moz-box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
     box-shadow: inset rgba(0, 0, 0, 0.1) 0 1px 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003437}}
-  .ios.switch .slide-button {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003430}}
+  .ios.switch-toggle a {
     background-color: #53d76a;
     border-radius: 25px;
     -webkit-transition: all 0.3s ease-out;
@@ -449,7 +440,11 @@
     -o-transition: all 0.3s ease-out;
     transition: all 0.3s ease-out;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003446}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003437}}
+  .ios.switch-toggle label {
+    color: #868686;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003443}}
   .ios input:checked + label {
     color: #3a3a3a;
   }
@@ -461,16 +456,16 @@
  * https://github.com/zurb/foundation/pull/2725
  */
 @media only screen and (-webkit-min-device-pixel-ratio: 0) and (max-device-width: 480px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003461}}
-  .toggle,
-  .switch {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003458}}
+  .switch-light,
+  .switch-toggle {
     -webkit-animation: webkitSiblingBugfix infinite 1s;
   }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Desktop\/izi_prototype\/css\/toggle-switch\.scss}line{font-family:\00003461}}
-  .toggle,
-  .switch {
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/toggle-switch\.scss}line{font-family:\00003458}}
+  .switch-light,
+  .switch-toggle {
     -webkit-animation: none 0;
   }
 }

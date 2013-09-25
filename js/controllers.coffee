@@ -440,7 +440,8 @@ angular.module("Museum.controllers", [])
 
   # just prototype function - remove active class, if window was reloaded when dropdown was opened
   for exhibit in $scope.exhibits
-    exhibit.active = false
+    exhibit.active   = false
+    exhibit.selected = false
 
   findActive = -> $('ul.exhibits li.exhibit.active')
 
@@ -582,7 +583,7 @@ angular.module("Museum.controllers", [])
 
   # TODO: find angular hook on after render and refactior. Get rid of setTimeout
   setTimeout ->
-    $scope.grid()
+    # $scope.grid()
     $scope.museum_list_prepare()
     initFileUpload()
   , 200
@@ -590,29 +591,14 @@ angular.module("Museum.controllers", [])
   $scope.active_exhibit =  $scope.exhibits[0]
 
   angular.element($window).bind "resize", ->
-    $scope.grid()
-    $scope.museum_list_prepare()
-
-  # TODO: refactor museums search behavior according to angular way
-  $('.museum_navigation_menu .search').click ->
-    elem = $ @
-    elem.hide()
-    elem.next().show().children().first().focus()
-
-  $('.museum_navigation_menu .search_input input').blur ->
-    elem   = $ @
-    parent = elem.parents('.search_input')
-    elem.animate {width: '150px'}, 150,  ->
-      parent.hide()
-      parent.prev().show()
-
-  $('.museum_navigation_menu .search_input input').focus ->
-    input = $ @
-    width = $('body').width() - 700
-    if width > 150
-      input.animate {width: "#{width}px"}, 300
+    setTimeout ->
+      # $scope.grid()
+      $scope.museum_list_prepare()
+    , 100
 
   $scope.new_item_creation = false
+
+  $scope.all_selected = false
 
   get_number = ->
     ++$scope.exhibits[$scope.exhibits.length-1].number + 1
@@ -689,6 +675,24 @@ angular.module("Museum.controllers", [])
     languages: $scope.current_museum.stories
   }
 
+  $scope.check_selected = ->
+    count = 0
+    $scope.select_all_enabled = false
+    for exhibit in $scope.exhibits
+      if exhibit.selected is true
+        $scope.select_all_enabled = true
+        count += 1
+    if count is $scope.exhibits.length
+       $scope.all_selected = true
+
+  $scope.select_all_exhibits = ->
+    sign = !$scope.all_selected
+    console.log  sign
+    for exhibit in $scope.exhibits
+      exhibit.selected = sign
+    $scope.all_selected = !$scope.all_selected
+    $scope.select_all_enabled = sign
+
   $scope.delete_modal_open = ->
     ModalDeleteInstance = $modal.open(
       templateUrl: "myModalContent.html"
@@ -699,11 +703,11 @@ angular.module("Museum.controllers", [])
     )
     ModalDeleteInstance.result.then ((selected) ->
       $scope.selected = selected
-      console.log selected
-      for story, st_index in $scope.active_exhibit.stories
+      console.log $scope.active_exhibit
+      for st_index, story of $scope.active_exhibit.stories
         for item in selected
-          if story.language is item
-            if $scope.active_exhibit.stories.length is 1
+          if item is st_index
+            if Object.keys($scope.active_exhibit.stories).length is 1
               $scope.closeDropDown()
               $scope.exhibits.splice $scope.active_exhibit.index, 1
               $scope.active_exhibit = $scope.exhibits[0]
@@ -796,59 +800,6 @@ angular.module("Museum.controllers", [])
       if nav.hasClass 'navbar-fixed-top'
         $('body').animate {'padding-top': '+=44px'}, 200
       elem.addClass 'active'
-
-  $scope.upload_image = (e) ->
-    console.log e
-    e.preventDefault()
-    elem = $ e.target
-    parent = elem.parents('#images, #maps')
-
-    if parent.find('li:hidden').isEmpty()
-      $.ajax
-        url: elem.attr('href')
-        async: false
-        success: (response) ->
-          node = $(response).hide()
-          parent.find('li.new').before node
-          initFileUpload e, node.find('.fileupload'), { progress: elem.find('.progress') }
-    parent.find('li:hidden :file').click()
-
-  $scope.delete_image = (e) ->
-    e.preventDefault()
-    e.stopPropagation()
-    elem = $ e.target
-    parent = elem.parents('#images, #maps')
-
-    if confirm(elem.data('confirm'))
-      $.ajax
-        url: elem.attr('href')
-        type: elem.data('method')
-        data:
-          authentity_token: $('meta[name=csrf-token]').attr('content')
-        success: ->
-          fadeTime = 200
-          if parent.attr('id').match(/images/)
-            elem.parents('li').fadeOut fadeTime, ->
-              elem.remove()
-              storySetImage.trigger 'image:deleted'
-          else
-            elem.parents('li').fadeOut fadeTime, ->
-              elem.remove()
-
-  $scope.change_image = (e) ->
-    elem = $ e.target
-    form = elem.parents 'form'
-    unless elem.hasClass('disabled')
-      form.find(':file').trigger 'click'
-
-  $scope.quiz_state = (form) ->
-    # console.log form
-    if form.$valid
-      console.log 'wow!'
-    else
-      console.log 'nope:('
-    # console.log $scope.active_exhibit.stories[$scope.current_museum.language].quiz.state
-    true
 
   $scope.$on 'save_dummy', ->
     $scope.new_exhibit.publish_state = 'passcode'
@@ -962,6 +913,91 @@ angular.module("Museum.controllers", [])
       $scope.exhibits.push exhibit
 
   # $scope.populate_localstorage()
+
+])
+
+.controller('DropDownController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage) ->
+  
+  $scope.quiz_state = (form) ->
+    $scope.mark_quiz_validity(form.$valid)
+    unless form.$valid
+      setTimeout ->
+        $("#story_quiz_disabled").click()
+      , 300      
+    true
+
+  $scope.mark_quiz_validity = (valid) ->
+    form = $('#quiz form')
+    if valid
+      form.removeClass 'has_error'
+    else
+      form.addClass 'has_error'
+    # for answer in $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].quiz.answers
+    #   group = $("#quiz input[name=#{answer.id}]").parents('.form-group')
+    #   unless answer.title?
+    #     group.addClass 'has-error'
+    #   else
+    #     group.removeClass 'has-error'
+
+    true
+
+  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz.state', (newValue, oldValue) ->
+    if newValue is 'limited'
+      unless $("#story_quiz_disabled").is(':checked')
+        setTimeout ->
+          $("#story_quiz_disabled").click()
+        , 10
+    else
+      unless $("#story_quiz_enabled").is(':checked')
+        setTimeout ->
+          $("#story_quiz_enabled").click()
+        , 10
+
+  $scope.upload_image = (e) ->
+    console.log e
+    e.preventDefault()
+    elem = $ e.target
+    parent = elem.parents('#images, #maps')
+
+    if parent.find('li:hidden').isEmpty()
+      $.ajax
+        url: elem.attr('href')
+        async: false
+        success: (response) ->
+          node = $(response).hide()
+          parent.find('li.new').before node
+          initFileUpload e, node.find('.fileupload'), { progress: elem.find('.progress') }
+    parent.find('li:hidden :file').click()
+
+  $scope.delete_image = (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    elem = $ e.target
+    parent = elem.parents('#images, #maps')
+
+    if confirm(elem.data('confirm'))
+      $.ajax
+        url: elem.attr('href')
+        type: elem.data('method')
+        data:
+          authentity_token: $('meta[name=csrf-token]').attr('content')
+        success: ->
+          fadeTime = 200
+          if parent.attr('id').match(/images/)
+            elem.parents('li').fadeOut fadeTime, ->
+              elem.remove()
+              storySetImage.trigger 'image:deleted'
+          else
+            elem.parents('li').fadeOut fadeTime, ->
+              elem.remove()
+
+  $scope.change_image = (e) ->
+    elem = $ e.target
+    form = elem.parents 'form'
+    unless elem.hasClass('disabled')
+      form.find(':file').trigger 'click'
+
+  true
 
 ])
 

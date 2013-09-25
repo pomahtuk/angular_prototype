@@ -30,20 +30,14 @@ html lang="en" ng-app="Museum"
             a.top_nav href="#" 
               | New Tour
           .right_content.navbar-right
-            .searches
-              .search
-                i.icon-search
-                a href="#" 
-                  | {{museum_search || 'Search'}}
-              .search_input ng-show="museum_search_visible"
-                input.form-control type="text" placeholder="Search" ng-model="museum_search"
-                a.search_reset href='#' ng-click="museum_search=''"
-                  i.icon-remove-sign
+            
+            museum-search ng-model="museum_search"
+           
             .dropdown
-              a#visibility_filter.dropdown-toggle data-toggle="dropdown" href="#"
+              a.dropdown-toggle data-toggle="dropdown" href="#"
                 | {{user.mail}}
                 span.caret
-              ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
+              ul.dropdown-menu
                 li role="presentation" ng-repeat="provider in user.providers"
                   a role="menuitem" tabindex="-1" href="{{provider.link}}" 
                     | {{provider.name}}
@@ -58,11 +52,11 @@ html lang="en" ng-app="Museum"
                   a role="menuitem" tabindex="-1" href="" Logout
         
         .museum_filters
-          a.active.time_changed href="#" ng-click="museum_type_filter = ''"
+          a.time_changed href="#" ng-click="museum_type_filter = ''" ng-class="{'active': museum_type_filter == ''}"
             i.icon-time
-          a.type_museum href="#" ng-click="museum_type_filter = 'museum'"
+          a.type_museum href="#" ng-click="museum_type_filter = 'museum'" ng-class="{'active': museum_type_filter == 'museum'}"
             i.icon-home
-          a.type_tour href="#" ng-click="museum_type_filter = 'tour'"
+          a.type_tour href="#" ng-click="museum_type_filter = 'tour'" ng-class="{'active': museum_type_filter == 'tour'}"
             i.icon-map-marker
         
         ul.museum_list.row
@@ -114,22 +108,26 @@ html lang="en" ng-app="Museum"
       .actions_bar
         .left_content
           button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" New item 
-          .btn-group
-            button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
-              | Actions  
-              span.caret
-            ul.dropdown-menu role="menu"
-              li
-                a href="#" 1
-              li
-                a href="#" 2
-              li
-                a href="#" 3
-          .btn-group.spacer
-            button.btn.btn-default.undo type="button" 
-              i.icon-undo
-            button.btn.btn-default.redo type="button" 
-              i.icon-repeat
+          / .btn-group
+          /   button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
+          /     | Actions  
+          /     span.caret
+          /   ul.dropdown-menu role="menu"
+          /     li
+          /       a href="#" 1
+          /     li
+          /       a href="#" 2
+          /     li
+          /       a href="#" 3
+          / .btn-group.spacer
+          /   button.btn.btn-default.undo type="button" 
+          /     i.icon-undo
+          /   button.btn.btn-default.redo type="button" 
+          /     i.icon-repeat
+
+          a.spacer href="#" ng-click="select_all_exhibits()" ng-show="select_all_enabled" ng-switch="" on="all_selected"
+            span ng-switch-when="false" Select all
+            span ng-switch-when="true"  Unselect all
 
         .right_content
           span.limits.spacer
@@ -142,7 +140,7 @@ html lang="en" ng-app="Museum"
               i.icon-chevron-left
             button.btn.btn-default.next type="button" 
               i.icon-chevron-right
-          input.form-control.search.spacer type="text" placeholder="Search"
+          input.form-control.search.spacer type="text" placeholder="Search" ng-model="exhibit_search"
           button.btn.btn-default.filter_opener type="button" ng-click="toggle_filters($event)" Filters
 
       .filters_bar
@@ -178,7 +176,7 @@ html lang="en" ng-app="Museum"
 
         ul.exhibits
 
-          li#drop_down 
+          li#drop_down ng-controller="DropDownController" 
 
             .prev-ex
             #images
@@ -188,7 +186,7 @@ html lang="en" ng-app="Museum"
                   .help-tooltip
                     i.icon-question-sign.icon.tip data-placement="right" title="The images from this list will be made visible in mobile app.&lt;br&gt;The list should contain no more than 16 images."
                 ul.images-displayed data-max-displayed="16"
-                  li id="media_content_ids_{{image.id}}" ng-repeat="image in active_exhibit.images"
+                  li id="media_content_ids_{{image.id}}" ng-repeat="image in $parent.active_exhibit.images"
                     form#edit_image_38999.upload-form accept-charset="UTF-8" action="{{image.edit_url}}" data-remote="true" enctype="multipart/form-data" method="post"
                       div style="margin:0;padding:0;display:inline"
                         input name="utf8" type="hidden" value="✓"
@@ -297,17 +295,17 @@ html lang="en" ng-app="Museum"
                 tab heading="Quiz"
                   #quiz.row
                     form.form-horizontal role="form" name="quizform"
-                      .switch.ios
-                        input id="story_quiz_enabled" name="story_quiz_enabled" value="published" type="radio" checked="" ng-model="active_exhibit.stories[current_museum.language].quiz.state" ng-change="quiz_state(quizform)"
-                        label for="story_quiz_enabled" Enabled
-                        input id="story_quiz_disabled" name="story_quiz_enabled" value="limited" type="radio" ng-model="active_exhibit.stories[current_museum.language].quiz.state" ng-change="quiz_state(quizform)"
-                        label for="story_quiz_disabled" Disable
-                        span.slide-button
+                      .switch-toggle.ios
+                        input id="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.state" value="published" type="radio" name="story_quiz_enabled" 
+                        label for="story_quiz_enabled" ng-click="quiz_state(quizform)" Enabled
+                        input id="story_quiz_disabled" ng-model="active_exhibit.stories[current_museum.language].quiz.state" value="limited" type="radio" name="story_quiz_enabled"
+                        label for="story_quiz_disabled" ng-click="quiz_state(quizform)" Disable
+                        a
                       placeholderfield ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
                       .error
                         .controls
                       .answers
-                        quizanswer ng-item="answer" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-field="title" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers"
+                        quizanswer ng-item="answer" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers"
                       placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
 
                 tab heading="QR-code"
@@ -323,11 +321,11 @@ html lang="en" ng-app="Museum"
 
             .next-ex
 
-          li.exhibit data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits" ng-class="{active: exhibit.active}"
-            div class="opener {{exhibit.status}}"
+          li.exhibit data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search" ng-class="{active: exhibit.active}"
+            div class="opener {{exhibit.status}}" ng-class="{'border': exhibit.selected}"
               .overlay
               .checkbox
-                input type="checkbox"
+                input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
               .image ng-click="open_dropdown($event, exhibit)"
                 img src='{{exhibit.thumb}}'
               .description ng-click="open_dropdown($event, exhibit)"
@@ -339,11 +337,12 @@ html lang="en" ng-app="Museum"
                 .on_hover
                   switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider'
 
+
           li.exhibit.dummy data-big-image='/img/img-bg.png' ng-show="new_item_creation"
             div class="opener draft"
               .overlay ng-click="open_dropdown($event, new_exhibit)"
-              .checkbox
-                input type="checkbox"
+              / .checkbox
+              /   input type="checkbox"
               .image
                 img src='/img/img-bg.png'
               .description ng-click="open_dropdown($event, new_exhibit)"

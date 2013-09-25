@@ -3,12 +3,10 @@
 # Directives 
 angular.module("Museum.directives", [])
 
-
 # Focus and blur support
 .directive "ngBlur", ->
   (scope, elem, attrs) ->
     elem.bind "blur", ->
-      # console.log scope
       scope.$apply attrs.ngBlur
 
 .directive "ngFocus", ($timeout) ->
@@ -47,7 +45,7 @@ angular.module("Museum.directives", [])
     current_museum: '=ngMuseum'
     trans: '=translations'
   template: """
-    <div class="btn-group pull-right item_publish_settings ololo">
+    <div class="btn-group pull-right item_publish_settings">
       <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" type="button" ng-switch on="item.stories[current_museum.language].publish_state">
         <div class="extra" ng-switch on="item.stories[current_museum.language].publish_state">
           <i class="icon-globe" ng-switch-when="all" ></i>
@@ -156,14 +154,12 @@ angular.module("Museum.directives", [])
     </div>
   """ 
   controller : ($scope, $rootScope, $element, $attrs) ->
-    console.log $scope.field unless $scope.item
     $scope.item.statuses = {} unless $scope.item.statuses?
     $scope.status = $scope.item.statuses[$scope.item.field]
     $scope.status_process = ->
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
         $scope.status = 'progress'
         $scope.empty_val = false
-        console.log $scope.field, $scope.item.publish_state is 'draft'
         if $scope.field is 'name' and $scope.item.publish_state is 'draft'
           $rootScope.$broadcast 'save_dummy'
       else
@@ -212,11 +208,10 @@ angular.module("Museum.directives", [])
       else
         $scope.empty_val = true
   link: (scope, element, attrs) ->
+    scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true
-      else
-        scope.edit_mode = false
     true
 
 .directive "quizanswer", ->
@@ -227,30 +222,40 @@ angular.module("Museum.directives", [])
     item: '=ngItem'
     collection: '=ngCollection'
     id: '@ngId'
-    title: '@ngTitle'
-    field: '@ngField'
   template: """
     <div class="form-group string optional checkbox_added">
-      <label class="string optional control-label col-xs-2" for="{{id}}"></label>
+      <label class="string optional control-label col-xs-2" for="{{id}}">
+        <span class='correct_answer_indicator' ng-show="item.correct_saved">correct</span>
+      </label>
       <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item.id}}" ng-model="checked" ng-click="check_items(item)">
-      <div class="col-xs-5 trigger"  ng-hide="edit_mode || empty_val">
-        <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
+      <div class="col-xs-5 trigger" ng-hide="edit_mode || empty_val">
+        <span class="placeholder" ng-click="edit_mode = true">{{item.title}}</span>
       </div>
       <div class="col-xs-5 triggered" ng-show="edit_mode || empty_val">
-        <input class="form-control" id="{{id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="status_process()" required>
+        <input class="form-control" id="{{id}}" name="{{item.id}}" placeholder="Enter option" type="text" ng-model="item.title" focus-me="edit_mode" ng-blur="status_process()" required>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
   """
   controller : ($scope, $rootScope, $element, $attrs) ->
     $scope.item.statuses = {} unless $scope.item.statuses?
+    $scope.item.correct_saved = false unless $scope.item.correct_saved?
     $scope.status = $scope.item.statuses[$scope.item.field]
+
+    $scope.check_items = (item) ->
+      for sub_item in $scope.collection
+        sub_item.correct = false
+        sub_item.correct_saved = false
+      item.correct = true
+      $scope.item.correct_saved = true
+
     $scope.status_process = ->
-      if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
+      if $scope.item.title && $scope.item.title.length isnt 0
         $scope.status = 'progress'
         $scope.empty_val = false
       else
         $scope.empty_val = true
+
   link: (scope, element, attrs) ->
     scope.checked = 0
     scope.$watch 'collection', (newValue, oldValue) ->
@@ -258,9 +263,15 @@ angular.module("Museum.directives", [])
         for single_item in newValue
           scope.checked = single_item.id if single_item.correct is true            
 
-    scope.$watch 'item[field]', (newValue, oldValue) ->
+    scope.$watch 'item.title', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true 
+
+    scope.$watch 'item.correct_saved', (newValue, oldValue) ->
+      if newValue is true
+        setTimeout ->
+          scope.$apply scope.item.correct_saved = false
+        , 1000
 
     , true
 
@@ -375,4 +386,45 @@ angular.module("Museum.directives", [])
         scope.edit_mode = false
         $("#jquery_jplayer_1").jPlayer "setMedia",
           oga:newValue
+    true
+
+.directive "museumSearch", ->
+  restrict: "E"
+  replace: true
+  transclude: true
+  require: "?ngModel"
+  scope:
+    item: '=ngModel'
+  template: """
+    <div class="searches">
+      <div class="search" ng-hide="museum_search_visible" ng-click="museum_search_visible=true; museum_input_focus = true">
+        <i class="icon-search"></i>
+        <a href="#">{{item || 'Search'}}</a>
+      </div>
+      <div class="search_input" ng-show="museum_search_visible">
+        <input class="form-control" ng-model="item" placeholder="Search" type="text" focus-me="museum_input_focus">
+        <a class="search_reset" href="#" ng-click="item=''">
+          <i class="icon-remove-sign"></i>
+        </a>
+      </div>
+    </div>
+  """ 
+  controller: ($scope, $element) ->
+    $scope.museum_search_visible = false
+    $scope.museum_input_focus = false
+
+    $($element).find('.search_input input').blur ->
+      elem   = $ @
+      $scope.$apply $scope.museum_input_focus = false
+      elem.animate {width: '150px'}, 150, ->
+        $scope.$apply $scope.museum_search_visible = false
+        true
+
+    $($element).find('.search_input input').focus ->
+      input = $ @
+      width = $('body').width() - 700
+      if width > 150
+        input.animate {width: "#{width}px"}, 300
+
+  link: (scope, element, attrs) ->
     true

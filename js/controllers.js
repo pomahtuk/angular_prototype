@@ -470,6 +470,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         exhibit = _ref[_i];
         exhibit.active = false;
+        exhibit.selected = false;
       }
       findActive = function() {
         return $('ul.exhibits li.exhibit.active');
@@ -631,43 +632,17 @@
         }
       };
       setTimeout(function() {
-        $scope.grid();
         $scope.museum_list_prepare();
         return initFileUpload();
       }, 200);
       $scope.active_exhibit = $scope.exhibits[0];
       angular.element($window).bind("resize", function() {
-        $scope.grid();
-        return $scope.museum_list_prepare();
-      });
-      $('.museum_navigation_menu .search').click(function() {
-        var elem;
-        elem = $(this);
-        elem.hide();
-        return elem.next().show().children().first().focus();
-      });
-      $('.museum_navigation_menu .search_input input').blur(function() {
-        var elem, parent;
-        elem = $(this);
-        parent = elem.parents('.search_input');
-        return elem.animate({
-          width: '150px'
-        }, 150, function() {
-          parent.hide();
-          return parent.prev().show();
-        });
-      });
-      $('.museum_navigation_menu .search_input input').focus(function() {
-        var input, width;
-        input = $(this);
-        width = $('body').width() - 700;
-        if (width > 150) {
-          return input.animate({
-            width: "" + width + "px"
-          }, 300);
-        }
+        return setTimeout(function() {
+          return $scope.museum_list_prepare();
+        }, 100);
       });
       $scope.new_item_creation = false;
+      $scope.all_selected = false;
       get_number = function() {
         return ++$scope.exhibits[$scope.exhibits.length - 1].number + 1;
       };
@@ -742,6 +717,34 @@
         },
         languages: $scope.current_museum.stories
       };
+      $scope.check_selected = function() {
+        var count, _j, _len1, _ref1;
+        count = 0;
+        $scope.select_all_enabled = false;
+        _ref1 = $scope.exhibits;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          exhibit = _ref1[_j];
+          if (exhibit.selected === true) {
+            $scope.select_all_enabled = true;
+            count += 1;
+          }
+        }
+        if (count === $scope.exhibits.length) {
+          return $scope.all_selected = true;
+        }
+      };
+      $scope.select_all_exhibits = function() {
+        var sign, _j, _len1, _ref1;
+        sign = !$scope.all_selected;
+        console.log(sign);
+        _ref1 = $scope.exhibits;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          exhibit = _ref1[_j];
+          exhibit.selected = sign;
+        }
+        $scope.all_selected = !$scope.all_selected;
+        return $scope.select_all_enabled = sign;
+      };
       $scope.delete_modal_open = function() {
         var ModalDeleteInstance;
         ModalDeleteInstance = $modal.open({
@@ -754,20 +757,20 @@
           }
         });
         return ModalDeleteInstance.result.then((function(selected) {
-          var item, st_index, story, _j, _len1, _ref1, _results;
+          var item, st_index, story, _ref1, _results;
           $scope.selected = selected;
-          console.log(selected);
+          console.log($scope.active_exhibit);
           _ref1 = $scope.active_exhibit.stories;
           _results = [];
-          for (st_index = _j = 0, _len1 = _ref1.length; _j < _len1; st_index = ++_j) {
+          for (st_index in _ref1) {
             story = _ref1[st_index];
             _results.push((function() {
-              var _k, _len2, _results1;
+              var _j, _len1, _results1;
               _results1 = [];
-              for (_k = 0, _len2 = selected.length; _k < _len2; _k++) {
-                item = selected[_k];
-                if (story.language === item) {
-                  if ($scope.active_exhibit.stories.length === 1) {
+              for (_j = 0, _len1 = selected.length; _j < _len1; _j++) {
+                item = selected[_j];
+                if (item === st_index) {
+                  if (Object.keys($scope.active_exhibit.stories).length === 1) {
                     $scope.closeDropDown();
                     $scope.exhibits.splice($scope.active_exhibit.index, 1);
                     _results1.push($scope.active_exhibit = $scope.exhibits[0]);
@@ -895,74 +898,6 @@
           return elem.addClass('active');
         }
       };
-      $scope.upload_image = function(e) {
-        var elem, parent;
-        console.log(e);
-        e.preventDefault();
-        elem = $(e.target);
-        parent = elem.parents('#images, #maps');
-        if (parent.find('li:hidden').isEmpty()) {
-          $.ajax({
-            url: elem.attr('href'),
-            async: false,
-            success: function(response) {
-              var node;
-              node = $(response).hide();
-              parent.find('li.new').before(node);
-              return initFileUpload(e, node.find('.fileupload'), {
-                progress: elem.find('.progress')
-              });
-            }
-          });
-        }
-        return parent.find('li:hidden :file').click();
-      };
-      $scope.delete_image = function(e) {
-        var elem, parent;
-        e.preventDefault();
-        e.stopPropagation();
-        elem = $(e.target);
-        parent = elem.parents('#images, #maps');
-        if (confirm(elem.data('confirm'))) {
-          return $.ajax({
-            url: elem.attr('href'),
-            type: elem.data('method'),
-            data: {
-              authentity_token: $('meta[name=csrf-token]').attr('content')
-            },
-            success: function() {
-              var fadeTime;
-              fadeTime = 200;
-              if (parent.attr('id').match(/images/)) {
-                return elem.parents('li').fadeOut(fadeTime, function() {
-                  elem.remove();
-                  return storySetImage.trigger('image:deleted');
-                });
-              } else {
-                return elem.parents('li').fadeOut(fadeTime, function() {
-                  return elem.remove();
-                });
-              }
-            }
-          });
-        }
-      };
-      $scope.change_image = function(e) {
-        var elem, form;
-        elem = $(e.target);
-        form = elem.parents('form');
-        if (!elem.hasClass('disabled')) {
-          return form.find(':file').trigger('click');
-        }
-      };
-      $scope.quiz_state = function(form) {
-        if (form.$valid) {
-          console.log('wow!');
-        } else {
-          console.log('nope:(');
-        }
-        return true;
-      };
       $scope.$on('save_dummy', function() {
         $scope.new_exhibit.publish_state = 'passcode';
         $scope.exhibits.push($scope.new_exhibit);
@@ -1081,6 +1016,104 @@
         }
         return _results;
       };
+    }
+  ]).controller('DropDownController', [
+    '$scope', '$http', '$filter', '$window', '$modal', 'storage', function($scope, $http, $filter, $window, $modal, storage) {
+      $scope.quiz_state = function(form) {
+        $scope.mark_quiz_validity(form.$valid);
+        if (!form.$valid) {
+          setTimeout(function() {
+            return $("#story_quiz_disabled").click();
+          }, 300);
+        }
+        return true;
+      };
+      $scope.mark_quiz_validity = function(valid) {
+        var form;
+        form = $('#quiz form');
+        if (valid) {
+          form.removeClass('has_error');
+        } else {
+          form.addClass('has_error');
+        }
+        return true;
+      };
+      $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language].quiz.state', function(newValue, oldValue) {
+        if (newValue === 'limited') {
+          if (!$("#story_quiz_disabled").is(':checked')) {
+            return setTimeout(function() {
+              return $("#story_quiz_disabled").click();
+            }, 10);
+          }
+        } else {
+          if (!$("#story_quiz_enabled").is(':checked')) {
+            return setTimeout(function() {
+              return $("#story_quiz_enabled").click();
+            }, 10);
+          }
+        }
+      });
+      $scope.upload_image = function(e) {
+        var elem, parent;
+        console.log(e);
+        e.preventDefault();
+        elem = $(e.target);
+        parent = elem.parents('#images, #maps');
+        if (parent.find('li:hidden').isEmpty()) {
+          $.ajax({
+            url: elem.attr('href'),
+            async: false,
+            success: function(response) {
+              var node;
+              node = $(response).hide();
+              parent.find('li.new').before(node);
+              return initFileUpload(e, node.find('.fileupload'), {
+                progress: elem.find('.progress')
+              });
+            }
+          });
+        }
+        return parent.find('li:hidden :file').click();
+      };
+      $scope.delete_image = function(e) {
+        var elem, parent;
+        e.preventDefault();
+        e.stopPropagation();
+        elem = $(e.target);
+        parent = elem.parents('#images, #maps');
+        if (confirm(elem.data('confirm'))) {
+          return $.ajax({
+            url: elem.attr('href'),
+            type: elem.data('method'),
+            data: {
+              authentity_token: $('meta[name=csrf-token]').attr('content')
+            },
+            success: function() {
+              var fadeTime;
+              fadeTime = 200;
+              if (parent.attr('id').match(/images/)) {
+                return elem.parents('li').fadeOut(fadeTime, function() {
+                  elem.remove();
+                  return storySetImage.trigger('image:deleted');
+                });
+              } else {
+                return elem.parents('li').fadeOut(fadeTime, function() {
+                  return elem.remove();
+                });
+              }
+            }
+          });
+        }
+      };
+      $scope.change_image = function(e) {
+        var elem, form;
+        elem = $(e.target);
+        form = elem.parents('form');
+        if (!elem.hasClass('disabled')) {
+          return form.find(':file').trigger('click');
+        }
+      };
+      return true;
     }
   ]);
 
