@@ -258,7 +258,7 @@ angular.module("Museum.controllers", [])
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
               description: 'test description'
               publish_state: 'all'
-              audio: ''
+              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
               quiz: {
                 question: 'are you sure?'
                 description: 'can you tell me?'
@@ -598,14 +598,14 @@ angular.module("Museum.controllers", [])
 
   $scope.grid = ->
     collection = $('.exhibits>li.exhibit')
-    tileListMargin = 59
-    tileWidth = collection.width()
-    tileSpace = parseInt(collection.css('margin-left')) \
-      + parseInt(collection.css('margin-right'))
-
-    $('.exhibits').css 'text-align': 'left'
+    tileListMargin = 20
+    tileWidth = collection.first().width()
+    tileSpace = 40 # parseInt(collection.first().css('margin-left'), 10) + parseInt(collection.first().css('margin-right'), 10)
+    # $('.exhibits').css 'text-align': 'left'
     tileGrid(collection, tileWidth, tileSpace, tileListMargin)
     $(window).resize(tileGrid.bind(@, collection, tileWidth, tileSpace, tileListMargin))
+
+  # $scope.grid()
 
   $scope.museum_list_prepare = ->
     list        = $('ul.museum_list')
@@ -707,6 +707,9 @@ angular.module("Museum.controllers", [])
       e = {}
       e.target = $('li.exhibit.dummy > .opener.draft')
       $scope.open_dropdown(e, $scope.new_exhibit)
+
+      #hack to tile grid when adding an item to new line
+      $(window).resize()     
 
       # hack, cant find out what exactly happening and why new exhibit created before saving
       $scope.exhibits.splice $scope.exhibits.length-1, 1 
@@ -811,15 +814,6 @@ angular.module("Museum.controllers", [])
     ), ->
       console.log "Modal dismissed at: " + new Date()
 
-  $scope.toggle_menu = (elem) ->
-    $('.navigation').toggleClass 'navbar-fixed-top'
-    $('.museum_navigation_menu').slideToggle(300)
-    $('body').toggleClass('fixed_navbar')
-    setTimeout ->
-      $.scrollTo(0,0)
-    , 0
-    true
-
   $scope.toggle_filters = (elem) ->
     $('.filters_bar').slideToggle(200)
     setTimeout ->
@@ -832,6 +826,11 @@ angular.module("Museum.controllers", [])
     elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
     $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened
     false
+
+  $scope.museum_edit_dropdown_close = () ->
+    setTimeout ->
+      $('.actions_bar .museum_edit_opener').click()
+    , 10
 
   $scope.$on 'save_dummy', ->
     console.log 'saving!'

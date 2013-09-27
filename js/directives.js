@@ -41,6 +41,64 @@
         });
       }
     };
+  }).directive("resizer", function() {
+    return {
+      restrict: "A",
+      link: function(scope, element, attr) {
+        var elem;
+        elem = $(element);
+        elem.focus(function() {
+          return elem.animate({
+            'width': '+=150'
+          }, 200);
+        });
+        return elem.blur(function() {
+          return elem.animate({
+            'width': '-=150'
+          }, 200);
+        });
+      }
+    };
+  }).directive("toggleMenu", function() {
+    return {
+      restrict: "A",
+      link: function(scope, element, attr) {
+        var elem;
+        elem = $(element);
+        return elem.click(function() {
+          $('.navigation').toggleClass('navbar-fixed-top');
+          $('.museum_navigation_menu').slideToggle(300);
+          $('body').toggleClass('fixed_navbar');
+          return setTimeout(function() {
+            return $.scrollTo(0, 0);
+          }, 0);
+        });
+      }
+    };
+  }).directive("toggleFilters", function() {
+    return {
+      restrict: "A",
+      link: function(scope, element, attr) {
+        var elem;
+        elem = $(element);
+        return elem.click(function() {
+          $('.filters_bar').slideToggle(200);
+          return setTimeout(function() {
+            return $('body').toggleClass('filers');
+          }, 100);
+        });
+      }
+    };
+  }).directive('postRender', function($timeout) {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attrs) {
+        if (scope.$last) {
+          $timeout(scope.grid, 0);
+        }
+        return true;
+      }
+    };
   }).directive("switchpubitem", function() {
     return {
       restrict: "E",
@@ -297,14 +355,16 @@
           preload: "auto",
           smoothPlayBar: true,
           keyEnabled: true,
-          supplied: "oga"
+          supplied: "m4a, oga"
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
             return scope.edit_mode = true;
           } else {
             scope.edit_mode = false;
+            console.log($("#jquery_jplayer_1"));
             return $("#jquery_jplayer_1").jPlayer("setMedia", {
+              m4a: newValue,
               oga: newValue
             });
           }

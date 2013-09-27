@@ -33,6 +33,46 @@ angular.module("Museum.directives", [])
     element.bind attr.stopEvent, (e) ->
       e.stopPropagation()
 
+.directive "resizer", ->
+  restrict: "A"
+  link: (scope, element, attr) ->
+    elem = $ element
+    elem.focus ->
+      elem.animate {'width': '+=150'}, 200
+    elem.blur ->
+      elem.animate {'width': '-=150'}, 200
+
+.directive "toggleMenu", ->
+  restrict: "A"
+  link: (scope, element, attr) ->
+    elem = $ element
+    elem.click ->
+      $('.navigation').toggleClass 'navbar-fixed-top'
+      $('.museum_navigation_menu').slideToggle(300)
+      $('body').toggleClass('fixed_navbar')
+      setTimeout ->
+        $.scrollTo(0,0)
+      , 0
+
+.directive "toggleFilters", ->
+  restrict: "A"
+  link: (scope, element, attr) ->
+    elem = $ element
+    elem.click ->
+      $('.filters_bar').slideToggle(200)
+      setTimeout ->
+        $('body').toggleClass('filers')
+      , 100
+
+.directive 'postRender', ($timeout) ->
+  restrict : 'A',
+  # terminal : true
+  # transclude : true
+  link : (scope, element, attrs) ->
+    if scope.$last
+      $timeout scope.grid, 0
+    true
+
 # Custom HTML elements
 .directive "switchpubitem", ->
   restrict: "E"
@@ -411,14 +451,21 @@ angular.module("Museum.directives", [])
       preload: "auto"
       smoothPlayBar: true
       keyEnabled: true
-      supplied: "oga"
+      supplied: "m4a, oga"
+      # ready: () ->
+      #   $(@).jPlayer("setMedia", {
+      #     m4a: "http://www.jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
+      #     oga: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
+      #   })
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true
       else
         scope.edit_mode = false
+        console.log $("#jquery_jplayer_1")
         $("#jquery_jplayer_1").jPlayer "setMedia",
-          oga:newValue
+          m4a: newValue
+          oga: newValue
     true
 
 .directive "museumSearch", ->

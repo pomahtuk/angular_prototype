@@ -56,8 +56,8 @@
       </div>
       <div class="navbar navbar-default" ng-mouseover="show_museum_edit_dropdown=true">
         <div class="left_content">
-          <a class="menu_opener" href="#" ng-click="toggle_menu($event)"><i class="icon-reorder"></i></a>
-          <h1 class="museum_title">
+          <a class="menu_opener" href="#" toggle-menu=""><i class="icon-reorder"></i></a><span class="cms_text_logo">izi.cms</span>
+          <h1 class="museum_title" ng-class="{&#39;opened&#39;:museum_edit_dropdown_opened}">
             {{current_museum.name}}
           </h1>
           <div class="btn-group language">
@@ -156,7 +156,7 @@
             </div>
           </div>
           <div class="description">
-            <div class="close"></div>
+            <div class="close" ng-click="museum_edit_dropdown_close()"></div>
             <a class="delete_story" href="#delete_story" ng-click="delete_modal_open()"><i class="icon-trash"></i></a>
             <script id="myMuseumModalContent.html" type="text/ng-template">
               <div class="modal-dialog" id="delete_museum_story">
@@ -195,7 +195,7 @@
             <tabset><tab heading="Media content">
                 <div class="row" id="museum_media">
                   <form class="form-horizontal" name="mainForm" role="form">
-                    <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="museum_opas_number" ng-item="current_museum" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="museum_name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="museum_audio" ng-item="current_museum.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="museum_description" ng-item="current_museum" ng-title="Description"></placeholdertextarea>
+                    <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="museum_opas_number" ng-item="current_museum" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="museum_name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name"></placeholderfield><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="museum_description" ng-item="current_museum" ng-title="Description"></placeholdertextarea>
                   </form>
                 </div>
               </tab><tab heading="QR-code">
@@ -220,18 +220,14 @@
           Museum properties  <i class="icon-chevron-down"></i>
         </div>
         <div class="left_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <button class="btn btn-warning spacer" id="create_new_item" ng-click="create_new_item()" type="button">New item </button><a class="spacer" href="#" ng-click="select_all_exhibits()" ng-show="select_all_enabled" ng-switch="" on="all_selected"><span ng-switch-when="false">Select all</span><span ng-switch-when="true"> Unselect all</span></a>
+          <button class="btn btn-warning spacer" id="create_new_item" ng-class="{&#39;disabled&#39;:new_item_creation}" ng-click="create_new_item()" type="button">New item </button><a class="spacer" href="#" ng-click="select_all_exhibits()" ng-show="select_all_enabled" ng-switch="" on="all_selected"><span ng-switch-when="false">Select all</span><span ng-switch-when="true"> Unselect all</span></a>
         </div>
         <div class="right_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <span class="limits spacer">All items: <b>50-150</b> of <b>304 </b></span>
-          <div class="btn-group spacer">
-            <button class="btn btn-default prev" type="button"><i class="icon-chevron-left"></i></button><button class="btn btn-default next" type="button"><i class="icon-chevron-right"></i></button>
-          </div>
-          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="Search" type="text"><button class="btn btn-default filter_opener" ng-click="toggle_filters($event)" type="button">Filters</button>
+          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="Search" resizer="" type="text"><button class="btn btn-default filter_opener" toggle-filters="" type="button">Filters</button>
         </div>
       </div>
       <div class="filters_bar">
-        <a class="clear_fiters spacer" href="#">Clear filters</a>
+        <a class="clear_fiters spacer" href="#" ng-click="populate_localstorage()">Clear filters</a>
         <div class="dropdown">
           <a data-toggle="dropdown" href="#" id="visibility_filter">Visibility in mobile application <span class="caret"></span></a>
           <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
@@ -425,7 +421,7 @@
             </div>
             <div class="next-ex"></div>
           </li>
-          <li class="exhibit" data-big-image="{{exhibit.image}}" ng-class="{active: exhibit.active}" ng-repeat="exhibit in exhibits | filter: exhibit_search">
+          <li class="exhibit" data-big-image="{{exhibit.image}}" ng-class="{active: exhibit.active}" ng-repeat="exhibit in exhibits | filter: exhibit_search" post-render="">
             <div class="opener {{exhibit.status}}" ng-class="{&#39;border&#39;: exhibit.selected}">
               <div class="overlay" ng-click="open_dropdown($event, exhibit)"></div>
               <div class="checkbox">

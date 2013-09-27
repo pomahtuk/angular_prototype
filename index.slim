@@ -73,9 +73,11 @@ html lang="en" ng-app="Museum"
 
       .navbar.navbar-default ng-mouseover="show_museum_edit_dropdown=true"
         .left_content
-          a.menu_opener href="#" ng-click="toggle_menu($event)"
+          a.menu_opener href="#" toggle-menu=""
             i.icon-reorder
-          h1.museum_title 
+          span.cms_text_logo
+            | izi.cms
+          h1.museum_title ng-class="{'opened':museum_edit_dropdown_opened}"
             | {{current_museum.name}}
           .btn-group.language
             button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
@@ -161,7 +163,7 @@ html lang="en" ng-app="Museum"
                   | Cancel
 
           .description
-            .close
+            .close ng-click="museum_edit_dropdown_close()"
 
             a.delete_story ng-click="delete_modal_open()" href="#delete_story" 
               i.icon-trash
@@ -204,7 +206,7 @@ html lang="en" ng-app="Museum"
                   form.form-horizontal role="form" name="mainForm"
                     placeholderfield ng-item="current_museum" ng-id="museum_opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup"
                     placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="museum_name" ng-title="Name" ng-field="name" ng-help="help text for popup 2"
-                    audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="museum_audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
+                    / audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="museum_audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
 
                     placeholdertextarea ng-item="current_museum" ng-id="museum_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3" maxlength="255"
                     
@@ -240,7 +242,7 @@ html lang="en" ng-app="Museum"
           | Museum properties  
           i.icon-chevron-down
         .left_content ng-mouseover="show_museum_edit_dropdown=false"
-          button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" New item 
+          button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" ng-class="{'disabled':new_item_creation}" New item 
           / .btn-group
           /   button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
           /     | Actions  
@@ -263,21 +265,21 @@ html lang="en" ng-app="Museum"
             span ng-switch-when="true"  Unselect all
 
         .right_content ng-mouseover="show_museum_edit_dropdown=false"
-          span.limits.spacer
-            | All items: 
-            b 50-150
-            |  of 
-            b 304 
-          .btn-group.spacer
-            button.btn.btn-default.prev type="button" 
-              i.icon-chevron-left
-            button.btn.btn-default.next type="button" 
-              i.icon-chevron-right
-          input.form-control.search.spacer type="text" placeholder="Search" ng-model="exhibit_search"
-          button.btn.btn-default.filter_opener type="button" ng-click="toggle_filters($event)" Filters
+          / span.limits.spacer
+          /   | All items: 
+          /   b 50-150
+          /   |  of 
+          /   b 304 
+          / .btn-group.spacer
+          /   button.btn.btn-default.prev type="button" 
+          /     i.icon-chevron-left
+          /   button.btn.btn-default.next type="button" 
+          /     i.icon-chevron-right
+          input.form-control.search.spacer type="text" placeholder="Search" ng-model="exhibit_search" resizer=""
+          button.btn.btn-default.filter_opener type="button" toggle-filters="" Filters
 
       .filters_bar
-        a.clear_fiters.spacer href="#" Clear filters
+        a.clear_fiters.spacer href="#" ng-click="populate_localstorage()" Clear filters
 
         .dropdown
           a#visibility_filter data-toggle="dropdown" href="#"
@@ -457,7 +459,7 @@ html lang="en" ng-app="Museum"
 
             .next-ex
 
-          li.exhibit data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search" ng-class="{active: exhibit.active}"
+          li.exhibit post-render="" data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search" ng-class="{active: exhibit.active}"
             div class="opener {{exhibit.status}}" ng-class="{'border': exhibit.selected}"
               .overlay ng-click="open_dropdown($event, exhibit)"
               .checkbox

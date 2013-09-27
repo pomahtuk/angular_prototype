@@ -302,7 +302,7 @@
                 name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
                 description: 'test description',
                 publish_state: 'all',
-                audio: '',
+                audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
                 quiz: {
                   question: 'are you sure?',
                   description: 'can you tell me?',
@@ -645,12 +645,9 @@
       $scope.grid = function() {
         var collection, tileListMargin, tileSpace, tileWidth;
         collection = $('.exhibits>li.exhibit');
-        tileListMargin = 59;
-        tileWidth = collection.width();
-        tileSpace = parseInt(collection.css('margin-left')) + parseInt(collection.css('margin-right'));
-        $('.exhibits').css({
-          'text-align': 'left'
-        });
+        tileListMargin = 20;
+        tileWidth = collection.first().width();
+        tileSpace = 40;
         tileGrid(collection, tileWidth, tileSpace, tileListMargin);
         return $(window).resize(tileGrid.bind(this, collection, tileWidth, tileSpace, tileListMargin));
       };
@@ -748,6 +745,7 @@
           e = {};
           e.target = $('li.exhibit.dummy > .opener.draft');
           $scope.open_dropdown(e, $scope.new_exhibit);
+          $(window).resize();
           return $scope.exhibits.splice($scope.exhibits.length - 1, 1);
         }
       };
@@ -892,15 +890,6 @@
           return console.log("Modal dismissed at: " + new Date());
         });
       };
-      $scope.toggle_menu = function(elem) {
-        $('.navigation').toggleClass('navbar-fixed-top');
-        $('.museum_navigation_menu').slideToggle(300);
-        $('body').toggleClass('fixed_navbar');
-        setTimeout(function() {
-          return $.scrollTo(0, 0);
-        }, 0);
-        return true;
-      };
       $scope.toggle_filters = function(elem) {
         $('.filters_bar').slideToggle(200);
         return setTimeout(function() {
@@ -914,6 +903,11 @@
         elem.find('i').toggleClass("icon-chevron-down icon-chevron-up");
         $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened;
         return false;
+      };
+      $scope.museum_edit_dropdown_close = function() {
+        return setTimeout(function() {
+          return $('.actions_bar .museum_edit_opener').click();
+        }, 10);
       };
       $scope.$on('save_dummy', function() {
         console.log('saving!');
