@@ -139,8 +139,17 @@ $noConflictColor: #444
 body
   background: #ededed
   text-rendering: optimizeLegibility
-  -webkit-font-smoothing: antialiased
-  padding-top: 100px
+  -webkit-font-smoothing: antialiased  
+
+  &.fixed_navbar
+    padding-top: 100px
+
+    &.filers
+      padding-top: 144px
+
+    .museum_edit_guaranter
+      height: 548px
+
 
 .museum_navigation_menu
   background: #222222
@@ -307,6 +316,31 @@ body
           span
             color: #777777
 
+.museum_edit
+  display: none
+
+.museum_edit_guaranter
+  display: none
+
+.museum_edit_opener
+  +box-shadow(#666, 0px 1px)
+  +border-top-radius(3px)
+  position: absolute
+  top: -24px
+  height: 24px
+  z-index: 1000
+  background: #777777
+  color: #fff
+  width: 160px
+  text-align: center
+  line-height: 24px
+  left: 50%
+  margin-left: -80px
+  cursor: pointer
+
+  i
+    font-size: 12px
+
 .navbar
   margin-bottom: 0px
  
@@ -349,15 +383,22 @@ body
     line-height: 50px
     margin-right: 10px
 
-  .icon-globe
-    padding: 0px 10px 0px 5px
-    font-size: 20px
+  // .icon-globe
+  //   padding: 0px 10px 0px 5px
+  //   font-size: 20px
 
   .dropdown-toggle
     max-height: 34px
 
   .dropdown-menu
     text-align: left
+
+  .item_publish_settings
+    position: relative
+    top: 7px
+
+    .extra
+      margin-right: 5px
 
 .spacer
   margin-right: 10px
@@ -379,6 +420,7 @@ body
   font-size: 18px
 
 .actions_bar, .filters_bar
+  position: relative
   padding-top: 4px
   height: 44px
   background: #fff
@@ -394,8 +436,7 @@ body
   text-align: right
   padding: 0px 40px
   line-height: 38px
-  height: 0
-  overflow: hidden
+  display: none
 
   .clear_fiters
     color: $slideDownTextColorHover
@@ -473,15 +514,16 @@ ul.exhibits
         background: $exhibitBackgroundColor
         border-top: 1px solid #fff
         padding: 10px
-        height: 90px
+        height: 70px
         position: relative
         cursor: pointer
 
         h4
           color: $exhibitTextColor
           font-size: 14px
-          max-height: (16px * 2)
+          max-height: 16px
           line-height: 16px
+          margin: 0px
           overflow: hidden
           cursor: pointer
 
@@ -579,7 +621,7 @@ ul.exhibits
       .visibility
         display: none
 
-#drop_down
+#drop_down, #museum_edit_dropdown
   background: #f8f8f8
   border-top: 1px solid $slideDownOuterBorderColor
   border-bottom: 1px solid $slideDownOuterBorderColor
@@ -607,27 +649,27 @@ ul.exhibits
     left: inherit
     right: 0
 
-  >#images, >.description
+  >.images, >.description
     border-top: 1px solid #fff
     border-bottom: 1px solid #fff
     display: table-cell
     height: 100%
     vertical-align: top
 
-  #images
+  >.images
     +box-sizing(border-box)
     padding:  20px 20px 20px 40px
     border-right: 1px solid #fff
-    width: 30%
+    width: 40%
     vertical-align: middle
     overflow: hidden
 
-  .description
+  >.description
     background: url('../img/images-separator.png') repeat-y 0 0
     padding: 30px 80px 0 55px
     position: relative
     text-align: left
-    width: 70%
+    width: 60%
 
     .close
       background: url('../img/cross.png') center center no-repeat
@@ -669,6 +711,7 @@ ul.exhibits
 
     .form-group
       width: 100%
+      position: relative
 
       .col-lg-2
         min-width: 150px
@@ -676,19 +719,45 @@ ul.exhibits
       .col-lg-6
         margin-left: -13px
 
+      .error_text
+        +inline-block
+        margin-left: 20px
+        line-height: 34px
+        color: #b94a48
+        display: none
+        position: absolute
+        top: 0px
+        left: 100%
+        margin-left: 0px
+
       .preloader
         float: left
         width: 16px
         height: 16px
-        margin-top: 7px
+        margin: 7px 0px 0px 20px
         background: url('../img/small_loader.gif')
+
+      .sumbols_left
+        padding-left: 10px
+        line-height: 34px
+        color: #777
+
+      .empty_name_error
+        color: red
+        display: none
+        position: absolute
+        top: 0px
+        line-height: 34px
+        height: 34px
+        left: 70%
+        background: #f8f8f8
 
       .save_status
         line-height: 34px
         color: #888
 
         i
-          margin-right: 5px
+          margin: 0px 5px 0px 20px
           color: #13b013
 
       .trigger
@@ -725,6 +794,9 @@ ul.exhibits
           vertical-align: center
           margin: 10px 0px 10px 20px
           cursor: pointer
+
+        .error_text
+          margin-left: 25px
 
       .triggered
 
@@ -776,16 +848,34 @@ ul.exhibits
             padding: 6px 12px
             line-height: 1.44
 
-    #quiz form.has_error
-      .form-control.ng-invalid
+    form.has_error
+      .form-control.ng-invalid, .form-control.number_invalid
         border-color: #b94a48
         +box-shadow(rgba(0, 0, 0, 0.075) 1px 1px 0 inset)
 
-    #qr_code img
+        & + .error_text
+          +inline-block
+
+    #qr_code img, #museum_qr_code img
       height: 300px
 
   &.loading .full
     background: url('../img/ajax-loader.gif') no-repeat top center
+
+  .item_publish_settings
+    position: relative
+    top: -5px
+
+    .extra
+      margin-right: 5px
+
+
+#museum_edit_dropdown
+  margin-bottom: 0px
+  .images
+    padding:  20px
+  .description
+    padding: 30px 30px 0 55px
 
 .muted
   color: #666
@@ -798,12 +888,6 @@ textarea
   background-color: #f56600
   border-color: #f56600
 
-.item_publish_settings
-  position: relative
-  top: -5px
-
-  .extra
-    margin-right: 5px
 
 .form-group
   margin-bottom: 10px

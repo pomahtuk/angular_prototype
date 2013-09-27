@@ -138,6 +138,9 @@ acceptableExtensions = gon.acceptable_extensions
 angular.module("Museum.controllers", [])
 # Main controller
 .controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage) ->
+  
+  window.sc = $scope
+
   $scope.museums = [
     {
       name: 'Imperial Peace Museum'
@@ -418,20 +421,47 @@ angular.module("Museum.controllers", [])
     defaultValue: {
       language: 'ru'
       name: 'Museum of modern art'
-      stories: [
+      index: 2
+      number: 3
+      image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+      thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+      publish_state: 'all'
+      description: ''
+      qr_code: {
+        url: '/img/qr_code.png'
+        print_link: 'http://localhost:8000/img/qr_code.png'
+      }
+      images: [
         {
-          name: 'English'
-          language: 'en'
+          image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+          thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+          id: 1
+          edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
         }
         {
-          name: 'Spanish'
-          language: 'es'
-        }
-        {
-          name: 'Russian'
-          language: 'ru'
+          image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+          thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+          id: 2
+          edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
         }
       ]
+      stories: {
+        en: {
+          name: 'English'
+          language: 'en'
+          publish_state: 'all'
+        }
+        es: {
+          name: 'Spanish'
+          language: 'es'
+          publish_state: 'all'
+        }
+        ru: {
+          name: 'Russian'
+          language: 'ru'
+          publish_state: 'all'
+        }
+      }
       new_story_link: '/1/1/1/'
     }
   }
@@ -439,9 +469,12 @@ angular.module("Museum.controllers", [])
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
   # just prototype function - remove active class, if window was reloaded when dropdown was opened
-  for exhibit in $scope.exhibits
-    exhibit.active   = false
-    exhibit.selected = false
+  for exhibit, index in $scope.exhibits
+    if exhibit?
+      exhibit.active   = false
+      exhibit.selected = false
+    else
+      $scope.exhibits.splice(index, 1)
 
   findActive = -> $('ul.exhibits li.exhibit.active')
 
@@ -527,7 +560,10 @@ angular.module("Museum.controllers", [])
       return false
 
     for exhibit in $scope.exhibits
-      exhibit.active = false
+      if exhibit?
+        exhibit.active = false
+
+    # console.log elem
     elem.active = true
     $scope.active_exhibit = elem
 
@@ -541,7 +577,9 @@ angular.module("Museum.controllers", [])
 
     unless isSameLine(clicked, previous)
       $scope.attachDropDown clicked
-      $('body').scrollTo(clicked, 500, 150)
+      setTimeout ->
+        $.scrollTo(clicked, 500)
+      , 100
    
     item_publish_settings = dropDown.find('.item_publish_settings')
     delete_story = dropDown.find('.delete_story')
@@ -570,9 +608,9 @@ angular.module("Museum.controllers", [])
     $(window).resize(tileGrid.bind(@, collection, tileWidth, tileSpace, tileListMargin))
 
   $scope.museum_list_prepare = ->
-    list  = $('ul.museum_list')
-    count = list.find('li').length
-    width = $('body').width()
+    list        = $('ul.museum_list')
+    count       = list.find('li').length
+    width       = $('body').width()
     row_count = (count * 150 + 160) / width
     if row_count > 1
       $('.museum_filters').show()
@@ -604,7 +642,7 @@ angular.module("Museum.controllers", [])
     ++$scope.exhibits[$scope.exhibits.length-1].number + 1
 
   get_index = ->
-    $scope.exhibits.length
+    ++$scope.exhibits.length
 
   get_lang = ->
     $scope.current_museum.language
@@ -629,44 +667,49 @@ angular.module("Museum.controllers", [])
             thumb: '/img/img-bg.png'
           }
         ]
+        stories: {}
       }
-      $scope.new_exhibit.stories = {}
-      $scope.new_exhibit.stories[$scope.current_museum.language] = {
-        name: ''
-        description: ''
-        audio: ''
-        quiz: {
-          question: ''
+      for lang of $scope.current_museum.stories
+        $scope.new_exhibit.stories[lang] = {
+          name: ''
           description: ''
-          state: 'limited'
-          answers: [
-            {
-              title: ''
-              correct: true
-              id: 0
-            }
-            {
-              title: ''
-              correct: false
-              id: 1
-            }
-            {
-              title: ''
-              correct: false
-              id: 2
-            }
-            {
-              title: ''
-              correct: false
-              id: 3
-            }
-          ]
+          audio: ''
+          publish_stat: 'passcode'
+          quiz: {
+            question: ''
+            description: ''
+            state: 'limited'
+            answers: [
+              {
+                title: ''
+                correct: true
+                id: 0
+              }
+              {
+                title: ''
+                correct: false
+                id: 1
+              }
+              {
+                title: ''
+                correct: false
+                id: 2
+              }
+              {
+                title: ''
+                correct: false
+                id: 3
+              }
+            ]
+          }
         }
-      }
       $scope.new_item_creation = true
       e = {}
       e.target = $('li.exhibit.dummy > .opener.draft')
       $scope.open_dropdown(e, $scope.new_exhibit)
+
+      # hack, cant find out what exactly happening and why new exhibit created before saving
+      $scope.exhibits.splice $scope.exhibits.length-1, 1 
 
   $scope.modal_options = {
     current_language: 
@@ -687,7 +730,6 @@ angular.module("Museum.controllers", [])
 
   $scope.select_all_exhibits = ->
     sign = !$scope.all_selected
-    console.log  sign
     for exhibit in $scope.exhibits
       exhibit.selected = sign
     $scope.all_selected = !$scope.all_selected
@@ -703,15 +745,17 @@ angular.module("Museum.controllers", [])
     )
     ModalDeleteInstance.result.then ((selected) ->
       $scope.selected = selected
-      console.log $scope.active_exhibit
-      for st_index, story of $scope.active_exhibit.stories
-        for item in selected
-          if item is st_index
-            if Object.keys($scope.active_exhibit.stories).length is 1
-              $scope.closeDropDown()
-              $scope.exhibits.splice $scope.active_exhibit.index, 1
-              $scope.active_exhibit = $scope.exhibits[0]
-            else
+      if Object.keys($scope.active_exhibit.stories).length is selected.length || Object.keys($scope.active_exhibit.stories).length is 1
+        $scope.closeDropDown()
+        for exhibit, index in $scope.exhibits
+          if exhibit.index is $scope.active_exhibit.index
+            $scope.exhibits.splice index, 1
+            $scope.active_exhibit = $scope.exhibits[0]
+            break
+      else
+        for st_index, story of $scope.active_exhibit.stories
+          for item in selected
+            if item is st_index
               $scope.active_exhibit.stories[st_index] = {
                 language: get_lang()
                 name: ''
@@ -768,48 +812,38 @@ angular.module("Museum.controllers", [])
       console.log "Modal dismissed at: " + new Date()
 
   $scope.toggle_menu = (elem) ->
-    elem = $ elem.target
-    museum_nav = $('.museum_navigation_menu')
-    nav        = $('.navigation')
-
-    if museum_nav.is(':visible')
-      padding    = elem.data('last-padding')
-      museum_nav.slideUp(300)
-      nav.addClass 'navbar-fixed-top'
-      $('body').css {'padding-top':"#{padding}"}
-    else
-      padding    = $('body').css('padding-top')
-      elem.data('last-padding', padding)
-      museum_nav.slideDown(300)
-      nav.removeClass 'navbar-fixed-top'
-      $('body').css {'padding-top':'0px'}
+    $('.navigation').toggleClass 'navbar-fixed-top'
+    $('.museum_navigation_menu').slideToggle(300)
+    $('body').toggleClass('fixed_navbar')
+    setTimeout ->
+      $.scrollTo(0,0)
+    , 0
+    true
 
   $scope.toggle_filters = (elem) ->
-    elem = $ elem.target
-    filters_bar = $('.filters_bar')
-    nav         = $('.navigation')
-    if elem.hasClass 'active'
-      filters_bar.css {overflow: 'hidden'}
-      filters_bar.animate {height: "0px"}, 200  
-      elem.removeClass 'active'
-      if nav.hasClass 'navbar-fixed-top'
-        $('body').animate {'padding-top': '-=44px'}, 200
-    else
-      filters_bar.animate {height: "44px"}, 200, ->
-        filters_bar.css {overflow: 'visible'}
-      if nav.hasClass 'navbar-fixed-top'
-        $('body').animate {'padding-top': '+=44px'}, 200
-      elem.addClass 'active'
+    $('.filters_bar').slideToggle(200)
+    setTimeout ->
+      $('body').toggleClass('filers')
+    , 100
+
+  $scope.show_museum_edit = (event) ->
+    elem = $ event.target
+    $('.navigation .museum_edit, .page .museum_edit_guaranter').slideToggle(1000, "easeOutQuint")
+    elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
+    $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened
+    false
 
   $scope.$on 'save_dummy', ->
-    $scope.new_exhibit.publish_state = 'passcode'
+    console.log 'saving!'
+    # $scope.new_exhibit.publish_state = 'passcode'
+    # for lang, story of $scope.new_exhibit.stories
+    #   story.publish_state = 'passcode'
     $scope.exhibits.push $scope.new_exhibit
     $scope.new_item_creation = false
 
   $scope.populate_localstorage = ->
     for exhibit in $scope.exhibits
       for lang in $scope.current_museum.stories
-        console.log lang
         unless exhibit.stories[lang.language]?
           exhibit.stories[lang.language] = {
             language: lang.language
@@ -845,8 +879,7 @@ angular.module("Museum.controllers", [])
               ]
             }
           }
-        console.log exhibit.stories[lang.language]
-    for i in [0..5]
+    for i in [0..22]
       exhibit = {
         index: $scope.exhibits[$scope.exhibits.length-1].index + 1
         name: 'Экспонат'
@@ -875,10 +908,10 @@ angular.module("Museum.controllers", [])
         ]
       }
       exhibit.stories = {}
-      for lang in $scope.current_museum.stories
-        exhibit.stories[lang.language] = {
+      for lang of $scope.current_museum.stories
+        exhibit.stories[lang] = {
           language: lang.language
-          name: 'Экспонат_'+lang.language
+          name: 'Экспонат_'+lang
           description: 'test description'
           audio: ''
           publish_state: 'all'
@@ -916,8 +949,8 @@ angular.module("Museum.controllers", [])
 
 ])
 
-.controller('DropDownController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage) ->
-  
+.controller('DropDownController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', ($scope, $http, $filter, $window, $modal, storage, $rootScope) ->
+
   $scope.quiz_state = (form) ->
     $scope.mark_quiz_validity(form.$valid)
     unless form.$valid
@@ -932,29 +965,68 @@ angular.module("Museum.controllers", [])
       form.removeClass 'has_error'
     else
       form.addClass 'has_error'
-    # for answer in $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].quiz.answers
-    #   group = $("#quiz input[name=#{answer.id}]").parents('.form-group')
-    #   unless answer.title?
-    #     group.addClass 'has-error'
-    #   else
-    #     group.removeClass 'has-error'
-
     true
 
-  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz.state', (newValue, oldValue) ->
-    if newValue is 'limited'
+  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz', (newValue, oldValue) ->
+    if newValue.state is 'limited'
       unless $("#story_quiz_disabled").is(':checked')
         setTimeout ->
           $("#story_quiz_disabled").click()
         , 10
-    else
-      unless $("#story_quiz_enabled").is(':checked')
+    else if newValue.state is 'published'
+      if $("#story_quiz_enabled").is(':checked')
+        setTimeout ->
+          unless $scope.quizform.$valid
+            setTimeout ->
+              $("#story_quiz_disabled").click()
+            , 10
+        , 100
+      else
         setTimeout ->
           $("#story_quiz_enabled").click()
         , 10
+  , true
+
+  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz.question', (newValue, oldValue) ->
+    if $scope.quizform?
+      # console.log $scope.quizform
+      if $scope.quizform.$valid
+        $scope.mark_quiz_validity($scope.quizform.$valid)
+      else
+        setTimeout ->
+          $("#story_quiz_disabled").click()
+          $scope.mark_quiz_validity($scope.quizform.$valid)
+        , 10
+
+  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].name', (newValue, oldValue) ->
+    form = $('#media form')
+    if form.length > 0
+      unless $scope.$parent.new_item_creation
+        unless newValue 
+          $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue
+          $('.empty_name_error').show()
+          setTimeout ->
+            $('.empty_name_error').hide()
+          , 1500
+      else
+        if newValue
+          $rootScope.$broadcast 'save_dummy'
+
+
+  $scope.$watch ->
+    angular.toJson($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].quiz.answers)
+  , (newValue, oldValue) ->
+    if $scope.quizform?
+      if $scope.quizform.$valid
+        $scope.mark_quiz_validity($scope.quizform.$valid)
+      else
+        setTimeout ->
+          $("#story_quiz_disabled").click()
+        , 10
+
+  , true
 
   $scope.upload_image = (e) ->
-    console.log e
     e.preventDefault()
     elem = $ e.target
     parent = elem.parents('#images, #maps')
@@ -1001,6 +1073,11 @@ angular.module("Museum.controllers", [])
 
 ])
 
+.controller('MuseumEditController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage) ->
+
+  true
+])
+
 @ModalDeleteInstanceCtrl = ($scope, $modalInstance, modal_options) ->
 
   $scope.modal_options = modal_options
@@ -1009,21 +1086,21 @@ angular.module("Museum.controllers", [])
 
   $scope.ok = ->
     $scope.selected = []
-    for language in $scope.modal_options.languages
-      $scope.selected.push language.language if language.checked is true
+    for language, value of $scope.modal_options.languages
+      $scope.selected.push language if value.checked is true
     $modalInstance.close $scope.selected
 
   $scope.cancel = ->
     $modalInstance.dismiss()
 
   $scope.mark_all = ->
-    for language in $scope.modal_options.languages
-      language.checked = true
+    for language, value of $scope.modal_options.languages
+      value.checked = true
 
   $scope.mark_default_only = ->
-    for language in $scope.modal_options.languages
-      language.checked = false
-      language.checked = true if $scope.modal_options.current_language.language is language.language
+    for language, value of $scope.modal_options.languages
+      value.checked = false
+      value.checked = true if $scope.modal_options.current_language.language is language
 
   $scope.mark_default_only()
 

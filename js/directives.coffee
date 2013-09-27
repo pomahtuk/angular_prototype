@@ -87,6 +87,7 @@ angular.module("Museum.directives", [])
     </div>
   """  
   link: (scope, element, attrs) ->
+    scope.hidden_list = true
     true
 
 .directive "switchpub", ->
@@ -138,17 +139,20 @@ angular.module("Museum.directives", [])
     id: '@ngId'
     title: '@ngTitle'
     field: '@ngField'
+    inv_sign: '=invalidsign'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
+      <span class="empty_name_error" ng-show="field == 'name'">can't be empty</span>
       <div class="col-xs-6 trigger" ng-hide="edit_mode || empty_val">
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-xs-6 triggered" ng-show="edit_mode || empty_val">
         <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="status_process()" required>
+        <div class="error_text" ng-show="field=='name' || field=='question'">can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
@@ -160,16 +164,24 @@ angular.module("Museum.directives", [])
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
         $scope.status = 'progress'
         $scope.empty_val = false
-        if $scope.field is 'name' and $scope.item.publish_state is 'draft'
-          $rootScope.$broadcast 'save_dummy'
+        $scope.edit_mode = false
       else
         $scope.empty_val = true
-  # The linking function will add behavior to the template
   link: (scope, element, attrs) ->
     scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
-        scope.edit_mode = true
+        scope.empty_val = true
+      else
+        scope.empty_val = false
+    scope.$watch 'inv_sign', (newValue, oldValue) ->
+      if newValue is true
+        setTimeout ->
+          scope.name_error = false
+          console.log scope.name_error
+        , 1000
+      else
+        scope.empty_val = false
     true
 
 .directive "placeholdertextarea", ->
@@ -182,12 +194,16 @@ angular.module("Museum.directives", [])
     id: '@ngId'
     title: '@ngTitle'
     field: '@ngField'
+    max_length: '@maxlength'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
+      <span class="sumbols_left" ng-hide="status == 'progress' || status == 'done' || empty_val || !edit_mode ">
+        {{length_text}}
+      </span>
       <div class="col-lg-6 trigger" ng-hide="edit_mode || empty_val">
         <span class="placeholder large" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
@@ -205,13 +221,22 @@ angular.module("Museum.directives", [])
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
         $scope.status = 'progress'
         $scope.empty_val = false
+        $scope.edit_mode = false
       else
         $scope.empty_val = true
   link: (scope, element, attrs) ->
+    scope.length_text = "осталось символов: 255"
     scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
-        scope.edit_mode = true
+        scope.empty_val = true
+        scope.length_text = "осталось символов: 255"
+      else
+        scope.empty_val = false
+        scope.max_length ||= 255
+        scope.length_text = "осталось символов: #{scope.max_length - newValue.length - 1}"
+        if newValue.length >= scope.max_length
+          scope.item[scope.field] = newValue.substr(0, scope.max_length-1)
     true
 
 .directive "quizanswer", ->
@@ -233,14 +258,15 @@ angular.module("Museum.directives", [])
       </div>
       <div class="col-xs-5 triggered" ng-show="edit_mode || empty_val">
         <input class="form-control" id="{{id}}" name="{{item.id}}" placeholder="Enter option" type="text" ng-model="item.title" focus-me="edit_mode" ng-blur="status_process()" required>
+        <div class="error_text">can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
   """
   controller : ($scope, $rootScope, $element, $attrs) ->
     $scope.item.statuses = {} unless $scope.item.statuses?
+    $scope.status = $scope.item.statuses[$scope.item.title]
     $scope.item.correct_saved = false unless $scope.item.correct_saved?
-    $scope.status = $scope.item.statuses[$scope.item.field]
 
     $scope.check_items = (item) ->
       for sub_item in $scope.collection
@@ -253,10 +279,14 @@ angular.module("Museum.directives", [])
       if $scope.item.title && $scope.item.title.length isnt 0
         $scope.status = 'progress'
         $scope.empty_val = false
+        $scope.edit_mode = false
       else
         $scope.empty_val = true
 
   link: (scope, element, attrs) ->
+    scope.edit_mode = false
+    scope.empty_val = false
+
     scope.checked = 0
     scope.$watch 'collection', (newValue, oldValue) ->
       if newValue
@@ -265,7 +295,10 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'item.title', (newValue, oldValue) ->
       unless newValue
-        scope.edit_mode = true 
+        scope.edit_mode = true
+        scope.empty_val = true
+      else
+        scope.empty_val = false
 
     scope.$watch 'item.correct_saved', (newValue, oldValue) ->
       if newValue is true
