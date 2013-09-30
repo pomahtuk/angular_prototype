@@ -9,6 +9,7 @@ html lang="en" ng-app="Museum"
     link rel="stylesheet" href="css/jplayer.blue.monday.css"
     link rel="stylesheet" href="css/toggle-switch.css"
     link rel="stylesheet" href="css/prototype.css"
+    link href="http://fonts.googleapis.com/css?family=Open+Sans&subset=latin,cyrillic-ext,greek-ext,greek,cyrillic,latin-ext" rel="stylesheet" type="text/css"
 
   body.fixed_navbar ng-controller="IndexController"
 
@@ -206,25 +207,25 @@ html lang="en" ng-app="Museum"
                   form.form-horizontal role="form" name="mainForm"
                     placeholderfield ng-item="current_museum" ng-id="museum_opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup"
                     placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="museum_name" ng-title="Name" ng-field="name" ng-help="help text for popup 2"
-                    / audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="museum_audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
+                    audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="museum_audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
 
                     placeholdertextarea ng-item="current_museum" ng-id="museum_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3" maxlength="255"
                     
-              / tab heading="Quiz"
-              /   #museum_quiz.row
-              /     form.form-horizontal role="form" name="quizform"
-              /       .switch-toggle.ios
-              /         input id="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="published" type="radio" name="story_quiz_enabled" 
-              /         label for="story_quiz_enabled" ng-click="quiz_state(quizform)" Enabled
-              /         input id="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="limited" type="radio" name="story_quiz_enabled"
-              /         label for="story_quiz_disabled" ng-click="quiz_state(quizform)" Disable
-              /         a
-              /       placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
-              /       .error
-              /         .controls
-              /       .answers
-              /         quizanswer ng-item="answer" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="museum_story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers"
-              /       placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
+              tab heading="Quiz"
+                #museum_quiz.row
+                  form.form-horizontal role="form" name="museumQuizform"
+                    .switch-toggle.ios
+                      input id="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="published" type="radio" name="museum_story_quiz_enabled" 
+                      label for="museum_story_quiz_enabled" ng-click="museum_quiz_state(museumQuizform)" Enabled
+                      input id="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="limited" type="radio" name="museum_story_quiz_disabled"
+                      label for="museum_story_quiz_disabled" ng-click="museum_quiz_state(museumQuizform)" Disable
+                      a
+                    placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup"
+                    .error
+                      .controls
+                    .answers
+                      quizanswer ng-item="answer" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="museum_story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers"
+                    placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
 
               tab heading="QR-code"
                 #museum_qr_code.row
@@ -331,7 +332,7 @@ html lang="en" ng-app="Museum"
                         input name="_method" type="hidden" value="put"
                         input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E="
                       input#image_link.hide.fileupload data-accept="image" name="image[link]" type="file"
-                      a.thumbnail href="{{image.edit_url}}/crop.json"
+                      a.img_thumbnail href="{{image.edit_url}}crop.json"
                         img alt="" data-crop-url="{{image.image}}" src="{{image.thumb}}"
                       a.remove data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="{{image.edit_url}}" ng-click="delete_image($event)" rel="nofollow" ×
                       .progress.progress-success.progress-striped.active.hide
@@ -384,7 +385,8 @@ html lang="en" ng-app="Museum"
 
             .description
               .close
-              switchpubitem ng-item="active_exhibit" ng-provider='provider' ng-museum="current_museum" translations="translations"
+              .hider ng-hide="active_exhibit.stories[current_museum.language].publish_state == 'dummy'"
+                switchpubitem ng-item="active_exhibit" ng-provider='provider' ng-museum="current_museum" translations="translations"
 
               a.delete_story ng-click="delete_modal_open()" href="#delete_story" 
                 i.icon-trash
@@ -424,11 +426,11 @@ html lang="en" ng-app="Museum"
                 tab heading="Media content"
                   #media.row
                     form.form-horizontal role="form" name="mainForm"
-                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup"
-                      placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2"
+                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup" 
+                      placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name"
                       audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
 
-                      placeholdertextarea ng-item="active_exhibit" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3" maxlength="255"
+                      placeholdertextarea ng-item="active_exhibit" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3" maxlength="255" placeholder="active_exhibit.stories[current_museum.def_lang].description"
                       
                 tab heading="Quiz"
                   #quiz.row
@@ -460,15 +462,19 @@ html lang="en" ng-app="Museum"
             .next-ex
 
           li.exhibit post-render="" data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search" ng-class="{active: exhibit.active}"
-            div class="opener {{exhibit.status}}" ng-class="{'border': exhibit.selected}"
-              .overlay ng-click="open_dropdown($event, exhibit)"
+            div class="opener {{exhibit.stories[current_museum.language].publish_state}}" ng-class="{'border': exhibit.selected}"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
               .image
-                img src='{{exhibit.thumb}}'
+                img src='{{exhibit.thumb}}' ng-click="open_dropdown($event, exhibit)"
               .description ng-click="open_dropdown($event, exhibit)"
-                h4 
-                  | {{exhibit.number}} {{exhibit.stories[current_museum.language].name}}
+                h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
+                  | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
+                .media_types
+                  i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio.length > 0"
+                  i class="icon-qrcode"
+                  i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length > 0"
+                  i class="icon-question-sign" ng-show="exhibit.stories[current_museum.language].quiz.state == 'published'"
               .visibility ng-switch="" on="exhibit.stories[current_museum.language].publish_state"
                 i class="icon-globe placeholder" ng-switch-when="all"
                 i class="icon-user placeholder" ng-switch-when="passcode"

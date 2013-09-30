@@ -1,9 +1,7 @@
 @import "compass"
+@import 'compass/reset'
 
 $unmain_color: #999999
-$headerColor: #686e6e
-$contrastColor: #f7f7f7
-$textColor: #666
 
 $exhibitBackgroundColor: #f7f7f7
 $exhibitTextColor: #4b4b4b
@@ -16,6 +14,10 @@ $slideDownHeight: 550px
 $slideDownOuterBorderColor: #bbbcbc
 $slideDownDescriptionMarginTop: 60px
 $slideDownDescriptionMarginBottom: 60px
+
+$headerColor: #686e6e
+$contrastColor: #f7f7f7
+$textColor: #666
 
 $border_color: #e7e7e7
 $hover_color: #FB6E02
@@ -152,6 +154,14 @@ body
     .museum_edit_guaranter
       height: 548px
 
+html, body
+  width: 100%
+
+body
+  color: #222
+  font-family: 'Helvetica Neue', 'Open Sans', Helvetica, Arial, sans-serif
+  font-size: 13px
+  line-height: 1.5em
 
 .museum_navigation_menu
   background: #222222
@@ -484,36 +494,28 @@ body
       top: 30px
 
 ul.exhibits
-  margin: 30px 0 15px
+  margin: 30px 0 90px
   text-align: justify
   padding: 0px
 
   >li.exhibit // class fix ie8 bug
     display: inline-block
-    margin: 0 (20px - 1px) // border
+    margin: 0 20px
     padding-bottom: 30px
     position: relative
     vertical-align: top
-    text-align: left
 
     >.opener
       background: white
       border: 1px solid white
-      +border-radius(2px)
-      +box-shadow(#555 0 0 2px)
+      +border-radius(3px)
+      width: 200px
+      position: relative
+      text-align: left
+
       display: block
       text-decoration: none
       width: 200px
-      position: relative
-
-      .overlay
-        position: absolute
-        top: 0px
-        left: 0px
-        height: 100%
-        width: 100%
-        opacity: 0.4
-        cursor: pointer
 
       .checkbox
         +border-top-left-radius(2px)
@@ -537,14 +539,20 @@ ul.exhibits
         overflow-x: hidden
 
       img
+        background: #f7f7f7
+        border-radius: 3px 3px 0 0
         display: block
         height: 150px
-        width: 199px
+        width: 200px
         cursor: pointer
 
       .description
         background: $exhibitBackgroundColor
-        border-top: 1px solid white
+        border-color: #fff
+        border-radius: 0 0 2px 2px
+        border-style: solid
+        border-width: 0 1px 1px
+        box-shadow: #ccc 0px 1px 2px
         padding: 10px
         height: 70px
         position: relative
@@ -605,6 +613,16 @@ ul.exhibits
             float: left
             margin-right: 5px
 
+      .media_types
+        position: absolute
+        left: 15px
+        bottom: 12px
+
+        i
+          margin-right: 15px
+          font-size: 14px
+          color: $unmain_text_color
+
       &.border
         +box-sizing(border-box)
         +box-shadow($exhibitTextColorHover 0 0 1px 1px)
@@ -623,34 +641,39 @@ ul.exhibits
         display: block
         z-index: 10
 
-      .opener:not(.draft) 
-        .overlay
-          background: #000
-
+      .opener:not(.dummy) 
         .description 
           h4
             color: $exhibitTextColorHover
 
     &:hover
-      .visibility
-        bottom: 5px
-        right: 5px
+      .opener:not(.dummy) 
+        .description
+          background-image: url('../img/tile-shadow.png')
+          background-repeat: no-repeat
 
-        i.placeholder
-          display: none
-        .on_hover
-          display: block
+        .visibility
+          bottom: 5px
+          right: 5px
 
-    .draft
+          i.placeholder
+            display: none
+          .on_hover
+            display: block
+
+    .dummy
       position: relative
       cursor: pointer
+      +opacity(0.5)
 
-      .overlay
-        background: white
-        z-index: 9
-        opacity: 0.65
+      .description h4
+        font-style: italic
+        color: $dark_gray_color
 
       .visibility
+        display: none
+
+      .checkbox
         display: none
 
 #drop_down, #museum_edit_dropdown
@@ -828,7 +851,7 @@ ul.exhibits
           cursor: pointer
 
         .error_text
-          margin-left: 25px
+          margin-left: 65px
 
       .triggered
 
@@ -930,20 +953,24 @@ textarea
 
 //
 // @import images
+.images-displayed, .images-hidden
+  padding-left: 30px
+
 .images-list, .maps-list
   margin: 0
   padding: 0
 
   li
     display: inline-block
-    margin: 0 30px 30px 0
+    margin: 0 10px 30px 0
     position: relative
     vertical-align: top
-    width: 170px
+    width: 200px
+    height: 150px
 
-    .thumbnail img
-      max-height: 120px
-      max-width: 160px
+    .img_thumbnail img
+      max-height: 150px
+      max-width: 200px
 
     a
       text-decoration: none

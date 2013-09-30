@@ -10,6 +10,7 @@
     <link href="css/jplayer.blue.monday.css" rel="stylesheet">
     <link href="css/toggle-switch.css" rel="stylesheet">
     <link href="css/prototype.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans&amp;subset=latin,cyrillic-ext,greek-ext,greek,cyrillic,latin-ext" rel="stylesheet" type="text/css">
   </head>
   <body class="fixed_navbar" ng-controller="IndexController">
     <div class="navigation navbar-fixed-top">
@@ -195,7 +196,23 @@
             <tabset><tab heading="Media content">
                 <div class="row" id="museum_media">
                   <form class="form-horizontal" name="mainForm" role="form">
-                    <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="museum_opas_number" ng-item="current_museum" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="museum_name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name"></placeholderfield><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="museum_description" ng-item="current_museum" ng-title="Description"></placeholdertextarea>
+                    <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="museum_opas_number" ng-item="current_museum" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="museum_name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="museum_audio" ng-item="current_museum.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="museum_description" ng-item="current_museum" ng-title="Description"></placeholdertextarea>
+                  </form>
+                </div>
+              </tab><tab heading="Quiz">
+                <div class="row" id="museum_quiz">
+                  <form class="form-horizontal" name="museumQuizform" role="form">
+                    <div class="switch-toggle ios">
+                      <input id="museum_story_quiz_enabled" name="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="published"><label for="museum_story_quiz_enabled" ng-click="museum_quiz_state(museumQuizform)">Enabled</label><input id="museum_story_quiz_disabled" name="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="limited"><label for="museum_story_quiz_disabled" ng-click="museum_quiz_state(museumQuizform)">Disable</label><a></a>
+                    </div>
+                    <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="museum_story_quiz_attributes_question" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Question"></placeholderfield>
+                    <div class="error">
+                      <div class="controls"></div>
+                    </div>
+                    <div class="answers">
+                      <quizanswer ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="museum_story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers"></quizanswer>
+                    </div>
+                    <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="museum_quiz_description" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Description"></placeholdertextarea>
                   </form>
                 </div>
               </tab><tab heading="QR-code">
@@ -284,7 +301,7 @@
                       <div style="margin:0;padding:0;display:inline">
                         <input name="utf8" type="hidden" value="✓"><input name="_method" type="hidden" value="put"><input name="authenticity_token" type="hidden" value="slPXFPmxToMp04VZEhyFiOHAmj1fX4qmry9EFqFud5E=">
                       </div>
-                      <input class="hide fileupload" data-accept="image" id="image_link" name="image[link]" type="file"><a class="thumbnail" href="{{image.edit_url}}/crop.json"><img alt="" data-crop-url="{{image.image}}" src="{{image.thumb}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="{{image.edit_url}}" ng-click="delete_image($event)" rel="nofollow">×</a>
+                      <input class="hide fileupload" data-accept="image" id="image_link" name="image[link]" type="file"><a class="img_thumbnail" href="{{image.edit_url}}crop.json"><img alt="" data-crop-url="{{image.image}}" src="{{image.thumb}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-method="delete" href="{{image.edit_url}}" ng-click="delete_image($event)" rel="nofollow">×</a>
                       <div class="progress progress-success progress-striped active hide">
                         <div class="bar"></div>
                       </div>
@@ -347,7 +364,10 @@
             </div>
             <div class="description">
               <div class="close"></div>
-              <switchpubitem ng-item="active_exhibit" ng-museum="current_museum" ng-provider="provider" translations="translations"></switchpubitem><a class="delete_story" href="#delete_story" ng-click="delete_modal_open()"><i class="icon-trash"></i></a>
+              <div class="hider" ng-hide="active_exhibit.stories[current_museum.language].publish_state == &#39;dummy&#39;">
+                <switchpubitem ng-item="active_exhibit" ng-museum="current_museum" ng-provider="provider" translations="translations"></switchpubitem>
+              </div>
+              <a class="delete_story" href="#delete_story" ng-click="delete_modal_open()"><i class="icon-trash"></i></a>
               <script id="myModalContent.html" type="text/ng-template">
                 <div class="modal-dialog" id="delete_story">
                   <div class="modal-content">
@@ -385,7 +405,7 @@
               <tabset><tab heading="Media content">
                   <div class="row" id="media">
                     <form class="form-horizontal" name="mainForm" role="form">
-                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit" ng-title="Description"></placeholdertextarea>
+                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].description"></placeholdertextarea>
                     </form>
                   </div>
                 </tab><tab heading="Quiz">
@@ -422,18 +442,20 @@
             <div class="next-ex"></div>
           </li>
           <li class="exhibit" data-big-image="{{exhibit.image}}" ng-class="{active: exhibit.active}" ng-repeat="exhibit in exhibits | filter: exhibit_search" post-render="">
-            <div class="opener {{exhibit.status}}" ng-class="{&#39;border&#39;: exhibit.selected}">
-              <div class="overlay" ng-click="open_dropdown($event, exhibit)"></div>
+            <div class="opener {{exhibit.stories[current_museum.language].publish_state}}" ng-class="{&#39;border&#39;: exhibit.selected}">
               <div class="checkbox">
                 <input ng-change="check_selected()" ng-model="exhibit.selected" type="checkbox">
               </div>
               <div class="image">
-                <img src="{{exhibit.thumb}}">
+                <img ng-click="open_dropdown($event, exhibit)" src="{{exhibit.thumb}}">
               </div>
               <div class="description" ng-click="open_dropdown($event, exhibit)">
-                <h4>
-                  {{exhibit.number}} {{exhibit.stories[current_museum.language].name}}
+                <h4 ng-class="{&#39;dummy_header&#39;:exhibit.stories[current_museum.language].name.length == 0}">
+                  {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
                 </h4>
+                <div class="media_types">
+                  <i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio.length &gt; 0"></i><i class="icon-qrcode"></i><i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length &gt; 0"></i><i class="icon-question-sign" ng-show="exhibit.stories[current_museum.language].quiz.state == &#39;published&#39;"></i>
+                </div>
               </div>
               <div class="visibility" ng-switch="" on="exhibit.stories[current_museum.language].publish_state">
                 <i class="icon-globe placeholder" ng-switch-when="all"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>

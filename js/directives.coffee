@@ -180,19 +180,21 @@ angular.module("Museum.directives", [])
     title: '@ngTitle'
     field: '@ngField'
     inv_sign: '=invalidsign'
+    placeholder: '=placeholder'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <span class="empty_name_error" ng-show="field == 'name'">can't be empty</span>
+      {{active_exhibit}}
+      <span class="empty_name_error {{field}}">can't be empty</span>
       <div class="col-xs-6 trigger" ng-hide="edit_mode || empty_val">
         <span class="placeholder" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-xs-6 triggered" ng-show="edit_mode || empty_val">
-        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="status_process()" required>
-        <div class="error_text" ng-show="field=='name' || field=='question'">can't be blank</div>
+        <input class="form-control" id="{{id}}" ng-model="item[field]" focus-me="edit_mode" type="text" ng-blur="status_process()" required placeholder="{{placeholder}}">
+        <div class="error_text {{field}}" >can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
@@ -210,6 +212,7 @@ angular.module("Museum.directives", [])
   link: (scope, element, attrs) ->
     scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
+      scope.status    = ''
       unless newValue
         scope.empty_val = true
       else
@@ -222,6 +225,12 @@ angular.module("Museum.directives", [])
         , 1000
       else
         scope.empty_val = false
+
+    # scope.$watch 'status', (newValue, oldValue) ->
+    #   if newValue is 'progress'
+    #     scope.exhibits = angular.copy(scope.work_exhibits)
+    #     scope.$apply
+
     true
 
 .directive "placeholdertextarea", ->
@@ -235,6 +244,7 @@ angular.module("Museum.directives", [])
     title: '@ngTitle'
     field: '@ngField'
     max_length: '@maxlength'
+    placeholder: '=placeholder'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
@@ -248,7 +258,7 @@ angular.module("Museum.directives", [])
         <span class="placeholder large" ng-click="edit_mode = true">{{item[field]}}</span>
       </div>
       <div class="col-lg-6 triggered" ng-show="edit_mode || empty_val">
-        <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="status_process()" required>
+        <textarea class="form-control" id="{{id}}" focus-me="edit_mode" ng-model="item[field]" ng-blur="status_process()" required placeholder="{{placeholder}}">
         </textarea>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
@@ -368,14 +378,19 @@ angular.module("Museum.directives", [])
       # code below just emulates work of server and some latency
       if newValue
         if newValue is 'progress'
-          setTimeout ->
+          scope.progress_timeout = setTimeout ->
             scope.$apply scope.item = 'done'
           , 500
         if newValue is 'done'
-          setTimeout ->
+          scope.done_timeout = setTimeout ->
             scope.$apply scope.item = ''
           , 700
+      else
+        clearTimeout(scope.done_timeout)
+        clearTimeout(scope.progress_timeout)
     , true
+
+    true
 
 .directive "audioplayer", ->
   restrict: "E"
@@ -394,9 +409,9 @@ angular.module("Museum.directives", [])
         <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
       </div>
       <div class="col-xs-6 trigger" ng-hide="edit_mode">
-        <div class="jp-jplayer" id="jquery_jplayer_1">
+        <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
         </div>
-        <div class="jp-audio" id="jp_container_1">
+        <div class="jp-audio" id="jp_container_{{id}}">
           <div class="jp-type-single">
             <div class="jp-gui jp-interface">
               <ul class="jp-controls">
@@ -445,25 +460,21 @@ angular.module("Museum.directives", [])
   """
   link: (scope, element, attrs) ->
     scope.edit_mode = false
-    $("#jquery_jplayer_1").jPlayer
-      swfPath: "/js"
-      wmode: "window"
-      preload: "auto"
-      smoothPlayBar: true
-      keyEnabled: true
-      supplied: "m4a, oga"
-      # ready: () ->
-      #   $(@).jPlayer("setMedia", {
-      #     m4a: "http://www.jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
-      #     oga: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
-      #   })
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true
       else
         scope.edit_mode = false
-        console.log $("#jquery_jplayer_1")
-        $("#jquery_jplayer_1").jPlayer "setMedia",
+        console.log newValue
+        $("#jquery_jplayer_#{scope.id}").jPlayer
+          cssSelectorAncestor: "#jp_container_#{scope.id}"
+          swfPath: "/js"
+          wmode: "window"
+          preload: "auto"
+          smoothPlayBar: true
+          keyEnabled: true
+          supplied: "m4a, oga"
+        $("#jquery_jplayer_#{scope.id}").jPlayer "setMedia",
           m4a: newValue
           oga: newValue
     true

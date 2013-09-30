@@ -196,7 +196,7 @@
 
   angular.module("Museum.controllers", []).controller('IndexController', [
     '$scope', '$http', '$filter', '$window', '$modal', 'storage', function($scope, $http, $filter, $window, $modal, storage) {
-      var dropDown, exhibit, findActive, get_index, get_lang, get_number, index, _i, _len, _ref;
+      var dropDown, exhibit, findActive, get_index, get_lang, get_name, get_number, get_state, index, _i, _len, _ref;
       window.sc = $scope;
       $scope.museums = [
         {
@@ -450,6 +450,7 @@
       storage.bind($scope, 'current_museum', {
         defaultValue: {
           language: 'ru',
+          def_lang: 'ru',
           name: 'Museum of modern art',
           index: 2,
           number: 3,
@@ -478,22 +479,96 @@
             en: {
               name: 'English',
               language: 'en',
-              publish_state: 'all'
+              publish_state: 'all',
+              quiz: {
+                question: 'are you sure?',
+                description: 'can you tell me?',
+                state: 'published',
+                answers: [
+                  {
+                    title: 'yes',
+                    correct: false,
+                    id: 0
+                  }, {
+                    title: 'may be',
+                    correct: true,
+                    id: 1
+                  }, {
+                    title: 'who cares?',
+                    correct: false,
+                    id: 2
+                  }, {
+                    title: 'nope',
+                    correct: false,
+                    id: 3
+                  }
+                ]
+              }
             },
             es: {
               name: 'Spanish',
               language: 'es',
-              publish_state: 'all'
+              publish_state: 'all',
+              quiz: {
+                question: 'are you sure?',
+                description: 'can you tell me?',
+                state: 'published',
+                answers: [
+                  {
+                    title: 'yes',
+                    correct: false,
+                    id: 0
+                  }, {
+                    title: 'may be',
+                    correct: true,
+                    id: 1
+                  }, {
+                    title: 'who cares?',
+                    correct: false,
+                    id: 2
+                  }, {
+                    title: 'nope',
+                    correct: false,
+                    id: 3
+                  }
+                ]
+              }
             },
             ru: {
               name: 'Russian',
               language: 'ru',
-              publish_state: 'all'
+              publish_state: 'all',
+              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
+              quiz: {
+                question: 'are you sure?',
+                description: 'can you tell me?',
+                state: 'published',
+                answers: [
+                  {
+                    title: 'yes',
+                    correct: false,
+                    id: 0
+                  }, {
+                    title: 'may be',
+                    correct: true,
+                    id: 1
+                  }, {
+                    title: 'who cares?',
+                    correct: false,
+                    id: 2
+                  }, {
+                    title: 'nope',
+                    correct: false,
+                    id: 3
+                  }
+                ]
+              }
             }
           },
           new_story_link: '/1/1/1/'
         }
       });
+      $scope.work_museum = angular.copy($scope.current_museum);
       dropDown = $('#drop_down').removeClass('hidden').hide();
       _ref = $scope.exhibits;
       for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
@@ -645,7 +720,7 @@
       $scope.grid = function() {
         var collection, tileListMargin, tileSpace, tileWidth;
         collection = $('.exhibits>li.exhibit');
-        tileListMargin = 20;
+        tileListMargin = 60;
         tileWidth = collection.first().width();
         tileSpace = 40;
         tileGrid(collection, tileWidth, tileSpace, tileListMargin);
@@ -685,6 +760,20 @@
       };
       get_lang = function() {
         return $scope.current_museum.language;
+      };
+      get_state = function(lang) {
+        if (lang === $scope.current_museum.language) {
+          return 'passcode';
+        } else {
+          return 'dummy';
+        }
+      };
+      get_name = function(lang) {
+        if (lang === $scope.current_museum.language) {
+          return 'Экспонат_' + lang;
+        } else {
+          return '';
+        }
       };
       $scope.create_new_item = function() {
         var e, lang;
@@ -880,21 +969,21 @@
         });
         return ModalDummyInstance.result.then((function(result_string) {
           $scope.new_item_creation = false;
+          $scope.item_deletion = true;
           if (result_string === 'save_as') {
-            $scope.new_exhibit.publish_state = 'passcode';
-            $scope.new_exhibit.name = "item_" + $scope.new_exhibit.number;
+            $scope.new_exhibit.stories[$scope.current_museum.language].name = "item_" + $scope.new_exhibit.number;
+            $scope.new_exhibit.stories[$scope.current_museum.language].publish_state = "passcode";
             $scope.new_exhibit.active = false;
-            return $scope.exhibits.push($scope.new_exhibit);
+            $scope.exhibits.push($scope.new_exhibit);
+          } else {
+            $scope.closeDropDown();
+            $scope.new_exhibit.active = false;
+            $scope.active_exhibit = $scope.exhibits[0];
           }
+          return $scope.item_deletion = false;
         }), function() {
           return console.log("Modal dismissed at: " + new Date());
         });
-      };
-      $scope.toggle_filters = function(elem) {
-        $('.filters_bar').slideToggle(200);
-        return setTimeout(function() {
-          return $('body').toggleClass('filers');
-        }, 100);
       };
       $scope.show_museum_edit = function(event) {
         var elem;
@@ -909,45 +998,50 @@
           return $('.actions_bar .museum_edit_opener').click();
         }, 10);
       };
-      $scope.$on('save_dummy', function() {
+      $scope.$on('save_new_exhibit', function() {
+        var lang, story, _ref1;
         console.log('saving!');
+        $scope.new_exhibit.publish_state = 'passcode';
+        _ref1 = $scope.new_exhibit.stories;
+        for (lang in _ref1) {
+          story = _ref1[lang];
+          story.publish_state = 'passcode';
+        }
         $scope.exhibits.push($scope.new_exhibit);
         return $scope.new_item_creation = false;
       });
       return $scope.populate_localstorage = function() {
-        var i, lang, _j, _k, _l, _len1, _len2, _ref1, _ref2, _results;
+        var i, lang, _j, _k, _len1, _ref1, _results;
         _ref1 = $scope.exhibits;
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
           exhibit = _ref1[_j];
-          _ref2 = $scope.current_museum.stories;
-          for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-            lang = _ref2[_k];
-            if (exhibit.stories[lang.language] == null) {
-              exhibit.stories[lang.language] = {
-                language: lang.language,
-                name: 'Экспонат_' + lang.language,
-                description: 'test description',
+          for (lang in $scope.current_museum.stories) {
+            if (exhibit.stories[lang] == null) {
+              exhibit.stories[lang] = {
+                language: lang,
+                name: '',
+                description: '',
                 audio: '',
-                publish_state: 'all',
+                publish_state: 'dummy',
                 quiz: {
-                  question: 'are you sure?',
-                  description: 'can you tell me?',
-                  state: 'limited',
+                  question: '',
+                  description: '',
+                  state: '',
                   answers: [
                     {
-                      title: 'yes',
+                      title: '',
                       correct: false,
                       id: 0
                     }, {
-                      title: 'may be',
+                      title: '',
                       correct: true,
                       id: 1
                     }, {
-                      title: 'who cares?',
+                      title: '',
                       correct: false,
                       id: 2
                     }, {
-                      title: 'nope',
+                      title: '',
                       correct: false,
                       id: 3
                     }
@@ -958,14 +1052,13 @@
           }
         }
         _results = [];
-        for (i = _l = 0; _l <= 22; i = ++_l) {
+        for (i = _k = 0; _k <= 22; i = ++_k) {
           exhibit = {
-            index: $scope.exhibits[$scope.exhibits.length - 1].index + 1,
+            index: $scope.exhibits[$scope.exhibits.length - 1].index + 2,
             name: 'Экспонат',
-            number: $scope.exhibits[$scope.exhibits.length - 1].index + 1,
+            number: $scope.exhibits[$scope.exhibits.length - 1].index + 2,
             image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
             thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
-            publish_state: 'all',
             description: '',
             qr_code: {
               url: '/img/qr_code.png',
@@ -989,10 +1082,10 @@
           for (lang in $scope.current_museum.stories) {
             exhibit.stories[lang] = {
               language: lang.language,
-              name: 'Экспонат_' + lang,
+              name: get_name(lang),
               description: 'test description',
               audio: '',
-              publish_state: 'all',
+              publish_state: get_state(lang),
               quiz: {
                 question: 'are you sure?',
                 description: 'can you tell me?',
@@ -1084,17 +1177,38 @@
         var form;
         form = $('#media form');
         if (form.length > 0) {
-          if (!$scope.$parent.new_item_creation) {
-            if (!newValue) {
-              $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue;
-              $('.empty_name_error').show();
-              return setTimeout(function() {
-                return $('.empty_name_error').hide();
-              }, 1500);
+          if ($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].publish_state === 'dummy') {
+            if (newValue) {
+              return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].publish_state = 'passcode';
             }
           } else {
-            if (newValue) {
-              return $rootScope.$broadcast('save_dummy');
+            if (!($scope.$parent.new_item_creation || $scope.$parent.item_deletion)) {
+              if (!newValue) {
+                $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue;
+                $('.empty_name_error.name').show();
+                return setTimeout(function() {
+                  return $('.empty_name_error.name').hide();
+                }, 1500);
+              }
+            } else {
+              if (newValue && $scope.$parent.new_item_creation) {
+                return $rootScope.$broadcast('save_new_exhibit');
+              }
+            }
+          }
+        }
+      });
+      $scope.$watch('$parent.active_exhibit.number', function(newValue, oldValue) {
+        var form;
+        form = $('#media form');
+        if (form.length > 0) {
+          if (!($scope.$parent.new_item_creation || $scope.$parent.item_deletion)) {
+            if (!newValue) {
+              $scope.$parent.active_exhibit.number = oldValue;
+              $('.empty_name_error.number').show();
+              return setTimeout(function() {
+                return $('.empty_name_error.number').hide();
+              }, 1500);
             }
           }
         }
@@ -1175,6 +1289,73 @@
     }
   ]).controller('MuseumEditController', [
     '$scope', '$http', '$filter', '$window', '$modal', 'storage', function($scope, $http, $filter, $window, $modal, storage) {
+      $scope.museum_quiz_state = function(form) {
+        $scope.mark_quiz_validity(form.$valid);
+        if (!form.$valid) {
+          setTimeout(function() {
+            return $("#museum_story_quiz_disabled").click();
+          }, 300);
+        }
+        return true;
+      };
+      $scope.mark_quiz_validity = function(valid) {
+        var form;
+        form = $('#museum_quiz form');
+        if (valid) {
+          form.removeClass('has_error');
+        } else {
+          form.addClass('has_error');
+        }
+        return true;
+      };
+      $scope.$watch('$parent.current_museum.stories[$parent.current_museum.language].quiz', function(newValue, oldValue) {
+        if (newValue.state === 'limited') {
+          if (!$("#museum_story_quiz_disabled").is(':checked')) {
+            return setTimeout(function() {
+              return $("#museum_story_quiz_disabled").click();
+            }, 10);
+          }
+        } else if (newValue.state === 'published') {
+          if ($("#museum_story_quiz_enabled").is(':checked')) {
+            return setTimeout(function() {
+              if (!$scope.museumQuizform.$valid) {
+                return setTimeout(function() {
+                  return $("#museum_story_quiz_disabled").click();
+                }, 10);
+              }
+            }, 100);
+          } else {
+            return setTimeout(function() {
+              return $("#museum_story_quiz_enabled").click();
+            }, 10);
+          }
+        }
+      }, true);
+      $scope.$watch('$parent.current_museum.stories[$parent.current_museum.language].quiz.question', function(newValue, oldValue) {
+        if ($scope.museumQuizform != null) {
+          if ($scope.museumQuizform.$valid) {
+            return $scope.mark_quiz_validity($scope.museumQuizform.$valid);
+          } else {
+            return setTimeout(function() {
+              $("#story_quiz_disabled").click();
+              return $scope.mark_quiz_validity($scope.museumQuizform.$valid);
+            }, 10);
+          }
+        }
+      });
+      $scope.$watch(function() {
+        return angular.toJson($scope.$parent.current_museum.stories[$scope.$parent.current_museum.language].quiz.answers);
+      }, function(newValue, oldValue) {
+        if ($scope.museumQuizform != null) {
+          if ($scope.museumQuizform.$valid) {
+            return $scope.mark_quiz_validity($scope.museumQuizform.$valid);
+          } else {
+            return setTimeout(function() {
+              return $("#museum_#story_quiz_disabled").click();
+            }, 10);
+          }
+        }
+      }, true);
       return true;
     }
   ]);
