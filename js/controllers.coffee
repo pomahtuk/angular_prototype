@@ -949,19 +949,11 @@ angular.module("Museum.controllers", [])
     $scope.new_item_creation = false
 
   $scope.$on 'changes_to_save', (event, child_scope) ->
-    switch child_scope.field_type
-      when 'story'
-        $http.put("http://192.168.216.128:3000/story/#{child_scope.item._id}", child_scope.item).success (data) ->
-          console.log data
-          child_scope.satus = 'done'
-        .error ->
-          console.log 'fail'
-      when 'exhibit'
-        $http.put("http://192.168.216.128:3000/exhibit/#{child_scope.item._id}", child_scope.item).success (data) ->
-          console.log data
-          child_scope.satus = 'done'
-        .error ->
-          console.log 'fail'
+    $http.put("http://192.168.216.128:3000/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
+      child_scope.satus = 'done'
+      console.log data
+    .error ->
+      console.log 'fail'
 
   # only pototype function
   $scope.populate_localstorage = ->
@@ -1157,6 +1149,13 @@ angular.module("Museum.controllers", [])
           $("#story_quiz_disabled").click()
         , 10
 
+  , true
+
+  # qr_code workaround
+  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language]', (newValue, oldValue) ->
+    if newValue
+      $http.get("http://192.168.216.128:3000/qr_code/#{$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id}").success (d) ->
+        $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d
   , true
 
   $scope.upload_image = (e) ->

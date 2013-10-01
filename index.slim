@@ -451,7 +451,7 @@ html lang="en" ng-app="Museum"
                 tab heading="QR-code"
                   #qr_code.row
                     .qr_image.col-lg-4
-                      img#qr alt="Qr_code" src="{{active_exhibit.qr_code.url}}"
+                      img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code}}"
                     .well.col-lg-4.col-md-offset-2
                       a.btn.qr-code href="{{active_exhibit.qr_code.print_link}}" target="_blank" Print QR-code
                       br
@@ -461,7 +461,7 @@ html lang="en" ng-app="Museum"
 
             .next-ex
 
-          li.exhibit post-render="" data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search" ng-class="{active: exhibit.active}"
+          li.exhibit post-render="" data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search | orderBy:'number' " ng-class="{active: exhibit.active}"
             div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected}"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
@@ -497,11 +497,9 @@ html lang="en" ng-app="Museum"
 
     script src="lib/angular/angular.min.js"
     script src="lib/angular/angular-cookies.js"
-    script src="lib/restangular.js"
     script src="lib/ui-bootstrap-tpls-0.6.0.js"
     script src="lib/ui-bootstrap-0.6.0.js"
-    script src="lib/angularLocalStorage.js"  
-    
+    script src="lib/angularLocalStorage.js"      
     / jquery part
     script src="lib/jquery-1.10.2.js"
     script src="lib/jquery.scrollTo.js"
@@ -512,7 +510,7 @@ html lang="en" ng-app="Museum"
     script src="lib/jQuery-File-Upload/jquery.fileupload-fp.js"
     script src="lib/jQuery-File-Upload/locale.js"
     script src="lib/jquery-ui.js"
-    script src="lib/underscore.js"
+    / script src="lib/qrcode.js"
     / app part
     script src="js/app.js"
     script src="js/services.js"

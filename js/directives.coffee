@@ -273,6 +273,7 @@ angular.module("Museum.directives", [])
     $scope.status_process = ->
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
         $scope.status = 'progress'
+        $rootScope.$broadcast 'changes_to_save', $scope
         console.log $scope.item
         $scope.empty_val = false
         $scope.edit_mode = false

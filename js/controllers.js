@@ -1032,22 +1032,12 @@
         return $scope.new_item_creation = false;
       });
       $scope.$on('changes_to_save', function(event, child_scope) {
-        switch (child_scope.field_type) {
-          case 'story':
-            return $http.put("http://192.168.216.128:3000/story/" + child_scope.item._id, child_scope.item).success(function(data) {
-              console.log(data);
-              return child_scope.satus = 'done';
-            }).error(function() {
-              return console.log('fail');
-            });
-          case 'exhibit':
-            return $http.put("http://192.168.216.128:3000/exhibit/" + child_scope.item._id, child_scope.item).success(function(data) {
-              console.log(data);
-              return child_scope.satus = 'done';
-            }).error(function() {
-              return console.log('fail');
-            });
-        }
+        return $http.put("http://192.168.216.128:3000/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
+          child_scope.satus = 'done';
+          return console.log(data);
+        }).error(function() {
+          return console.log('fail');
+        });
       });
       return $scope.populate_localstorage = function() {
         var i, lang, _j, _k, _len1, _ref1, _results;
@@ -1263,6 +1253,13 @@
               return $("#story_quiz_disabled").click();
             }, 10);
           }
+        }
+      }, true);
+      $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language]', function(newValue, oldValue) {
+        if (newValue) {
+          return $http.get("http://192.168.216.128:3000/qr_code/" + $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id).success(function(d) {
+            return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d;
+          });
         }
       }, true);
       $scope.upload_image = function(e) {

@@ -211,6 +211,7 @@
         return $scope.status_process = function() {
           if ($scope.item[$scope.field] && $scope.item[$scope.field].length !== 0) {
             $scope.status = 'progress';
+            $rootScope.$broadcast('changes_to_save', $scope);
             console.log($scope.item);
             $scope.empty_val = false;
             return $scope.edit_mode = false;
