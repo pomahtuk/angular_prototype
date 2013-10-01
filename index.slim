@@ -426,11 +426,11 @@ html lang="en" ng-app="Museum"
                 tab heading="Media content"
                   #media.row
                     form.form-horizontal role="form" name="mainForm"
-                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup" 
-                      placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name"
-                      audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5"
+                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS number" ng-field="number" ng-help="help text for popup" type="exhibit"
+                      placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
+                      audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media'
 
-                      placeholdertextarea ng-item="active_exhibit" ng-id="description" ng-title="Description" ng-field="description" ng-help="help text for popup 3" maxlength="255" placeholder="active_exhibit.stories[current_museum.def_lang].description"
+                      placeholdertextarea ng-item="active_exhibit.stories[current_museum.def_lang]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="255" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
                       
                 tab heading="Quiz"
                   #quiz.row
@@ -446,7 +446,7 @@ html lang="en" ng-app="Museum"
                         .controls
                       .answers
                         quizanswer ng-item="answer" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers"
-                      placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="description" ng-help="help text for popup 3"
+                      placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3"
 
                 tab heading="QR-code"
                   #qr_code.row
@@ -462,11 +462,11 @@ html lang="en" ng-app="Museum"
             .next-ex
 
           li.exhibit post-render="" data-big-image='{{exhibit.image}}' ng-repeat="exhibit in exhibits | filter: exhibit_search" ng-class="{active: exhibit.active}"
-            div class="opener {{exhibit.stories[current_museum.language].publish_state}}" ng-class="{'border': exhibit.selected}"
+            div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected}"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
               .image
-                img src='{{exhibit.thumb}}' ng-click="open_dropdown($event, exhibit)"
+                img src='{{exhibit.images[0].thumb}}' ng-click="open_dropdown($event, exhibit)"
               .description ng-click="open_dropdown($event, exhibit)"
                 h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
                   | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
@@ -475,8 +475,8 @@ html lang="en" ng-app="Museum"
                   i class="icon-qrcode"
                   i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length > 0"
                   i class="icon-question-sign" ng-show="exhibit.stories[current_museum.language].quiz.state == 'published'"
-              .visibility ng-switch="" on="exhibit.stories[current_museum.language].publish_state"
-                i class="icon-globe placeholder" ng-switch-when="all"
+              .visibility ng-switch="" on="exhibit.stories[current_museum.language].status"
+                i class="icon-globe placeholder" ng-switch-when="published"
                 i class="icon-user placeholder" ng-switch-when="passcode"
                 .on_hover
                   switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider'
@@ -491,11 +491,17 @@ html lang="en" ng-app="Museum"
                 h4 
                   | {{new_exhibit.number}} {{new_exhibit.stories[current_museum.language].name}}
 
-    script src="lib/angular/angular.js"
+
+          li ng-repeat="story in stories"
+            | {{story}}
+
+    script src="lib/angular/angular.min.js"
     script src="lib/angular/angular-cookies.js"
+    script src="lib/restangular.js"
     script src="lib/ui-bootstrap-tpls-0.6.0.js"
     script src="lib/ui-bootstrap-0.6.0.js"
-    script src="lib/angularLocalStorage.js"
+    script src="lib/angularLocalStorage.js"  
+    
     / jquery part
     script src="lib/jquery-1.10.2.js"
     script src="lib/jquery.scrollTo.js"
@@ -506,6 +512,7 @@ html lang="en" ng-app="Museum"
     script src="lib/jQuery-File-Upload/jquery.fileupload-fp.js"
     script src="lib/jQuery-File-Upload/locale.js"
     script src="lib/jquery-ui.js"
+    script src="lib/underscore.js"
     / app part
     script src="js/app.js"
     script src="js/services.js"

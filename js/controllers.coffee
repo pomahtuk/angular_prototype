@@ -137,9 +137,24 @@ acceptableExtensions = gon.acceptable_extensions
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage) ->
+.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage ) ->
   
   window.sc = $scope
+
+  # Restangular.one('provider', '524692c10cff62683f000001').one('museums', '524692c10cff62683f000002').all('exhibits').getList().then (data) ->
+  $http.get('http://192.168.216.128:3000/provider/524692c10cff62683f000001/museums/524692c10cff62683f000002/exhibits').success (data) ->
+    exhibits = []
+    for item in data
+      exhibit = item.exhibit
+      exhibit.images = item.images
+      exhibit.stories = {}
+      for story in item.stories
+        story.story.quiz = story.quiz.quiz
+        story.story.quiz.answers = story.quiz.answers
+        exhibit.stories[story.story.language] = story.story
+      exhibits.push exhibit
+    $scope.exhibits = exhibits
+    $scope.active_exhibit =  $scope.exhibits[0]
 
   $scope.museums = [
     {
@@ -549,18 +564,18 @@ angular.module("Museum.controllers", [])
     }
   }
 
-  # $scope.work_exhibits = angular.copy($scope.exhibits)
-  $scope.work_museum   = angular.copy($scope.current_museum)
-
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
   # just prototype function - remove active class, if window was reloaded when dropdown was opened
-  for exhibit, index in $scope.exhibits
-    if exhibit?
-      exhibit.active   = false
-      exhibit.selected = false
-    else
-      $scope.exhibits.splice(index, 1)
+  if $scope.exhibits?
+    for exhibit, index in $scope.exhibits
+      if exhibit?
+        exhibit.active   = false
+        exhibit.selected = false
+      else
+        $scope.exhibits.splice(index, 1)
+
+    $scope.active_exhibit =  $scope.exhibits[0]
 
   findActive = -> $('ul.exhibits li.exhibit.active')
 
@@ -707,8 +722,6 @@ angular.module("Museum.controllers", [])
     $scope.museum_list_prepare()
     initFileUpload()
   , 200
-
-  $scope.active_exhibit =  $scope.exhibits[0]
 
   angular.element($window).bind "resize", ->
     setTimeout ->
@@ -935,6 +948,21 @@ angular.module("Museum.controllers", [])
     $scope.exhibits.push $scope.new_exhibit
     $scope.new_item_creation = false
 
+  $scope.$on 'changes_to_save', (event, child_scope) ->
+    switch child_scope.field_type
+      when 'story'
+        $http.put("http://192.168.216.128:3000/story/#{child_scope.item._id}", child_scope.item).success (data) ->
+          console.log data
+          child_scope.satus = 'done'
+        .error ->
+          console.log 'fail'
+      when 'exhibit'
+        $http.put("http://192.168.216.128:3000/exhibit/#{child_scope.item._id}", child_scope.item).success (data) ->
+          console.log data
+          child_scope.satus = 'done'
+        .error ->
+          console.log 'fail'
+
   # only pototype function
   $scope.populate_localstorage = ->
     for exhibit in $scope.exhibits
@@ -976,9 +1004,9 @@ angular.module("Museum.controllers", [])
           }
     for i in [0..22]
       exhibit = {
-        index: $scope.exhibits[$scope.exhibits.length-1].index + 2
+        index: $scope.exhibits[$scope.exhibits.length-1].index + 1
         name: 'Экспонат'
-        number: $scope.exhibits[$scope.exhibits.length-1].index + 2
+        number: $scope.exhibits[$scope.exhibits.length-1].index + 1
         image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
         thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
         description: ''

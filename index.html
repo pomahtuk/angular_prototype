@@ -405,7 +405,7 @@
               <tabset><tab heading="Media content">
                   <div class="row" id="media">
                     <form class="form-horizontal" name="mainForm" role="form">
-                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS number"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio"></audioplayer><placeholdertextarea maxlength="255" ng-field="description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].description"></placeholdertextarea>
+                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS number" type="exhibit"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio" type="media"></audioplayer><placeholdertextarea maxlength="255" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.def_lang]" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                     </form>
                   </div>
                 </tab><tab heading="Quiz">
@@ -421,7 +421,7 @@
                       <div class="answers">
                         <quizanswer ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers"></quizanswer>
                       </div>
-                      <placeholdertextarea ng-field="description" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Description"></placeholdertextarea>
+                      <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Description"></placeholdertextarea>
                     </form>
                   </div>
                 </tab><tab heading="QR-code">
@@ -442,12 +442,12 @@
             <div class="next-ex"></div>
           </li>
           <li class="exhibit" data-big-image="{{exhibit.image}}" ng-class="{active: exhibit.active}" ng-repeat="exhibit in exhibits | filter: exhibit_search" post-render="">
-            <div class="opener {{exhibit.stories[current_museum.language].publish_state}}" ng-class="{&#39;border&#39;: exhibit.selected}">
+            <div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{&#39;border&#39;: exhibit.selected}">
               <div class="checkbox">
                 <input ng-change="check_selected()" ng-model="exhibit.selected" type="checkbox">
               </div>
               <div class="image">
-                <img ng-click="open_dropdown($event, exhibit)" src="{{exhibit.thumb}}">
+                <img ng-click="open_dropdown($event, exhibit)" src="{{exhibit.images[0].thumb}}">
               </div>
               <div class="description" ng-click="open_dropdown($event, exhibit)">
                 <h4 ng-class="{&#39;dummy_header&#39;:exhibit.stories[current_museum.language].name.length == 0}">
@@ -457,8 +457,8 @@
                   <i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio.length &gt; 0"></i><i class="icon-qrcode"></i><i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length &gt; 0"></i><i class="icon-question-sign" ng-show="exhibit.stories[current_museum.language].quiz.state == &#39;published&#39;"></i>
                 </div>
               </div>
-              <div class="visibility" ng-switch="" on="exhibit.stories[current_museum.language].publish_state">
-                <i class="icon-globe placeholder" ng-switch-when="all"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>
+              <div class="visibility" ng-switch="" on="exhibit.stories[current_museum.language].status">
+                <i class="icon-globe placeholder" ng-switch-when="published"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>
                 <div class="on_hover">
                   <switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider="provider"></switchpub>
                 </div>
@@ -478,11 +478,15 @@
               </div>
             </div>
           </li>
+          <li ng-repeat="story in stories">
+            {{story}}
+          </li>
         </ul>
       </div>
     </div>
-    <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/angular.min.js"></script>
     <script src="lib/angular/angular-cookies.js"></script>
+    <script src="lib/restangular.js"></script>
     <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
     <script src="lib/ui-bootstrap-0.6.0.js"></script>
     <script src="lib/angularLocalStorage.js"></script>
@@ -495,6 +499,7 @@
     <script src="lib/jQuery-File-Upload/jquery.fileupload-fp.js"></script>
     <script src="lib/jQuery-File-Upload/locale.js"></script>
     <script src="lib/jquery-ui.js"></script>
+    <script src="lib/underscore.js"></script>
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>

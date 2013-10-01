@@ -86,25 +86,25 @@ angular.module("Museum.directives", [])
     trans: '=translations'
   template: """
     <div class="btn-group pull-right item_publish_settings">
-      <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" type="button" ng-switch on="item.stories[current_museum.language].publish_state">
-        <div class="extra" ng-switch on="item.stories[current_museum.language].publish_state">
-          <i class="icon-globe" ng-switch-when="all" ></i>
+      <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" type="button" ng-switch on="item.stories[current_museum.language].status">
+        <div class="extra" ng-switch on="item.stories[current_museum.language].status">
+          <i class="icon-globe" ng-switch-when="published" ></i>
           <i class="icon-user" ng-switch-when="passcode" ></i>
         </div>
         <span ng-switch-when="passcode">Publish</span>
-        <span ng-switch-when="all">Published</span>
+        <span ng-switch-when="published">Published</span>
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu status-select-dropdown" role="menu">
         Who can see it in mobile application
         <li class="divider"></li>
-        <li ng-click="item.stories[current_museum.language].publish_state = 'all'">
+        <li ng-click="item.stories[current_museum.language].status = 'published'">
           <i class="icon-globe"></i> Everyone
-          <span class="check" ng-show="item.stories[current_museum.language].publish_state == 'all'">✓</span>
+          <span class="check" ng-show="item.stories[current_museum.language].status == 'published'">✓</span>
         </li>
-        <li  ng-click="item.stories[current_museum.language].publish_state = 'passcode'">
+        <li  ng-click="item.stories[current_museum.language].status = 'passcode'">
           <i class="icon-user"></i> Only users who have passcode
-          <span class="check" ng-show="item.stories[current_museum.language].publish_state == 'passcode'">✓</span>
+          <span class="check" ng-show="item.stories[current_museum.language].status == 'passcode'">✓</span>
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">
               {{provider.passcode}}
@@ -116,9 +116,9 @@ angular.module("Museum.directives", [])
         <li class="other_list">
           <span class="other_lang" ng-click="hidden_list=!hidden_list" stop-event="click">Other languages</a>
           <ul class="other" ng-hide="hidden_list">
-            <li ng-repeat="(name, story) in item.stories" ng-switch on="story.publish_state">
+            <li ng-repeat="(name, story) in item.stories" ng-switch on="story.status">
               <span class="col-lg-4">{{trans[name]}} </span>
-              <i class="icon-globe" ng-switch-when="all" ></i>
+              <i class="icon-globe" ng-switch-when="published" ></i>
               <i class="icon-user" ng-switch-when="passcode" ></i>
             </li>
           </ul>
@@ -141,21 +141,21 @@ angular.module("Museum.directives", [])
   template: """
     <div class="btn-group">
       <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
-        <div class="extra_right" ng-switch on="item.publish_state">
-          <i class="icon-globe" ng-switch-when="all" ></i>
+        <div class="extra_right" ng-switch on="item.status">
+          <i class="icon-globe" ng-switch-when="published" ></i>
           <i class="icon-user" ng-switch-when="passcode" ></i>
         </div>
         <span class="caret"></span></button>
       <ul class="dropdown-menu" role="menu">
         Who can see it in mobile application
         <li class="divider"></li>
-        <li  ng-click="item.publish_state = 'all'">
+        <li  ng-click="item.status = 'published'">
           <i class="icon-globe"></i> Everyone
-          <span class="check" ng-show="item.publish_state == 'all'">✓</span>
+          <span class="check" ng-show="item.status == 'published'">✓</span>
         </li>
-        <li ng-click="item.publish_state = 'passcode'">
+        <li ng-click="item.status = 'passcode'">
           <i class="icon-user"></i> Only users who have passcode
-          <span class="check" ng-show="item.publish_state == 'passcode'">✓</span>
+          <span class="check" ng-show="item.status == 'passcode'">✓</span>
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">
               {{provider.passcode}}
@@ -181,6 +181,7 @@ angular.module("Museum.directives", [])
     field: '@ngField'
     inv_sign: '=invalidsign'
     placeholder: '=placeholder'
+    field_type: '@type'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
@@ -205,6 +206,7 @@ angular.module("Museum.directives", [])
     $scope.status_process = ->
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
         $scope.status = 'progress'
+        $rootScope.$broadcast 'changes_to_save', $scope
         $scope.empty_val = false
         $scope.edit_mode = false
       else
@@ -245,6 +247,7 @@ angular.module("Museum.directives", [])
     field: '@ngField'
     max_length: '@maxlength'
     placeholder: '=placeholder'
+    field_type: '@type'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
@@ -270,6 +273,7 @@ angular.module("Museum.directives", [])
     $scope.status_process = ->
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0
         $scope.status = 'progress'
+        console.log $scope.item
         $scope.empty_val = false
         $scope.edit_mode = false
       else
@@ -304,10 +308,10 @@ angular.module("Museum.directives", [])
       </label>
       <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item.id}}" ng-model="checked" ng-click="check_items(item)">
       <div class="col-xs-5 trigger" ng-hide="edit_mode || empty_val">
-        <span class="placeholder" ng-click="edit_mode = true">{{item.title}}</span>
+        <span class="placeholder" ng-click="edit_mode = true">{{item.content}}</span>
       </div>
       <div class="col-xs-5 triggered" ng-show="edit_mode || empty_val">
-        <input class="form-control" id="{{id}}" name="{{item.id}}" placeholder="Enter option" type="text" ng-model="item.title" focus-me="edit_mode" ng-blur="status_process()" required>
+        <input class="form-control" id="{{id}}" name="{{item.id}}" placeholder="Enter option" type="text" ng-model="item.content" focus-me="edit_mode" ng-blur="status_process()" required>
         <div class="error_text">can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
@@ -315,7 +319,7 @@ angular.module("Museum.directives", [])
   """
   controller : ($scope, $rootScope, $element, $attrs) ->
     $scope.item.statuses = {} unless $scope.item.statuses?
-    $scope.status = $scope.item.statuses[$scope.item.title]
+    $scope.status = $scope.item.statuses[$scope.item.content]
     $scope.item.correct_saved = false unless $scope.item.correct_saved?
 
     $scope.check_items = (item) ->
@@ -326,7 +330,7 @@ angular.module("Museum.directives", [])
       $scope.item.correct_saved = true
 
     $scope.status_process = ->
-      if $scope.item.title && $scope.item.title.length isnt 0
+      if $scope.item.content && $scope.item.content.length isnt 0
         $scope.status = 'progress'
         $scope.empty_val = false
         $scope.edit_mode = false
@@ -343,7 +347,7 @@ angular.module("Museum.directives", [])
         for single_item in newValue
           scope.checked = single_item.id if single_item.correct is true            
 
-    scope.$watch 'item.title', (newValue, oldValue) ->
+    scope.$watch 'item.content', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true
         scope.empty_val = true

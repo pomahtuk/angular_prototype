@@ -198,6 +198,26 @@
     '$scope', '$http', '$filter', '$window', '$modal', 'storage', function($scope, $http, $filter, $window, $modal, storage) {
       var dropDown, exhibit, findActive, get_index, get_lang, get_name, get_number, get_state, index, _i, _len, _ref;
       window.sc = $scope;
+      $http.get('http://192.168.216.128:3000/provider/524692c10cff62683f000001/museums/524692c10cff62683f000002/exhibits').success(function(data) {
+        var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
+        exhibits = [];
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          item = data[_i];
+          exhibit = item.exhibit;
+          exhibit.images = item.images;
+          exhibit.stories = {};
+          _ref = item.stories;
+          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+            story = _ref[_j];
+            story.story.quiz = story.quiz.quiz;
+            story.story.quiz.answers = story.quiz.answers;
+            exhibit.stories[story.story.language] = story.story;
+          }
+          exhibits.push(exhibit);
+        }
+        $scope.exhibits = exhibits;
+        return $scope.active_exhibit = $scope.exhibits[0];
+      });
       $scope.museums = [
         {
           name: 'Imperial Peace Museum',
@@ -568,17 +588,19 @@
           new_story_link: '/1/1/1/'
         }
       });
-      $scope.work_museum = angular.copy($scope.current_museum);
       dropDown = $('#drop_down').removeClass('hidden').hide();
-      _ref = $scope.exhibits;
-      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-        exhibit = _ref[index];
-        if (exhibit != null) {
-          exhibit.active = false;
-          exhibit.selected = false;
-        } else {
-          $scope.exhibits.splice(index, 1);
+      if ($scope.exhibits != null) {
+        _ref = $scope.exhibits;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          exhibit = _ref[index];
+          if (exhibit != null) {
+            exhibit.active = false;
+            exhibit.selected = false;
+          } else {
+            $scope.exhibits.splice(index, 1);
+          }
         }
+        $scope.active_exhibit = $scope.exhibits[0];
       }
       findActive = function() {
         return $('ul.exhibits li.exhibit.active');
@@ -744,7 +766,6 @@
         $scope.museum_list_prepare();
         return initFileUpload();
       }, 200);
-      $scope.active_exhibit = $scope.exhibits[0];
       angular.element($window).bind("resize", function() {
         return setTimeout(function() {
           return $scope.museum_list_prepare();
@@ -1010,6 +1031,24 @@
         $scope.exhibits.push($scope.new_exhibit);
         return $scope.new_item_creation = false;
       });
+      $scope.$on('changes_to_save', function(event, child_scope) {
+        switch (child_scope.field_type) {
+          case 'story':
+            return $http.put("http://192.168.216.128:3000/story/" + child_scope.item._id, child_scope.item).success(function(data) {
+              console.log(data);
+              return child_scope.satus = 'done';
+            }).error(function() {
+              return console.log('fail');
+            });
+          case 'exhibit':
+            return $http.put("http://192.168.216.128:3000/exhibit/" + child_scope.item._id, child_scope.item).success(function(data) {
+              console.log(data);
+              return child_scope.satus = 'done';
+            }).error(function() {
+              return console.log('fail');
+            });
+        }
+      });
       return $scope.populate_localstorage = function() {
         var i, lang, _j, _k, _len1, _ref1, _results;
         _ref1 = $scope.exhibits;
@@ -1054,9 +1093,9 @@
         _results = [];
         for (i = _k = 0; _k <= 22; i = ++_k) {
           exhibit = {
-            index: $scope.exhibits[$scope.exhibits.length - 1].index + 2,
+            index: $scope.exhibits[$scope.exhibits.length - 1].index + 1,
             name: 'Экспонат',
-            number: $scope.exhibits[$scope.exhibits.length - 1].index + 2,
+            number: $scope.exhibits[$scope.exhibits.length - 1].index + 1,
             image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
             thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
             description: '',
