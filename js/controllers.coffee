@@ -30,131 +30,179 @@ tileGrid = (collection, tileWidth, tileSpace, tileListMargin) ->
 
 @gon = {"google_api_key":"AIzaSyCPyGutBfuX48M72FKpF4X_CxxPadq6r4w","acceptable_extensions":{"audio":["mp3","ogg","aac","wav","amr","3ga","m4a","wma","mp4","mp2","flac"],"image":["jpg","jpeg","gif","png","tiff","bmp"],"video":["mp4","m4v"]},"development":false}
 
-fileSizeMb = 50
-acceptableExtensions = gon.acceptable_extensions
+# fileSizeMb = 50
+# acceptableExtensions = gon.acceptable_extensions
 
-@correctExtension = (object) ->
-  extension = object.files[0].name.split('.').pop().toLowerCase()
-  $.inArray(extension, acceptableExtensions[object.fileInput.context.dataset.accept]) != -1
+# @correctExtension = (object) ->
+#   console.log object
+#   extension = object.files[0].name.split('.').pop().toLowerCase()
+#   $.inArray(extension, gon.acceptable_extensions.image) != -1
 
-@correctFileSize = (object) ->
-  object.files[0] && object.files[0].size < fileSizeMb * 1024 * 1024
+# @correctFileSize = (object) ->
+#   object.files[0] && object.files[0].size < fileSizeMb * 1024 * 1024
 
-@initFileUpload = (e, object = null, options={}) ->
-  console.log 'inited'
-  (object || $('.fileupload')).each ->
-    upload = null
-    $this = $ this
-    form = $this.parent('form')
-    container = form.parent()
-    button = form.find('a.btn.browse')
-    cancel = form.find('a.btn.cancel')
-    progress = options.progress || form.find('.progress')
+# @initFileUpload = (e, object = null, options={}) ->
+#   console.log 'inited'
+#   (object || $('.fileupload')).each ->
+#     upload = null
+#     $this = $ this
+#     form = $this.parent('form')
+#     container = form.parent()
+#     button = form.find('a.btn.browse')
+#     cancel = form.find('a.btn.cancel')
+#     progress = options.progress || form.find('.progress')
 
-    cancel.unbind 'click'
-    cancel.bind 'click', (e) ->
-      e.preventDefault()
-      upload.abort() if upload
+#     cancel.unbind 'click'
+#     cancel.bind 'click', (e) ->
+#       e.preventDefault()
+#       upload.abort() if upload
 
-    $this.fileupload
-      add: (e, data) ->
-        if correctExtension(data)
-          if correctFileSize(data)
-            button.addClass 'disabled'
-            cancel.removeClass 'hide'
-            progress.removeClass 'hide'
-            data.form.find('.help-tooltip').remove()
-            data.submit()
-          else
-            Message.error t('message.errors.media_content.file_size', file_size: fileSizeMb)
-        else
-          Message.error t('message.errors.media_content.file_type')
-      beforeSend: (jqXHR) ->
-        progress.find('.bar').width('0%')
-        upload = jqXHR
-      success: (result) ->
-        container.replaceWith(result).hide().fadeIn ->
-          $('a.thumb').trigger 'image:uploaded'
-        $('#edit_story_form').trigger 'form:loaded'
-        Message.notice t('message.media_content.uploaded')
-      complete: ->
-        cancel.addClass 'hide'
-        progress.addClass 'hide'
-        button.removeClass 'disabled'
-      error: (result, status, errorThrown) ->
-        $this.val ''
-        if errorThrown == 'abort'
-          Message.notice t('message.media_content.canceled')
-        else
-          if result.status == 422
-            response = jQuery.parseJSON(result.responseText)
-            responseText = response.link[0]
-            Message.error responseText
-          else
-            Message.error t('message.errors.media_content.try_again')
-      progressall: (e, data) ->
-        percentage = parseInt(data.loaded / data.total * 100, 10)
-        progress.find('.bar').width(percentage + '%')
+#     $this.fileupload
+#       add: (e, data) ->
+#         if correctExtension(data)
+#           if correctFileSize(data)
+#             button.addClass 'disabled'
+#             cancel.removeClass 'hide'
+#             progress.removeClass 'hide'
+#             data.form.find('.help-tooltip').remove()
+#             data.submit()
+#           else
+#             console.log 'error: file size'
+#             # Message.error t('message.errors.media_content.file_size', file_size: fileSizeMb)
+#         else
+#           console.log 'error: file type'
+#           # Message.error t('message.errors.media_content.file_type')
+#       beforeSend: (jqXHR) ->
+#         progress.find('.bar').width('0%')
+#         upload = jqXHR
+#       success: (result) ->
+#         result = JSON.parse(result)
+#         container.find('img').attr('src', result.thumb).data('crop-url', result.image)
+#         container.find('.image_link').val(result.image)
+#         container.find('.thumb_link').val(result.thumb)
+#         $('ul.exhibits li.active img').attr('src', result.thumb)
+#         # container.replaceWith(result).hide().fadeIn ->
+#         #   $('a.thumb').trigger 'image:uploaded'
+#         # $('#edit_story_form').trigger 'form:loaded'
+#       complete: ->
+#         cancel.addClass 'hide'
+#         progress.addClass 'hide'
+#         button.removeClass 'disabled'
+#       error: (result, status, errorThrown) ->
+#         $this.val ''
+#         if errorThrown == 'abort'
+#           console.log 'abort'
+#           # Message.notice t('message.media_content.canceled')
+#         else
+#           if result.status == 422
+#             response = jQuery.parseJSON(result.responseText)
+#             responseText = response.link[0]
+#             console.log responseText
+#             # Message.error responseText
+#           else
+#             console.log 'unknown error'
+#             # Message.error t('message.errors.media_content.try_again')
+#       progressall: (e, data) ->
+#         percentage = parseInt(data.loaded / data.total * 100, 10)
+#         progress.find('.bar').width(percentage + '%')
 
-# load media urls and check that url exist
-@checkAudioFiles = ->
-  $('#audio_form[data-audio-check-url]').each ->
-    $this = $(this)
-    url = $this.data 'audio-check-url'
+# # load media urls and check that url exist
+# @checkAudioFiles = ->
+#   $('#audio_form[data-audio-check-url]').each ->
+#     $this = $(this)
+#     url = $this.data 'audio-check-url'
 
-    $.ajax
-      url: url
-      type: 'GET'
-      dataType: 'json'
-      success: (response) ->
-        $.each response, (key, item) ->
-          btn = $('.btn.' + key)
+#     $.ajax
+#       url: url
+#       type: 'GET'
+#       dataType: 'json'
+#       success: (response) ->
+#         $.each response, (key, item) ->
+#           btn = $('.btn.' + key)
 
-          if item.exist
-            audio = $this.find('.audio-upload-form').find('audio.' + key)
-            audio.empty()
-            $('<source>').attr('src', item.file).appendTo audio
-            audioElement = audio.get(0)
+#           if item.exist
+#             audio = $this.find('.audio-upload-form').find('audio.' + key)
+#             audio.empty()
+#             $('<source>').attr('src', item.file).appendTo audio
+#             audioElement = audio.get(0)
 
-            if audioElement
-              audioElement.pause()
-              audioElement.load()
-              canPlay = !!audioElement.canPlayType && audioElement.canPlayType(item.content_type) != ''
-              console.log canPlay + ' - ' + item.content_type
+#             if audioElement
+#               audioElement.pause()
+#               audioElement.load()
+#               canPlay = !!audioElement.canPlayType && audioElement.canPlayType(item.content_type) != ''
+#               console.log canPlay + ' - ' + item.content_type
 
-            $('.play.' + key).find('i').removeClass('icon-pause').addClass 'icon-play'
-            if canPlay
-              btn.removeClass 'disabled hide'
-            else
-              btn.addClass('disabled').removeClass('hide')
-          else
-            btn.addClass 'disabled'
-      error: ->
-        Message.notice t('message.media_content.not_processed_yet')
+#             $('.play.' + key).find('i').removeClass('icon-pause').addClass 'icon-play'
+#             if canPlay
+#               btn.removeClass 'disabled hide'
+#             else
+#               btn.addClass('disabled').removeClass('hide')
+#           else
+#             btn.addClass 'disabled'
+#       error: ->
+#         Message.notice t('message.media_content.not_processed_yet')
 
-#
+# #
 # App controllers
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage ) ->
+.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$routeParams', 'ngProgress', ($scope, $http, $filter, $window, $modal, storage, $routeParams, ngProgress) ->
   
   window.sc = $scope
 
-  # Restangular.one('provider', '524692c10cff62683f000001').one('museums', '524692c10cff62683f000002').all('exhibits').getList().then (data) ->
-  $http.get('http://192.168.216.128:3000/provider/524692c10cff62683f000001/museums/524692c10cff62683f000002/exhibits').success (data) ->
-    exhibits = []
-    for item in data
-      exhibit = item.exhibit
-      exhibit.images = item.images
-      exhibit.stories = {}
-      for story in item.stories
-        story.story.quiz = story.quiz.quiz
-        story.story.quiz.answers = story.quiz.answers
-        exhibit.stories[story.story.language] = story.story
-      exhibits.push exhibit
-    $scope.exhibits = exhibits
-    $scope.active_exhibit =  $scope.exhibits[0]
+  $scope.exhibit_search = ''
+
+  $scope.criteriaMatch = ( criteria ) ->
+    ( item ) ->
+      if item.stories[$scope.current_museum.language].name
+        in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
+        $scope.grid()
+        return in_string || criteria is ''
+      else
+        true
+
+  museum_id = if $routeParams.museum_id?
+    $routeParams.museum_id
+  else
+    "52485ff1da0484df71000002"
+    # "524c2a72856ee97345000002"
+
+  content_provider_id = if $routeParams.content_provider_id?
+    $routeParams.content_provider_id
+  else
+    "52485ff1da0484df71000001"
+    # "524c2a72856ee97345000001"
+
+  $scope.backend_url = "http://192.168.216.128:3000"
+  # $scope.backend_url = "http://prototype.izi.travel"
+
+  $scope.sort_field     = 'number'
+  $scope.sort_direction = 1
+  $scope.sort_text      = 'Sort 0-9'
+  $scope.ajax_progress = true
+
+  $scope.reload_exhibits = (sort_field, sort_direction) ->
+    # $http.get("#{$scope.backend_url}/provider/524c2a72856ee97345000001/museums/524c2a72856ee97345000002/exhibits").success (data) ->
+    ngProgress.color('#fd6e3b')
+    ngProgress.start()
+    $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
+      exhibits = []
+      for item in data
+        exhibit = item.exhibit
+        exhibit.images = item.images
+        exhibit.stories = {}
+        for story in item.stories
+          story.story.quiz = story.quiz.quiz
+          story.story.quiz.answers = story.quiz.answers
+          exhibit.stories[story.story.language] = story.story
+        exhibits.push exhibit
+      ngProgress.complete()
+      $scope.exhibits = exhibits
+      $scope.active_exhibit =  $scope.exhibits[0]
+      $scope.ajax_progress  = false
+
+  $scope.reload_exhibits($scope.sort_field, $scope.sort_direction)
 
   $scope.museums = [
     {
@@ -664,6 +712,7 @@ angular.module("Museum.controllers", [])
         exhibit.active = false
 
     elem.active = true
+    $scope.element_switch = true
     $scope.active_exhibit = elem
 
     previous = findActive()
@@ -692,7 +741,7 @@ angular.module("Museum.controllers", [])
     else
       item_publish_settings.show()
       delete_story.removeClass('no_margin')
-
+  
   $scope.museum_type_filter = ''
 
   $scope.grid = ->
@@ -702,7 +751,7 @@ angular.module("Museum.controllers", [])
     tileSpace = 40 # parseInt(collection.first().css('margin-left'), 10) + parseInt(collection.first().css('margin-right'), 10)
     # $('.exhibits').css 'text-align': 'left'
     tileGrid(collection, tileWidth, tileSpace, tileListMargin)
-    $(window).resize(tileGrid.bind(@, collection, tileWidth, tileSpace, tileListMargin))
+    # $(window).resize(tileGrid.bind(@, collection, tileWidth, tileSpace, tileListMargin))
 
   $scope.museum_list_prepare = ->
     list        = $('ul.museum_list')
@@ -720,10 +769,10 @@ angular.module("Museum.controllers", [])
   setTimeout ->
     # $scope.grid()
     $scope.museum_list_prepare()
-    initFileUpload()
+    # initFileUpload()
   , 200
 
-  angular.element($window).bind "resize", ->
+  $(window).resize ->
     setTimeout ->
       # $scope.grid()
       $scope.museum_list_prepare()
@@ -734,7 +783,7 @@ angular.module("Museum.controllers", [])
   $scope.all_selected = false
 
   get_number = ->
-    ++$scope.exhibits[$scope.exhibits.length-1].number + 1
+    ++$scope.exhibits[$scope.exhibits.length-1].number + 1 || 100
 
   get_index = ->
     ++$scope.exhibits.length
@@ -757,66 +806,61 @@ angular.module("Museum.controllers", [])
   $scope.create_new_item = () ->
     unless $scope.new_item_creation is true
       $scope.new_exhibit = {
-        name: ''
-        number: get_number()
-        index: get_index()
-        image: '/img/img-bg.png'
-        thumb: '/img/img-bg.png'
-        publish_state: 'draft'
-        description: ''
+        content_provider: content_provider_id
+        type:             'exhibit'
+        distance:         20
+        duration:         20
+        status:           'draft'
+        route:            ''
+        category:         ''
+        parent:           museum_id
+        name:             ''
+        number:           get_number()
         qr_code: {
           url: ''
           print_link: ''
         }
-        images: [
-          {
-            image: '/img/img-bg.png'
-            thumb: '/img/img-bg.png'
-          }
-        ]
         stories: {}
       }
+      $scope.new_exhibit.images = [
+        {
+          image: "http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg"
+          parent: "52472b44774dd1e650000069" #redefine!
+          thumb: "http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg"
+        }
+      ]
       for lang of $scope.current_museum.stories
         $scope.new_exhibit.stories[lang] = {
-          name: ''
-          description: ''
-          audio: ''
-          publish_stat: 'passcode'
-          quiz: {
-            question: ''
-            description: ''
-            state: 'limited'
-            answers: [
-              {
-                title: ''
-                correct: true
-                id: 0
-              }
-              {
-                title: ''
-                correct: false
-                id: 1
-              }
-              {
-                title: ''
-                correct: false
-                id: 2
-              }
-              {
-                title: ''
-                correct: false
-                id: 3
-              }
-            ]
-          }
+          playback_algorithm: 'generic'
+          content_provider:   content_provider_id
+          story_type:         'story'
+          status:             'passcode'
+          language:           lang
+          name:               ''
+          short_description:  ''
+          long_description:   ''
+          story_set:          "52472b44774dd1e650000069" #redefine!
         }
+        $scope.new_exhibit.stories[lang].quiz = {
+          story:     "52472b44774dd1e650000069" # redefine!
+          question:  ''
+          comment:   ''
+          status:    'passcode'
+          answers:   []
+        }
+        for i in [0..3]
+          $scope.new_exhibit.stories[lang].quiz.answers.push
+            quiz:     "52472b44774dd1e650000069" # redefine!
+            content:  ''
+            correct:  false
+
       $scope.new_item_creation = true
       e = {}
       e.target = $('li.exhibit.dummy > .opener.draft')
       $scope.open_dropdown(e, $scope.new_exhibit)
 
       #hack to tile grid when adding an item to new line
-      $(window).resize()     
+      $scope.grid()    
 
       # hack, cant find out what exactly happening and why new exhibit created before saving
       $scope.exhibits.splice $scope.exhibits.length-1, 1 
@@ -855,49 +899,39 @@ angular.module("Museum.controllers", [])
     )
     ModalDeleteInstance.result.then ((selected) ->
       $scope.selected = selected
-      if Object.keys($scope.active_exhibit.stories).length is selected.length || Object.keys($scope.active_exhibit.stories).length is 1
+      if Object.keys($scope.active_exhibit.stories).length is selected.length
         $scope.closeDropDown()
         for exhibit, index in $scope.exhibits
-          if exhibit.index is $scope.active_exhibit.index
+          if exhibit._id is $scope.active_exhibit._id
             $scope.exhibits.splice index, 1
-            $scope.active_exhibit = $scope.exhibits[0]
+            $scope.grid()
+            $http.delete("#{$scope.backend_url}/story_set/#{$scope.active_exhibit._id}/").success (data) ->
+              console.log data
+              $scope.active_exhibit = $scope.exhibits[0]
+            .error ->
+              console.log 'error'
             break
       else
         for st_index, story of $scope.active_exhibit.stories
           for item in selected
             if item is st_index
-              $scope.active_exhibit.stories[st_index] = {
-                language: get_lang()
-                name: ''
-                description: ''
-                audio: ''
-                quiz: {
-                  question: ''
-                  description: ''
-                  answers: [
-                    {
-                      title: ''
-                      correct: true
-                      id: 0
-                    }
-                    {
-                      title: ''
-                      correct: false
-                      id: 1
-                    }
-                    {
-                      title: ''
-                      correct: false
-                      id: 2
-                    }
-                    {
-                      title: ''
-                      correct: false
-                      id: 3
-                    }
-                  ]
-                }
-              }
+              story = $scope.active_exhibit.stories[st_index]
+              story.status = 'dummy'
+              story.name = ''
+              story.short_description = ''
+              story.long_description = ''
+              story.quiz.question = ''
+              story.quiz.comment = ''
+              story.quiz.status = ''
+              story.quiz.answers[0].content = ''
+              story.quiz.answers[0].correct = true
+              story.quiz.answers[1].content = ''
+              story.quiz.answers[1].correct = false
+              story.quiz.answers[2].content = ''
+              story.quiz.answers[2].correct = false
+              story.quiz.answers[3].content = ''
+              story.quiz.answers[3].correct = false
+              $scope.update_story(story)
     ), ->
       console.log "Modal dismissed at: " + new Date()
 
@@ -939,21 +973,90 @@ angular.module("Museum.controllers", [])
       $('.actions_bar .museum_edit_opener').click()
     , 10
 
+  $scope.update_story = (story) ->
+    $http.put("#{$scope.backend_url}/story/#{story._id}", story).success (data) ->
+      $http.put("#{$scope.backend_url}/quiz/#{story.quiz._id}", story.quiz).success (data) ->
+        for answer in story.quiz.answers
+          $scope.put_answers answer
+      .error ->
+        console.log 'error'
+    .error ->
+      console.log 'error'
+
+  $scope.put_answers = (answer) ->
+    $http.put("#{$scope.backend_url}/quiz_answer/#{answer._id}", answer).success (data) ->
+      console.log 'done'
+    .error ->
+      console.log 'error'
+
+  $scope.museum_edit_dropdown_close = () ->
+    setTimeout ->
+      $('.actions_bar .museum_edit_opener').click()
+    , 10
+
+  $scope.post_stories = (story) ->
+    $http.post("#{$scope.backend_url}/story/", story).success (data) ->
+      story._id = data._id
+      story.quiz.story = data._id
+      $http.post("#{$scope.backend_url}/quiz/", story.quiz).success (data) ->
+        story.quiz._id = data.id
+        for answer in story.quiz.answers
+          answer.quiz = data._id
+          $scope.post_answers answer
+      .error ->
+        console.log 'error'
+    .error ->
+      console.log 'error'
+
+  $scope.post_answers = (answer) ->
+    $http.post("#{$scope.backend_url}/quiz_answer/", answer).success (data) ->
+      # console.log data
+      answer._id = data._id
+    .error ->
+      console.log 'error'
+
   # only pototype function, backend neded
   $scope.$on 'save_new_exhibit', ->
     console.log 'saving!'
-    $scope.new_exhibit.publish_state = 'passcode'
-    for lang, story of $scope.new_exhibit.stories
-      story.publish_state = 'passcode'
-    $scope.exhibits.push $scope.new_exhibit
+    $http.post("#{$scope.backend_url}/story_set/", $scope.new_exhibit).success (data) ->
+      # console.log data
+      $scope.exhibits.push $scope.new_exhibit
+      media = $scope.new_exhibit.images[0]
+      media.parent = data._id
+      # console.log media
+      $http.post("#{$scope.backend_url}/media/", media).success (data) ->
+        # console.log data
+        media._id = media._id
+        # story.quiz.story = data._id
+      .error ->
+        console.log 'error'
+      for lang, story of $scope.new_exhibit.stories
+        story.publish_state = 'passcode'
+        story.story_set = data._id
+        $scope.post_stories story
+    .error ->
+      console.log 'fail'
     $scope.new_item_creation = false
 
   $scope.$on 'changes_to_save', (event, child_scope) ->
-    $http.put("http://192.168.216.128:3000/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
+    $http.put("#{$scope.backend_url}/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
       child_scope.satus = 'done'
       console.log data
     .error ->
       console.log 'fail'
+
+  $scope.$on 'quiz_changes_to_save', (event, child_scope, correct_item) ->
+    for sub_item in child_scope.collection
+      sign = if sub_item._id is correct_item._id
+        true
+      else
+        false
+      sub_item.correct = sign
+      sub_item.correct_saved = sign
+      $http.put("#{$scope.backend_url}/#{child_scope.field_type}/#{sub_item._id}", sub_item).success (data) ->
+        console.log data
+      .error ->
+        console.log 'fail'
 
   # only pototype function
   $scope.populate_localstorage = ->
@@ -1063,12 +1166,20 @@ angular.module("Museum.controllers", [])
 
 .controller('DropDownController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', ($scope, $http, $filter, $window, $modal, storage, $rootScope) ->
 
-  $scope.quiz_state = (form) ->
+  $scope.quiz_state = (form, item) ->
     $scope.mark_quiz_validity(form.$valid)
-    unless form.$valid
+    if form.$valid
+      setTimeout ->
+        $http.put("#{$scope.backend_url}/quiz/#{item._id}", item).success (data) ->
+          console.log data
+        .error ->
+          console.log 'fail'
+        true
+      , 50
+    else
       setTimeout ->
         $("#story_quiz_disabled").click()
-      , 300      
+      , 300     
     true
 
   $scope.mark_quiz_validity = (valid) ->
@@ -1080,12 +1191,7 @@ angular.module("Museum.controllers", [])
     true
 
   $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz', (newValue, oldValue) ->
-    if newValue.state is 'limited'
-      unless $("#story_quiz_disabled").is(':checked')
-        setTimeout ->
-          $("#story_quiz_disabled").click()
-        , 10
-    else if newValue.state is 'published'
+    if newValue.status is 'published'
       if $("#story_quiz_enabled").is(':checked')
         setTimeout ->
           unless $scope.quizform.$valid
@@ -1096,6 +1202,11 @@ angular.module("Museum.controllers", [])
       else
         setTimeout ->
           $("#story_quiz_enabled").click()
+        , 10
+    else
+      unless $("#story_quiz_disabled").is(':checked')
+        setTimeout ->
+          $("#story_quiz_disabled").click()
         , 10
   , true
 
@@ -1113,19 +1224,25 @@ angular.module("Museum.controllers", [])
   $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].name', (newValue, oldValue) ->
     form = $('#media form')
     if form.length > 0
-      if $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].publish_state is 'dummy'
-        $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].publish_state = 'passcode' if newValue
+      if $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status is 'dummy'
+        $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status = 'passcode' if newValue
       else
-        unless  $scope.$parent.new_item_creation or $scope.$parent.item_deletion
+        unless $scope.$parent.new_item_creation
           unless newValue 
             $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue
             $('.empty_name_error.name').show()
             setTimeout ->
               $('.empty_name_error.name').hide()
             , 1500
-        else
-          if newValue and $scope.$parent.new_item_creation
-            $rootScope.$broadcast 'save_new_exhibit'
+        # else
+        #   if newValue and $scope.$parent.new_item_creation
+        #     $rootScope.$broadcast 'save_new_exhibit'
+
+  $scope.$watch '$parent.element_switch', (newValue, oldValue) ->
+    if newValue isnt oldValue
+      setTimeout ->
+        $scope.$parent.element_switch = false
+      , 100
 
   $scope.$watch '$parent.active_exhibit.number', (newValue, oldValue) ->
     form = $('#media form')
@@ -1154,23 +1271,25 @@ angular.module("Museum.controllers", [])
   # qr_code workaround
   $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language]', (newValue, oldValue) ->
     if newValue
-      $http.get("http://192.168.216.128:3000/qr_code/#{$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id}").success (d) ->
-        $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d
+      unless $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code
+        $http.get("#{$scope.$parent.backend_url}/qr_code/#{$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id}").success (d) ->
+          $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d
   , true
 
   $scope.upload_image = (e) ->
     e.preventDefault()
     elem = $ e.target
-    parent = elem.parents('#images, #maps')
+    parent = elem.parents('.images')
 
     if parent.find('li:hidden').isEmpty()
       $.ajax
         url: elem.attr('href')
         async: false
         success: (response) ->
-          node = $(response).hide()
-          parent.find('li.new').before node
-          initFileUpload e, node.find('.fileupload'), { progress: elem.find('.progress') }
+          console.log response
+          # node = $(response).hide()
+          # parent.find('li.new').before node
+          # initFileUpload e, node.find('.fileupload'), { progress: elem.find('.progress') }
     parent.find('li:hidden :file').click()
 
   $scope.delete_image = (e) ->

@@ -389,6 +389,9 @@ body
     font-size: 24px
     text-align: center
 
+    i
+      line-height: 30px
+
     &:hover
       text-decoration: none
 
@@ -641,13 +644,13 @@ ul.exhibits
         display: block
         z-index: 10
 
-      .opener:not(.dummy) 
+      .opener:not(.dummy, .draft) 
         .description 
           h4
             color: $exhibitTextColorHover
 
     &:hover
-      .opener:not(.dummy) 
+      .opener:not(.dummy, .draft) 
         .description
           background-image: url('../img/tile-shadow.png')
           background-repeat: no-repeat
@@ -661,7 +664,7 @@ ul.exhibits
           .on_hover
             display: block
 
-    .dummy
+    .dummy, .draft
       position: relative
       cursor: pointer
       +opacity(0.5)
@@ -676,6 +679,10 @@ ul.exhibits
       .checkbox
         display: none
 
+.in
+  #dropzone
+    display: block !important
+
 #drop_down, #museum_edit_dropdown
   background: #f8f8f8
   border-top: 1px solid $slideDownOuterBorderColor
@@ -688,6 +695,67 @@ ul.exhibits
 
   &.hidden
     display: none
+
+  // #dropzone
+  //   // background: palegreen
+  //   // width: 150px
+  //   // height: 50px
+  //   // line-height: 50px
+  //   // text-align: center
+  //   // font-weight: bold
+
+    // &.in
+    //   background: rgba(0,0,0, 1)
+
+    // &.hover
+    //   background: #fff !important
+    
+    // &.fade
+    //   +transition(all 0.7s ease-out)
+    //   opacity: 1
+
+
+  >.dropdown_area
+    position: absolute
+    top: 0px
+    left: 0px
+    height: 100%
+    width: 100%
+    background: rgba(0,0,0, .75)
+    z-index: 998
+    display: none
+    // opacity: 0
+
+    .wrapper
+      +border-radius(20px)
+      border: 3px dashed #fff
+      margin: 10px 68px
+      height: $slideDownHeight - 20
+      background: url('../img/draganddrop.png') no-repeat 20% center
+      position: relative
+
+      .progress
+        position: absolute
+        width: 80%
+        margin: 0px 10%
+        bottom: 20px
+
+      .text
+        margin-left: calc(20% + 200px)
+        margin-right: 20px
+        margin-top: -75px
+        top: 50%
+        position: relative
+        text-align: left
+        font-size: 50px
+        line-height: 60px
+        color: #fff
+        -webkit-touch-callout: none
+        -webkit-user-select: none
+        -khtml-user-select: none
+        -moz-user-select: none
+        -ms-user-select: none
+        user-select: none
 
   >.prev-ex, >.next-ex
     background: url('../img/popin-left-arrow.png') no-repeat
@@ -715,16 +783,38 @@ ul.exhibits
     +box-sizing(border-box)
     padding:  20px 20px 20px 40px
     border-right: 1px solid white
-    width: 40%
+    width: 45%
     vertical-align: middle
     overflow: hidden
+    text-align: right
+    position: relative
+
+    .upload
+      position: absolute
+      top: 20px
+      left: 80px
+      z-index: 999
+      overflow: hidden
+
+      input
+        position: absolute
+        top: 0
+        right: 0
+        margin: 0
+        opacity: 0
+        -ms-filter: 'alpha(opacity=0)'
+        font-size: 200px
+        direction: ltr
+        cursor: pointer
+  
+
 
   >.description
     background: url('../img/images-separator.png') repeat-y 0 0
     padding: 30px 80px 0 55px
     position: relative
     text-align: left
-    width: 60%
+    width: 55%
 
     .close
       background: url('../img/cross.png') center center no-repeat
@@ -783,7 +873,6 @@ ul.exhibits
         position: absolute
         top: 0px
         left: 100%
-        margin-left: 0px
 
       .preloader
         float: left
@@ -854,7 +943,6 @@ ul.exhibits
           margin-left: 65px
 
       .triggered
-
         & > *
           min-width: 300px
 
@@ -862,6 +950,9 @@ ul.exhibits
           +box-sizing(border-box)
           height: 130px
           margin-left: 13px
+
+      &.textfield .triggered
+        display: none
 
       .help
         width: 15px
@@ -956,9 +1047,43 @@ textarea
 .images-displayed, .images-hidden
   padding-left: 30px
 
-.images-list, .maps-list
-  margin: 0
-  padding: 0
+.images
+
+  .img_thumbnail img
+    max-height: 150px
+    max-width: 200px
+
+  a
+    text-decoration: none
+
+  img, .picture
+    z-index: 1
+
+  .progress
+    left: 10px
+    position: absolute
+    top: 60px
+    width: 150px
+    z-index: 2
+
+    .bar
+      z-index: 3
+
+  .remove
+    color: white
+    font-size: 20px
+    font-weight: bold
+    line-height: 18px
+    position: absolute
+    right: 15px
+    text-shadow: #000 0 0 5px
+    top: 5px
+    z-index: 3
+
+    &:hover
+      color: #000
+      text-shadow: white 0 0 10px, white 0 0 5px
+
 
   li
     display: inline-block
@@ -967,41 +1092,6 @@ textarea
     vertical-align: top
     width: 200px
     height: 150px
-
-    .img_thumbnail img
-      max-height: 150px
-      max-width: 200px
-
-    a
-      text-decoration: none
-
-    img, .picture
-      z-index: 1
-
-    .progress
-      left: 10px
-      position: absolute
-      top: 60px
-      width: 150px
-      z-index: 2
-
-      .bar
-        z-index: 3
-
-    .remove
-      color: white
-      font-size: 20px
-      font-weight: bold
-      line-height: 18px
-      position: absolute
-      right: 15px
-      text-shadow: #000 0 0 5px
-      top: 5px
-      z-index: 3
-
-      &:hover
-        color: #000
-        text-shadow: white 0 0 10px, white 0 0 5px
 
     .browse.update
       cursor: pointer
@@ -1120,3 +1210,29 @@ label
     .other_variants
       margin-left: 20px
       /*display: none*/
+
+#ngProgress
+  margin: 0
+  padding: 0
+  z-index: 99998
+  background-color: green
+  color: green
+  box-shadow: 0 0 10px 0
+  height: 2px
+  opacity: 0
+
+  +transition(all 0.5s ease-in-out)
+
+  // -webkit-transition: all 0.5s ease-in-out
+  // -moz-transition: all 0.5s ease-in-out
+  // -o-transition: all 0.5s ease-in-out
+  // transition: all 0.5s ease-in-out
+
+#ngProgress-container
+  position: fixed
+  margin: 0
+  padding: 0
+  top: 0
+  left: 0
+  right: 0
+  z-index: 99999

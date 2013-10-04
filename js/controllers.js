@@ -1,6 +1,6 @@
 (function() {
   "use strict";
-  var acceptableExtensions, fileSizeMb, isSameLine, lastOfLine, tileGrid;
+  var isSameLine, lastOfLine, tileGrid;
 
   $.fn.refresh = function() {
     return $(this.selector);
@@ -56,168 +56,57 @@
     "development": false
   };
 
-  fileSizeMb = 50;
-
-  acceptableExtensions = gon.acceptable_extensions;
-
-  this.correctExtension = function(object) {
-    var extension;
-    extension = object.files[0].name.split('.').pop().toLowerCase();
-    return $.inArray(extension, acceptableExtensions[object.fileInput.context.dataset.accept]) !== -1;
-  };
-
-  this.correctFileSize = function(object) {
-    return object.files[0] && object.files[0].size < fileSizeMb * 1024 * 1024;
-  };
-
-  this.initFileUpload = function(e, object, options) {
-    if (object == null) {
-      object = null;
-    }
-    if (options == null) {
-      options = {};
-    }
-    console.log('inited');
-    return (object || $('.fileupload')).each(function() {
-      var $this, button, cancel, container, form, progress, upload;
-      upload = null;
-      $this = $(this);
-      form = $this.parent('form');
-      container = form.parent();
-      button = form.find('a.btn.browse');
-      cancel = form.find('a.btn.cancel');
-      progress = options.progress || form.find('.progress');
-      cancel.unbind('click');
-      cancel.bind('click', function(e) {
-        e.preventDefault();
-        if (upload) {
-          return upload.abort();
-        }
-      });
-      return $this.fileupload({
-        add: function(e, data) {
-          if (correctExtension(data)) {
-            if (correctFileSize(data)) {
-              button.addClass('disabled');
-              cancel.removeClass('hide');
-              progress.removeClass('hide');
-              data.form.find('.help-tooltip').remove();
-              return data.submit();
-            } else {
-              return Message.error(t('message.errors.media_content.file_size', {
-                file_size: fileSizeMb
-              }));
-            }
-          } else {
-            return Message.error(t('message.errors.media_content.file_type'));
-          }
-        },
-        beforeSend: function(jqXHR) {
-          progress.find('.bar').width('0%');
-          return upload = jqXHR;
-        },
-        success: function(result) {
-          container.replaceWith(result).hide().fadeIn(function() {
-            return $('a.thumb').trigger('image:uploaded');
-          });
-          $('#edit_story_form').trigger('form:loaded');
-          return Message.notice(t('message.media_content.uploaded'));
-        },
-        complete: function() {
-          cancel.addClass('hide');
-          progress.addClass('hide');
-          return button.removeClass('disabled');
-        },
-        error: function(result, status, errorThrown) {
-          var response, responseText;
-          $this.val('');
-          if (errorThrown === 'abort') {
-            return Message.notice(t('message.media_content.canceled'));
-          } else {
-            if (result.status === 422) {
-              response = jQuery.parseJSON(result.responseText);
-              responseText = response.link[0];
-              return Message.error(responseText);
-            } else {
-              return Message.error(t('message.errors.media_content.try_again'));
-            }
-          }
-        },
-        progressall: function(e, data) {
-          var percentage;
-          percentage = parseInt(data.loaded / data.total * 100, 10);
-          return progress.find('.bar').width(percentage + '%');
-        }
-      });
-    });
-  };
-
-  this.checkAudioFiles = function() {
-    return $('#audio_form[data-audio-check-url]').each(function() {
-      var $this, url;
-      $this = $(this);
-      url = $this.data('audio-check-url');
-      return $.ajax({
-        url: url,
-        type: 'GET',
-        dataType: 'json',
-        success: function(response) {
-          return $.each(response, function(key, item) {
-            var audio, audioElement, btn, canPlay;
-            btn = $('.btn.' + key);
-            if (item.exist) {
-              audio = $this.find('.audio-upload-form').find('audio.' + key);
-              audio.empty();
-              $('<source>').attr('src', item.file).appendTo(audio);
-              audioElement = audio.get(0);
-              if (audioElement) {
-                audioElement.pause();
-                audioElement.load();
-                canPlay = !!audioElement.canPlayType && audioElement.canPlayType(item.content_type) !== '';
-                console.log(canPlay + ' - ' + item.content_type);
-              }
-              $('.play.' + key).find('i').removeClass('icon-pause').addClass('icon-play');
-              if (canPlay) {
-                return btn.removeClass('disabled hide');
-              } else {
-                return btn.addClass('disabled').removeClass('hide');
-              }
-            } else {
-              return btn.addClass('disabled');
-            }
-          });
-        },
-        error: function() {
-          return Message.notice(t('message.media_content.not_processed_yet'));
-        }
-      });
-    });
-  };
-
   angular.module("Museum.controllers", []).controller('IndexController', [
-    '$scope', '$http', '$filter', '$window', '$modal', 'storage', function($scope, $http, $filter, $window, $modal, storage) {
-      var dropDown, exhibit, findActive, get_index, get_lang, get_name, get_number, get_state, index, _i, _len, _ref;
+    '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$routeParams', 'ngProgress', function($scope, $http, $filter, $window, $modal, storage, $routeParams, ngProgress) {
+      var content_provider_id, dropDown, exhibit, findActive, get_index, get_lang, get_name, get_number, get_state, index, museum_id, _i, _len, _ref;
       window.sc = $scope;
-      $http.get('http://192.168.216.128:3000/provider/524692c10cff62683f000001/museums/524692c10cff62683f000002/exhibits').success(function(data) {
-        var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
-        exhibits = [];
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          item = data[_i];
-          exhibit = item.exhibit;
-          exhibit.images = item.images;
-          exhibit.stories = {};
-          _ref = item.stories;
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            story = _ref[_j];
-            story.story.quiz = story.quiz.quiz;
-            story.story.quiz.answers = story.quiz.answers;
-            exhibit.stories[story.story.language] = story.story;
+      $scope.exhibit_search = '';
+      $scope.criteriaMatch = function(criteria) {
+        return function(item) {
+          var in_string;
+          if (item.stories[$scope.current_museum.language].name) {
+            in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
+            $scope.grid();
+            return in_string || criteria === '';
+          } else {
+            return true;
           }
-          exhibits.push(exhibit);
-        }
-        $scope.exhibits = exhibits;
-        return $scope.active_exhibit = $scope.exhibits[0];
-      });
+        };
+      };
+      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "52485ff1da0484df71000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "52485ff1da0484df71000001";
+      $scope.backend_url = "http://192.168.216.128:3000";
+      $scope.sort_field = 'number';
+      $scope.sort_direction = 1;
+      $scope.sort_text = 'Sort 0-9';
+      $scope.ajax_progress = true;
+      $scope.reload_exhibits = function(sort_field, sort_direction) {
+        ngProgress.color('#fd6e3b');
+        ngProgress.start();
+        return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
+          var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
+          exhibits = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            item = data[_i];
+            exhibit = item.exhibit;
+            exhibit.images = item.images;
+            exhibit.stories = {};
+            _ref = item.stories;
+            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+              story = _ref[_j];
+              story.story.quiz = story.quiz.quiz;
+              story.story.quiz.answers = story.quiz.answers;
+              exhibit.stories[story.story.language] = story.story;
+            }
+            exhibits.push(exhibit);
+          }
+          ngProgress.complete();
+          $scope.exhibits = exhibits;
+          $scope.active_exhibit = $scope.exhibits[0];
+          return $scope.ajax_progress = false;
+        });
+      };
+      $scope.reload_exhibits($scope.sort_field, $scope.sort_direction);
       $scope.museums = [
         {
           name: 'Imperial Peace Museum',
@@ -712,6 +601,7 @@
           }
         }
         elem.active = true;
+        $scope.element_switch = true;
         $scope.active_exhibit = elem;
         previous = findActive();
         if (previous.hasClass('dummy')) {
@@ -745,8 +635,7 @@
         tileListMargin = 60;
         tileWidth = collection.first().width();
         tileSpace = 40;
-        tileGrid(collection, tileWidth, tileSpace, tileListMargin);
-        return $(window).resize(tileGrid.bind(this, collection, tileWidth, tileSpace, tileListMargin));
+        return tileGrid(collection, tileWidth, tileSpace, tileListMargin);
       };
       $scope.museum_list_prepare = function() {
         var count, list, row_count, width;
@@ -763,10 +652,9 @@
         }
       };
       setTimeout(function() {
-        $scope.museum_list_prepare();
-        return initFileUpload();
+        return $scope.museum_list_prepare();
       }, 200);
-      angular.element($window).bind("resize", function() {
+      $(window).resize(function() {
         return setTimeout(function() {
           return $scope.museum_list_prepare();
         }, 100);
@@ -774,7 +662,7 @@
       $scope.new_item_creation = false;
       $scope.all_selected = false;
       get_number = function() {
-        return ++$scope.exhibits[$scope.exhibits.length - 1].number + 1;
+        return ++$scope.exhibits[$scope.exhibits.length - 1].number + 1 || 100;
       };
       get_index = function() {
         return ++$scope.exhibits.length;
@@ -797,65 +685,64 @@
         }
       };
       $scope.create_new_item = function() {
-        var e, lang;
+        var e, i, lang, _j;
         if ($scope.new_item_creation !== true) {
           $scope.new_exhibit = {
+            content_provider: content_provider_id,
+            type: 'exhibit',
+            distance: 20,
+            duration: 20,
+            status: 'draft',
+            route: '',
+            category: '',
+            parent: museum_id,
             name: '',
             number: get_number(),
-            index: get_index(),
-            image: '/img/img-bg.png',
-            thumb: '/img/img-bg.png',
-            publish_state: 'draft',
-            description: '',
             qr_code: {
               url: '',
               print_link: ''
             },
-            images: [
-              {
-                image: '/img/img-bg.png',
-                thumb: '/img/img-bg.png'
-              }
-            ],
             stories: {}
           };
+          $scope.new_exhibit.images = [
+            {
+              image: "http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg",
+              parent: "52472b44774dd1e650000069",
+              thumb: "http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg"
+            }
+          ];
           for (lang in $scope.current_museum.stories) {
             $scope.new_exhibit.stories[lang] = {
+              playback_algorithm: 'generic',
+              content_provider: content_provider_id,
+              story_type: 'story',
+              status: 'passcode',
+              language: lang,
               name: '',
-              description: '',
-              audio: '',
-              publish_stat: 'passcode',
-              quiz: {
-                question: '',
-                description: '',
-                state: 'limited',
-                answers: [
-                  {
-                    title: '',
-                    correct: true,
-                    id: 0
-                  }, {
-                    title: '',
-                    correct: false,
-                    id: 1
-                  }, {
-                    title: '',
-                    correct: false,
-                    id: 2
-                  }, {
-                    title: '',
-                    correct: false,
-                    id: 3
-                  }
-                ]
-              }
+              short_description: '',
+              long_description: '',
+              story_set: "52472b44774dd1e650000069"
             };
+            $scope.new_exhibit.stories[lang].quiz = {
+              story: "52472b44774dd1e650000069",
+              question: '',
+              comment: '',
+              status: 'passcode',
+              answers: []
+            };
+            for (i = _j = 0; _j <= 3; i = ++_j) {
+              $scope.new_exhibit.stories[lang].quiz.answers.push({
+                quiz: "52472b44774dd1e650000069",
+                content: '',
+                correct: false
+              });
+            }
           }
           $scope.new_item_creation = true;
           e = {};
           e.target = $('li.exhibit.dummy > .opener.draft');
           $scope.open_dropdown(e, $scope.new_exhibit);
-          $(window).resize();
+          $scope.grid();
           return $scope.exhibits.splice($scope.exhibits.length - 1, 1);
         }
       };
@@ -907,15 +794,21 @@
         return ModalDeleteInstance.result.then((function(selected) {
           var item, st_index, story, _j, _len1, _ref1, _ref2, _results, _results1;
           $scope.selected = selected;
-          if (Object.keys($scope.active_exhibit.stories).length === selected.length || Object.keys($scope.active_exhibit.stories).length === 1) {
+          if (Object.keys($scope.active_exhibit.stories).length === selected.length) {
             $scope.closeDropDown();
             _ref1 = $scope.exhibits;
             _results = [];
             for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
               exhibit = _ref1[index];
-              if (exhibit.index === $scope.active_exhibit.index) {
+              if (exhibit._id === $scope.active_exhibit._id) {
                 $scope.exhibits.splice(index, 1);
-                $scope.active_exhibit = $scope.exhibits[0];
+                $scope.grid();
+                $http["delete"]("" + $scope.backend_url + "/story_set/" + $scope.active_exhibit._id + "/").success(function(data) {
+                  console.log(data);
+                  return $scope.active_exhibit = $scope.exhibits[0];
+                }).error(function() {
+                  return console.log('error');
+                });
                 break;
               } else {
                 _results.push(void 0);
@@ -933,35 +826,23 @@
                 for (_k = 0, _len2 = selected.length; _k < _len2; _k++) {
                   item = selected[_k];
                   if (item === st_index) {
-                    _results2.push($scope.active_exhibit.stories[st_index] = {
-                      language: get_lang(),
-                      name: '',
-                      description: '',
-                      audio: '',
-                      quiz: {
-                        question: '',
-                        description: '',
-                        answers: [
-                          {
-                            title: '',
-                            correct: true,
-                            id: 0
-                          }, {
-                            title: '',
-                            correct: false,
-                            id: 1
-                          }, {
-                            title: '',
-                            correct: false,
-                            id: 2
-                          }, {
-                            title: '',
-                            correct: false,
-                            id: 3
-                          }
-                        ]
-                      }
-                    });
+                    story = $scope.active_exhibit.stories[st_index];
+                    story.status = 'dummy';
+                    story.name = '';
+                    story.short_description = '';
+                    story.long_description = '';
+                    story.quiz.question = '';
+                    story.quiz.comment = '';
+                    story.quiz.status = '';
+                    story.quiz.answers[0].content = '';
+                    story.quiz.answers[0].correct = true;
+                    story.quiz.answers[1].content = '';
+                    story.quiz.answers[1].correct = false;
+                    story.quiz.answers[2].content = '';
+                    story.quiz.answers[2].correct = false;
+                    story.quiz.answers[3].content = '';
+                    story.quiz.answers[3].correct = false;
+                    _results2.push($scope.update_story(story));
                   } else {
                     _results2.push(void 0);
                   }
@@ -1019,25 +900,115 @@
           return $('.actions_bar .museum_edit_opener').click();
         }, 10);
       };
+      $scope.update_story = function(story) {
+        return $http.put("" + $scope.backend_url + "/story/" + story._id, story).success(function(data) {
+          return $http.put("" + $scope.backend_url + "/quiz/" + story.quiz._id, story.quiz).success(function(data) {
+            var answer, _j, _len1, _ref1, _results;
+            _ref1 = story.quiz.answers;
+            _results = [];
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              answer = _ref1[_j];
+              _results.push($scope.put_answers(answer));
+            }
+            return _results;
+          }).error(function() {
+            return console.log('error');
+          });
+        }).error(function() {
+          return console.log('error');
+        });
+      };
+      $scope.put_answers = function(answer) {
+        return $http.put("" + $scope.backend_url + "/quiz_answer/" + answer._id, answer).success(function(data) {
+          return console.log('done');
+        }).error(function() {
+          return console.log('error');
+        });
+      };
+      $scope.museum_edit_dropdown_close = function() {
+        return setTimeout(function() {
+          return $('.actions_bar .museum_edit_opener').click();
+        }, 10);
+      };
+      $scope.post_stories = function(story) {
+        return $http.post("" + $scope.backend_url + "/story/", story).success(function(data) {
+          story._id = data._id;
+          story.quiz.story = data._id;
+          return $http.post("" + $scope.backend_url + "/quiz/", story.quiz).success(function(data) {
+            var answer, _j, _len1, _ref1, _results;
+            story.quiz._id = data.id;
+            _ref1 = story.quiz.answers;
+            _results = [];
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              answer = _ref1[_j];
+              answer.quiz = data._id;
+              _results.push($scope.post_answers(answer));
+            }
+            return _results;
+          }).error(function() {
+            return console.log('error');
+          });
+        }).error(function() {
+          return console.log('error');
+        });
+      };
+      $scope.post_answers = function(answer) {
+        return $http.post("" + $scope.backend_url + "/quiz_answer/", answer).success(function(data) {
+          return answer._id = data._id;
+        }).error(function() {
+          return console.log('error');
+        });
+      };
       $scope.$on('save_new_exhibit', function() {
-        var lang, story, _ref1;
         console.log('saving!');
-        $scope.new_exhibit.publish_state = 'passcode';
-        _ref1 = $scope.new_exhibit.stories;
-        for (lang in _ref1) {
-          story = _ref1[lang];
-          story.publish_state = 'passcode';
-        }
-        $scope.exhibits.push($scope.new_exhibit);
+        $http.post("" + $scope.backend_url + "/story_set/", $scope.new_exhibit).success(function(data) {
+          var lang, media, story, _ref1, _results;
+          $scope.exhibits.push($scope.new_exhibit);
+          media = $scope.new_exhibit.images[0];
+          media.parent = data._id;
+          $http.post("" + $scope.backend_url + "/media/", media).success(function(data) {
+            return media._id = media._id;
+          }).error(function() {
+            return console.log('error');
+          });
+          _ref1 = $scope.new_exhibit.stories;
+          _results = [];
+          for (lang in _ref1) {
+            story = _ref1[lang];
+            story.publish_state = 'passcode';
+            story.story_set = data._id;
+            _results.push($scope.post_stories(story));
+          }
+          return _results;
+        }).error(function() {
+          return console.log('fail');
+        });
         return $scope.new_item_creation = false;
       });
       $scope.$on('changes_to_save', function(event, child_scope) {
-        return $http.put("http://192.168.216.128:3000/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
+        return $http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
           child_scope.satus = 'done';
           return console.log(data);
         }).error(function() {
           return console.log('fail');
         });
+      });
+      $scope.$on('quiz_changes_to_save', function(event, child_scope, correct_item) {
+        var sign, sub_item, _j, _len1, _ref1, _results;
+        _ref1 = child_scope.collection;
+        _results = [];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          sub_item = _ref1[_j];
+          sign = sub_item._id === correct_item._id ? true : false;
+          sub_item.correct = sign;
+          sub_item.correct_saved = sign;
+          _results.push($http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + sub_item._id, sub_item).success(function(data) {
+            return console.log(data);
+          }).error(function() {
+            return console.log('fail');
+          }));
+        }
+        return _results;
       });
       return $scope.populate_localstorage = function() {
         var i, lang, _j, _k, _len1, _ref1, _results;
@@ -1148,9 +1119,18 @@
     }
   ]).controller('DropDownController', [
     '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', function($scope, $http, $filter, $window, $modal, storage, $rootScope) {
-      $scope.quiz_state = function(form) {
+      $scope.quiz_state = function(form, item) {
         $scope.mark_quiz_validity(form.$valid);
-        if (!form.$valid) {
+        if (form.$valid) {
+          setTimeout(function() {
+            $http.put("" + $scope.backend_url + "/quiz/" + item._id, item).success(function(data) {
+              return console.log(data);
+            }).error(function() {
+              return console.log('fail');
+            });
+            return true;
+          }, 50);
+        } else {
           setTimeout(function() {
             return $("#story_quiz_disabled").click();
           }, 300);
@@ -1168,13 +1148,7 @@
         return true;
       };
       $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language].quiz', function(newValue, oldValue) {
-        if (newValue.state === 'limited') {
-          if (!$("#story_quiz_disabled").is(':checked')) {
-            return setTimeout(function() {
-              return $("#story_quiz_disabled").click();
-            }, 10);
-          }
-        } else if (newValue.state === 'published') {
+        if (newValue.status === 'published') {
           if ($("#story_quiz_enabled").is(':checked')) {
             return setTimeout(function() {
               if (!$scope.quizform.$valid) {
@@ -1186,6 +1160,12 @@
           } else {
             return setTimeout(function() {
               return $("#story_quiz_enabled").click();
+            }, 10);
+          }
+        } else {
+          if (!$("#story_quiz_disabled").is(':checked')) {
+            return setTimeout(function() {
+              return $("#story_quiz_disabled").click();
             }, 10);
           }
         }
@@ -1206,12 +1186,12 @@
         var form;
         form = $('#media form');
         if (form.length > 0) {
-          if ($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].publish_state === 'dummy') {
+          if ($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status === 'dummy') {
             if (newValue) {
-              return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].publish_state = 'passcode';
+              return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status = 'passcode';
             }
           } else {
-            if (!($scope.$parent.new_item_creation || $scope.$parent.item_deletion)) {
+            if (!$scope.$parent.new_item_creation) {
               if (!newValue) {
                 $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue;
                 $('.empty_name_error.name').show();
@@ -1219,12 +1199,15 @@
                   return $('.empty_name_error.name').hide();
                 }, 1500);
               }
-            } else {
-              if (newValue && $scope.$parent.new_item_creation) {
-                return $rootScope.$broadcast('save_new_exhibit');
-              }
             }
           }
+        }
+      });
+      $scope.$watch('$parent.element_switch', function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          return setTimeout(function() {
+            return $scope.$parent.element_switch = false;
+          }, 100);
         }
       });
       $scope.$watch('$parent.active_exhibit.number', function(newValue, oldValue) {
@@ -1257,27 +1240,24 @@
       }, true);
       $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language]', function(newValue, oldValue) {
         if (newValue) {
-          return $http.get("http://192.168.216.128:3000/qr_code/" + $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id).success(function(d) {
-            return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d;
-          });
+          if (!$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code) {
+            return $http.get("" + $scope.$parent.backend_url + "/qr_code/" + $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id).success(function(d) {
+              return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d;
+            });
+          }
         }
       }, true);
       $scope.upload_image = function(e) {
         var elem, parent;
         e.preventDefault();
         elem = $(e.target);
-        parent = elem.parents('#images, #maps');
+        parent = elem.parents('.images');
         if (parent.find('li:hidden').isEmpty()) {
           $.ajax({
             url: elem.attr('href'),
             async: false,
             success: function(response) {
-              var node;
-              node = $(response).hide();
-              parent.find('li.new').before(node);
-              return initFileUpload(e, node.find('.fileupload'), {
-                progress: elem.find('.progress')
-              });
+              return console.log(response);
             }
           });
         }

@@ -94,7 +94,7 @@
       restrict: 'A',
       link: function(scope, element, attrs) {
         if (scope.$last) {
-          $timeout(scope.grid, 0);
+          $timeout(scope.grid, 200);
         }
         return true;
       }
@@ -109,9 +109,20 @@
         item: '=ngItem',
         provider: '=ngProvider',
         current_museum: '=ngMuseum',
-        trans: '=translations'
+        trans: '=translations',
+        field: '@field',
+        field_type: '@type'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\">\n  <button class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\" ng-switch on=\"item.stories[current_museum.language].status\">\n    <div class=\"extra\" ng-switch on=\"item.stories[current_museum.language].status\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n    <span class=\"caret\"></span>\n  </button>\n  <ul class=\"dropdown-menu status-select-dropdown\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li ng-click=\"item.stories[current_museum.language].status = 'published'\">\n      <i class=\"icon-globe\"></i> Everyone\n      <span class=\"check\" ng-show=\"item.stories[current_museum.language].status == 'published'\">✓</span>\n    </li>\n    <li  ng-click=\"item.stories[current_museum.language].status = 'passcode'\">\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <span class=\"check\" ng-show=\"item.stories[current_museum.language].status == 'passcode'\">✓</span>\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n    <li class=\"divider\"></li>\n    <li class=\"other_list\">\n      <span class=\"other_lang\" ng-click=\"hidden_list=!hidden_list\" stop-event=\"click\">Other languages</a>\n      <ul class=\"other\" ng-hide=\"hidden_list\">\n        <li ng-repeat=\"(name, story) in item.stories\" ng-switch on=\"story.status\">\n          <span class=\"col-lg-4\">{{trans[name]}} </span>\n          <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n          <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\">\n  <button class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n    <span class=\"caret\"></span>\n  </button>\n  <ul class=\"dropdown-menu status-select-dropdown\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li ng-click=\"item[field] = 'published'; status_process()\">\n      <i class=\"icon-globe\"></i> Everyone\n      <span class=\"check\" ng-show=\"item[field] == 'published'\">✓</span>\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <span class=\"check\" ng-show=\"item[field] == 'passcode'\">✓</span>\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n    <li class=\"divider\"></li>\n    <li class=\"other_list\">\n      <span class=\"other_lang\" ng-click=\"hidden_list=!hidden_list\" stop-event=\"click\">Other languages</a>\n      <ul class=\"other\" ng-hide=\"hidden_list\">\n        <li ng-repeat=\"(name, story) in item.stories\" ng-switch on=\"story.status\">\n          <span class=\"col-lg-4\">{{trans[name]}} </span>\n          <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n          <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</div>",
+      controller: function($scope, $rootScope, $element, $attrs) {
+        return $scope.status_process = function() {
+          var valid;
+          valid = true;
+          if (valid) {
+            return $rootScope.$broadcast('changes_to_save', $scope);
+          }
+        };
+      },
       link: function(scope, element, attrs) {
         scope.hidden_list = true;
         return true;
@@ -125,9 +136,20 @@
       require: "?ngModel",
       scope: {
         item: '=ngItem',
-        provider: '=ngProvider'
+        provider: '=ngProvider',
+        field: '@field',
+        field_type: '@type'
       },
-      template: "<div class=\"btn-group\">\n  <button class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\">\n    <div class=\"extra_right\" ng-switch on=\"item.status\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span class=\"caret\"></span></button>\n  <ul class=\"dropdown-menu\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li  ng-click=\"item.status = 'published'\">\n      <i class=\"icon-globe\"></i> Everyone\n      <span class=\"check\" ng-show=\"item.status == 'published'\">✓</span>\n    </li>\n    <li ng-click=\"item.status = 'passcode'\">\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <span class=\"check\" ng-show=\"item.status == 'passcode'\">✓</span>\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group\">\n  <button class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\">\n    <div class=\"extra_right\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span class=\"caret\"></span></button>\n  <ul class=\"dropdown-menu\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li  ng-click=\"item[field] = 'published'; status_process()\">\n      <i class=\"icon-globe\"></i> Everyone\n      <span class=\"check\" ng-show=\"item[field] == 'published'\">✓</span>\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <span class=\"check\" ng-show=\"item[field] == 'passcode'\">✓</span>\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n  </ul>\n</div>",
+      controller: function($scope, $rootScope, $element, $attrs) {
+        return $scope.status_process = function() {
+          var valid;
+          valid = true;
+          if (valid) {
+            return $rootScope.$broadcast('changes_to_save', $scope);
+          }
+        };
+      },
       link: function(scope, element, attrs) {
         return true;
       }
@@ -147,41 +169,61 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">can't be empty</span>\n  <div class=\"col-xs-6 trigger\" ng-hide=\"edit_mode || empty_val\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-6 triggered\" ng-show=\"edit_mode || empty_val\">\n    <input class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" focus-me=\"edit_mode\" type=\"text\" ng-blur=\"status_process()\" required placeholder=\"{{placeholder}}\">\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">can't be empty</span>\n  <div class=\"col-xs-6 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-6 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" required placeholder=\"{{placeholder}}\">\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
         }
         $scope.status = $scope.item.statuses[$scope.item.field];
+        $scope.update_old = function() {
+          return $scope.oldValue = $scope.item[$scope.field];
+        };
         return $scope.status_process = function() {
           if ($scope.item[$scope.field] && $scope.item[$scope.field].length !== 0) {
-            $scope.status = 'progress';
-            $rootScope.$broadcast('changes_to_save', $scope);
-            $scope.empty_val = false;
-            return $scope.edit_mode = false;
-          } else {
-            return $scope.empty_val = true;
+            if ($scope.item[$scope.field] !== $scope.oldValue) {
+              $scope.status = 'progress';
+              if ($scope.$parent.$parent.new_item_creation && $scope.field === 'name') {
+                console.log('wow');
+                return $rootScope.$broadcast('save_new_exhibit');
+              } else {
+                return $rootScope.$broadcast('changes_to_save', $scope);
+              }
+            }
           }
         };
       },
       link: function(scope, element, attrs) {
-        scope.edit_mode = false;
+        var trigger, triggered;
+        element = $(element);
+        trigger = element.find('.trigger');
+        triggered = element.find('.triggered');
+        element.find('span.placeholder').click(function() {
+          trigger.hide();
+          return triggered.show().children().first().focus();
+        });
+        element.find('.triggered > *').blur(function() {
+          var elem;
+          elem = $(this);
+          scope.status_process();
+          if (elem.val() !== '') {
+            triggered.hide();
+            return trigger.show();
+          }
+        });
         scope.$watch('item[field]', function(newValue, oldValue) {
           scope.status = '';
           if (!newValue) {
-            return scope.empty_val = true;
+            trigger.hide();
+            if (scope.filed === 'name') {
+              return triggered.find('.form-control').focus();
+            }
           } else {
-            return scope.empty_val = false;
-          }
-        });
-        scope.$watch('inv_sign', function(newValue, oldValue) {
-          if (newValue === true) {
-            return setTimeout(function() {
-              scope.name_error = false;
-              return console.log(scope.name_error);
-            }, 1000);
-          } else {
-            return scope.empty_val = false;
+            if (scope.$parent.$parent.element_switch === true) {
+              if (triggered.is(':visible')) {
+                trigger.show();
+                return triggered.hide();
+              }
+            }
           }
         });
         return true;
@@ -202,17 +244,21 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <span class=\"sumbols_left\" ng-hide=\"status == 'progress' || status == 'done' || empty_val || !edit_mode \">\n    {{length_text}}\n  </span>\n  <div class=\"col-lg-6 trigger\" ng-hide=\"edit_mode || empty_val\">\n    <span class=\"placeholder large\" ng-click=\"edit_mode = true\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\" ng-show=\"edit_mode || empty_val\">\n    <textarea class=\"form-control\" id=\"{{id}}\" focus-me=\"edit_mode\" ng-model=\"item[field]\" ng-blur=\"status_process()\" required placeholder=\"{{placeholder}}\">\n    </textarea>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <span class=\"sumbols_left\" ng-hide=\"status == 'progress' || status == 'done' || empty_val || !edit_mode \">\n    {{length_text}}\n  </span>\n  <div class=\"col-lg-6 trigger\">\n    <span class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\">\n    <textarea class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" required placeholder=\"{{placeholder}}\">\n    </textarea>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
         }
         $scope.status = $scope.item.statuses[$scope.item.field];
+        $scope.update_old = function() {
+          return $scope.oldValue = $scope.item[$scope.field];
+        };
         return $scope.status_process = function() {
           if ($scope.item[$scope.field] && $scope.item[$scope.field].length !== 0) {
-            $scope.status = 'progress';
-            $rootScope.$broadcast('changes_to_save', $scope);
-            console.log($scope.item);
+            if ($scope.item[$scope.field] !== $scope.oldValue) {
+              $scope.status = 'progress';
+              $rootScope.$broadcast('changes_to_save', $scope);
+            }
             $scope.empty_val = false;
             return $scope.edit_mode = false;
           } else {
@@ -221,19 +267,42 @@
         };
       },
       link: function(scope, element, attrs) {
+        var trigger, triggered;
         scope.length_text = "осталось символов: 255";
-        scope.edit_mode = false;
+        element = $(element);
+        trigger = element.find('.trigger');
+        triggered = element.find('.triggered');
+        element.find('span.placeholder').click(function() {
+          trigger.hide();
+          return triggered.show().children().first().focus();
+        });
+        element.find('.triggered > *').blur(function() {
+          var elem;
+          elem = $(this);
+          scope.status_process();
+          if (elem.val() !== '') {
+            triggered.hide();
+            return trigger.show();
+          }
+        });
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
-            scope.empty_val = true;
-            return scope.length_text = "осталось символов: 255";
+            scope.length_text = "осталось символов: 255";
+            trigger.hide();
+            return triggered.show();
           } else {
-            scope.empty_val = false;
             scope.max_length || (scope.max_length = 255);
             scope.length_text = "осталось символов: " + (scope.max_length - newValue.length - 1);
             if (newValue.length >= scope.max_length) {
-              return scope.item[scope.field] = newValue.substr(0, scope.max_length - 1);
+              scope.item[scope.field] = newValue.substr(0, scope.max_length - 1);
             }
+            if (scope.$parent.$parent.element_switch === true) {
+              if (triggered.is(':visible')) {
+                trigger.show();
+                triggered.hide();
+              }
+            }
+            return true;
           }
         });
         return true;
@@ -247,9 +316,11 @@
       scope: {
         item: '=ngItem',
         collection: '=ngCollection',
-        id: '@ngId'
+        id: '@ngId',
+        field: '@field',
+        field_type: '@type'
       },
-      template: "<div class=\"form-group string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator' ng-show=\"item.correct_saved\">correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item.id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\" ng-hide=\"edit_mode || empty_val\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true\">{{item.content}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\" ng-show=\"edit_mode || empty_val\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item.id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item.content\" focus-me=\"edit_mode\" ng-blur=\"status_process()\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator' ng-show=\"item.correct_saved\">correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\" ng-hide=\"edit_mode || empty_val\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true; update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\" ng-show=\"edit_mode || empty_val\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" focus-me=\"edit_mode\" ng-blur=\"status_process()\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -259,19 +330,19 @@
           $scope.item.correct_saved = false;
         }
         $scope.check_items = function(item) {
-          var sub_item, _i, _len, _ref;
-          _ref = $scope.collection;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            sub_item = _ref[_i];
-            sub_item.correct = false;
-            sub_item.correct_saved = false;
-          }
-          item.correct = true;
-          return $scope.item.correct_saved = true;
+          return $rootScope.$broadcast('quiz_changes_to_save', $scope, item);
+        };
+        $scope.update_old = function() {
+          return $scope.oldValue = $scope.item[$scope.field];
         };
         return $scope.status_process = function() {
-          if ($scope.item.content && $scope.item.content.length !== 0) {
-            $scope.status = 'progress';
+          console.log('status_process');
+          if ($scope.item[$scope.field] && $scope.item.content.length !== 0) {
+            console.log($scope.oldValue, $scope.item[$scope.field]);
+            if ($scope.item[$scope.field] !== $scope.oldValue) {
+              $scope.status = 'progress';
+              $rootScope.$broadcast('changes_to_save', $scope);
+            }
             $scope.empty_val = false;
             return $scope.edit_mode = false;
           } else {
@@ -282,15 +353,15 @@
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
         scope.empty_val = false;
-        scope.checked = 0;
         scope.$watch('collection', function(newValue, oldValue) {
           var single_item, _i, _len, _results;
           if (newValue) {
+            scope.checked = newValue[0]._id;
             _results = [];
             for (_i = 0, _len = newValue.length; _i < _len; _i++) {
               single_item = newValue[_i];
               if (single_item.correct === true) {
-                _results.push(scope.checked = single_item.id);
+                _results.push(scope.checked = single_item._id);
               } else {
                 _results.push(void 0);
               }
@@ -422,6 +493,107 @@
       },
       link: function(scope, element, attrs) {
         return true;
+      }
+    };
+  }).directive('canDragAndDrop', function($timeout) {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      scope: {
+        model: '=ngModel',
+        url: '@uploadTo'
+      },
+      link: function(scope, element, attrs) {
+        console.log(scope.url, scope.model);
+        $(document).bind('drop dragover', function(e) {
+          return e.preventDefault();
+        });
+        $(document).bind("dragover", function(e) {
+          var doc, dropZone, found, node, timeout;
+          dropZone = $("#dropzone");
+          doc = $(".page");
+          timeout = scope.dropZoneTimeout;
+          if (!timeout) {
+            doc.addClass("in");
+          } else {
+            clearTimeout(timeout);
+          }
+          found = false;
+          node = e.target;
+          while (true) {
+            if (node === dropZone[0]) {
+              found = true;
+              break;
+            }
+            node = node.parentNode;
+            if (node == null) {
+              break;
+            }
+          }
+          if (found) {
+            dropZone.addClass("hover");
+          } else {
+            dropZone.removeClass("hover");
+          }
+          return scope.dropZoneTimeout = setTimeout(function() {
+            scope.dropZoneTimeout = null;
+            dropZone.removeClass("in hover");
+            if (!scope.loading_in_progress) {
+              return doc.removeClass("in");
+            }
+          }, 100);
+        });
+        $("#fileupload").fileupload({
+          url: scope.url,
+          dataType: "json",
+          dropZone: $(".dropdown_area"),
+          drop: function(e, data) {
+            scope.loading_in_progress = true;
+            return $.each(data.files, function(index, file) {
+              return console.log("Dropped file: " + file.name);
+            });
+          },
+          success: function(result) {
+            var image, _i, _len, _results;
+            console.log(result);
+            _results = [];
+            for (_i = 0, _len = result.length; _i < _len; _i++) {
+              image = result[_i];
+              _results.push(scope.model.images.push(image));
+            }
+            return _results;
+          },
+          error: function(result, status, errorThrown) {
+            var response, responseText;
+            console.log(status, result, errorThrown);
+            if (errorThrown === 'abort') {
+              return console.log('abort');
+            } else {
+              if (result.status === 422) {
+                response = jQuery.parseJSON(result.responseText);
+                responseText = response.link[0];
+                return console.log(responseText);
+              } else {
+                return console.log('unknown error');
+              }
+            }
+          },
+          progressall: function(e, data) {
+            var progress;
+            progress = parseInt(data.loaded / data.total * 100, 10);
+            $("#progress .progress-bar").css("width", progress + "%");
+            if (progress === 100) {
+              return setTimeout(function() {
+                $(".page").removeClass("in");
+                return scope.loading_in_progress = false;
+              }, 1000);
+            }
+          }
+        }).prop("disabled", !$.support.fileInput).parent().addClass(($.support.fileInput ? undefined : "disabled"));
+        return scope.$watch('url', function(newValue, oldValue) {
+          console.log(newValue);
+          return $("#fileupload").fileupload("option", "url", newValue);
+        });
       }
     };
   });
