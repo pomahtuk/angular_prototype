@@ -83,6 +83,8 @@
         elem = $(element);
         return elem.click(function() {
           $('.filters_bar').slideToggle(200);
+          scope.filters_opened = !scope.filters_opened;
+          scope.$digest();
           return setTimeout(function() {
             return $('body').toggleClass('filers');
           }, 100);
@@ -113,7 +115,7 @@
         field: '@field',
         field_type: '@type'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\">\n  <button class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n    <span class=\"caret\"></span>\n  </button>\n  <ul class=\"dropdown-menu status-select-dropdown\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li ng-click=\"item[field] = 'published'; status_process()\">\n      <i class=\"icon-globe\"></i> Everyone\n      <span class=\"check\" ng-show=\"item[field] == 'published'\">✓</span>\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <span class=\"check\" ng-show=\"item[field] == 'passcode'\">✓</span>\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n    <li class=\"divider\"></li>\n    <li class=\"other_list\">\n      <span class=\"other_lang\" ng-click=\"hidden_list=!hidden_list\" stop-event=\"click\">Other languages</a>\n      <ul class=\"other\" ng-hide=\"hidden_list\">\n        <li ng-repeat=\"(name, story) in item.stories\" ng-switch on=\"story.status\">\n          <span class=\"col-lg-4\">{{trans[name]}} </span>\n          <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n          <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\">\n  <button class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n    <span class=\"caret\"></span>\n  </button>\n  <ul class=\"dropdown-menu status-select-dropdown\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li ng-click=\"item[field] = 'published'; status_process()\">\n    <span class=\"check\"><i ng-show=\"item[field] == 'published'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-globe\"></i> Everyone\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'passcode'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n    <li class=\"divider\"></li>\n    <li class=\"other_list\">\n      <span class=\"other_lang\" ng-click=\"hidden_list=!hidden_list\" stop-event=\"click\">Other languages</a>\n      <ul class=\"other\" ng-hide=\"hidden_list\">\n        <li ng-repeat=\"(name, story) in item.stories\" ng-switch on=\"story.status\">\n          <span class=\"col-lg-4\">{{trans[name]}} </span>\n          <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n          <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         return $scope.status_process = function() {
           var valid;
@@ -140,7 +142,7 @@
         field: '@field',
         field_type: '@type'
       },
-      template: "<div class=\"btn-group\">\n  <button class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\">\n    <div class=\"extra_right\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span class=\"caret\"></span></button>\n  <ul class=\"dropdown-menu\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li  ng-click=\"item[field] = 'published'; status_process()\">\n      <i class=\"icon-globe\"></i> Everyone\n      <span class=\"check\" ng-show=\"item[field] == 'published'\">✓</span>\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <span class=\"check\" ng-show=\"item[field] == 'passcode'\">✓</span>\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right\">\n  <button class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\">\n    <div class=\"extra_right\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span class=\"caret\"></span></button>\n  <ul class=\"dropdown-menu pull-left\" role=\"menu\" >\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li  ng-click=\"item[field] = 'published'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'published'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-globe\"></i> Everyone\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'passcode'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         return $scope.status_process = function() {
           var valid;
@@ -154,7 +156,7 @@
         return true;
       }
     };
-  }).directive("placeholderfield", function() {
+  }).directive("placeholderfield", function($timeout) {
     return {
       restrict: "E",
       replace: true,
@@ -169,7 +171,7 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">can't be empty</span>\n  <div class=\"col-xs-6 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-6 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" required placeholder=\"{{placeholder}}\">\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">can't be empty</span>\n  <div class=\"col-xs-6 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-6 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required\">\n    <input type=\"text\" class=\"form-control\" id=\"{{id}}\" value=\"{{item[field]}}\" placeholder=\"{{placeholder}}\">\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -179,16 +181,17 @@
           return $scope.oldValue = $scope.item[$scope.field];
         };
         return $scope.status_process = function() {
-          if ($scope.item[$scope.field] && $scope.item[$scope.field].length !== 0) {
-            if ($scope.item[$scope.field] !== $scope.oldValue) {
-              $scope.status = 'progress';
-              if ($scope.$parent.$parent.new_item_creation && $scope.field === 'name') {
+          if ($scope.item[$scope.field] !== $scope.oldValue) {
+            $scope.status = 'progress';
+            $scope.$digest();
+            if ($scope.$parent.$parent.new_item_creation && $scope.field === 'name') {
+              if ($scope.item[$scope.field] && $scope.item[$scope.field].length !== 0) {
                 console.log('wow');
-                return $rootScope.$broadcast('save_new_exhibit');
-              } else {
-                return $rootScope.$broadcast('changes_to_save', $scope);
+                $rootScope.$broadcast('save_new_exhibit');
+                return true;
               }
             }
+            return $rootScope.$broadcast('changes_to_save', $scope);
           }
         };
       },
@@ -199,37 +202,43 @@
         triggered = element.find('.triggered');
         element.find('span.placeholder').click(function() {
           trigger.hide();
-          return triggered.show().children().first().focus();
+          return triggered.show().children('.form-control').focus();
         });
-        element.find('.triggered > *').blur(function() {
+        element.find('.triggered > .form-control').blur(function() {
           var elem;
           elem = $(this);
-          scope.status_process();
-          if (elem.val() !== '') {
-            triggered.hide();
-            return trigger.show();
+          if (!(scope.$parent.$parent.new_item_creation && scope.field === 'number')) {
+            $timeout(function() {
+              scope.item[scope.field] = elem.val();
+              scope.$digest();
+              return scope.status_process();
+            }, 0, false);
+            if (elem.val() !== '') {
+              triggered.hide();
+              return trigger.show();
+            }
           }
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           scope.status = '';
           if (!newValue) {
+            console.log('hiding', scope.field);
             trigger.hide();
+            triggered.show();
             if (scope.filed === 'name') {
               return triggered.find('.form-control').focus();
             }
           } else {
             if (scope.$parent.$parent.element_switch === true) {
-              if (triggered.is(':visible')) {
-                trigger.show();
-                return triggered.hide();
-              }
+              trigger.show();
+              return triggered.hide();
             }
           }
         });
         return true;
       }
     };
-  }).directive("placeholdertextarea", function() {
+  }).directive("placeholdertextarea", function($timeout) {
     return {
       restrict: "E",
       replace: true,
@@ -244,7 +253,7 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <span class=\"sumbols_left\" ng-hide=\"status == 'progress' || status == 'done' || empty_val || !edit_mode \">\n    {{length_text}}\n  </span>\n  <div class=\"col-lg-6 trigger\">\n    <span class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\">\n    <textarea class=\"form-control\" id=\"{{id}}\" ng-model=\"item[field]\" required placeholder=\"{{placeholder}}\">\n    </textarea>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield large_field\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <span class=\"sumbols_left\">\n    {{length_text}}\n  </span>\n  <div class=\"col-lg-6 trigger\">\n    <span class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required\">\n    <textarea class=\"form-control\" id=\"{{id}}\" placeholder=\"{{placeholder}}\">{{item[field]}}</textarea>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -257,6 +266,7 @@
           if ($scope.item[$scope.field] && $scope.item[$scope.field].length !== 0) {
             if ($scope.item[$scope.field] !== $scope.oldValue) {
               $scope.status = 'progress';
+              $scope.$digest();
               $rootScope.$broadcast('changes_to_save', $scope);
             }
             $scope.empty_val = false;
@@ -267,23 +277,40 @@
         };
       },
       link: function(scope, element, attrs) {
-        var trigger, triggered;
+        var sumbols_left, trigger, triggered;
         scope.length_text = "осталось символов: 255";
         element = $(element);
         trigger = element.find('.trigger');
         triggered = element.find('.triggered');
+        sumbols_left = element.find('.sumbols_left');
         element.find('span.placeholder').click(function() {
           trigger.hide();
-          return triggered.show().children().first().focus();
+          triggered.show().children('.form-control').focus();
+          return sumbols_left.show();
         });
-        element.find('.triggered > *').blur(function() {
+        element.find('.triggered > .form-control').blur(function() {
           var elem;
           elem = $(this);
-          scope.status_process();
+          $timeout(function() {
+            scope.item[scope.field] = elem.val();
+            scope.$digest();
+            return scope.status_process();
+          }, 0, false);
           if (elem.val() !== '') {
             triggered.hide();
-            return trigger.show();
+            trigger.show();
+            return sumbols_left.hide();
           }
+        });
+        element.find('.triggered > .form-control').keyup(function(e) {
+          var elem, value;
+          elem = $(this);
+          value = elem.val();
+          if (value.length >= scope.max_length) {
+            elem.val(value.substr(0, scope.max_length - 1));
+          }
+          scope.length_text = "осталось символов: " + (scope.max_length - value.length - 1);
+          return scope.$digest();
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
@@ -292,15 +319,9 @@
             return triggered.show();
           } else {
             scope.max_length || (scope.max_length = 255);
-            scope.length_text = "осталось символов: " + (scope.max_length - newValue.length - 1);
-            if (newValue.length >= scope.max_length) {
-              scope.item[scope.field] = newValue.substr(0, scope.max_length - 1);
-            }
             if (scope.$parent.$parent.element_switch === true) {
-              if (triggered.is(':visible')) {
-                trigger.show();
-                triggered.hide();
-              }
+              trigger.show();
+              triggered.hide();
             }
             return true;
           }
@@ -320,7 +341,7 @@
         field: '@field',
         field_type: '@type'
       },
-      template: "<div class=\"form-group string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator' ng-show=\"item.correct_saved\">correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\" ng-hide=\"edit_mode || empty_val\">\n    <span class=\"placeholder\" ng-click=\"edit_mode = true; update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\" ng-show=\"edit_mode || empty_val\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" focus-me=\"edit_mode\" ng-blur=\"status_process()\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator' ng-show=\"item.correct_saved\">correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -336,23 +357,33 @@
           return $scope.oldValue = $scope.item[$scope.field];
         };
         return $scope.status_process = function() {
-          console.log('status_process');
-          if ($scope.item[$scope.field] && $scope.item.content.length !== 0) {
-            console.log($scope.oldValue, $scope.item[$scope.field]);
-            if ($scope.item[$scope.field] !== $scope.oldValue) {
-              $scope.status = 'progress';
-              $rootScope.$broadcast('changes_to_save', $scope);
-            }
-            $scope.empty_val = false;
-            return $scope.edit_mode = false;
-          } else {
-            return $scope.empty_val = true;
+          if ($scope.item[$scope.field] !== $scope.oldValue) {
+            $scope.status = 'progress';
+            $scope.$digest();
+            return $rootScope.$broadcast('changes_to_save', $scope);
           }
         };
       },
       link: function(scope, element, attrs) {
+        var trigger, triggered;
         scope.edit_mode = false;
         scope.empty_val = false;
+        element = $(element);
+        trigger = element.find('.trigger');
+        triggered = element.find('.triggered');
+        element.find('span.placeholder').click(function() {
+          trigger.hide();
+          return triggered.show().children().first().focus();
+        });
+        element.find('.triggered > *').blur(function() {
+          var elem;
+          elem = $(this);
+          scope.status_process();
+          if (elem.val() !== '') {
+            triggered.hide();
+            return trigger.show();
+          }
+        });
         scope.$watch('collection', function(newValue, oldValue) {
           var single_item, _i, _len, _results;
           if (newValue) {
@@ -427,17 +458,30 @@
         help: '@ngHelp',
         id: '@ngId',
         title: '@ngTitle',
-        field: '@ngField'
+        field: '@ngField',
+        parent: '=parent'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">Audio</label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-6 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"dropdown\">\n          <a data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">Audioguide 01<span class=\"caret\"></span></a>\n          <ul aria-labelledby=\"visibility_filter\" class=\"dropdown-menu\" role=\"menu\">\n            <li role=\"presentation\">\n            <a href=\"#\" role=\"menuitem\" tabindex=\"-1\">Replace</a>\n            </li>\n            <li role=\"presentation\">\n            <a href=\"#\" role=\"menuitem\" tabindex=\"-1\">Download</a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-xs-6 triggered\" ng-show=\"edit_mode\">\n    <input type=\"file\" id=\"exampleInputFile\">\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">Audio</label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-6 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"dropdown\">\n          <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\" role=\"menu\">\n            <li role=\"presentation\">\n              <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n            </li>\n            <li role=\"presentation\">\n              <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n            </li>\n            <li role=\"presentation\">\n              <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode\">\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Upload a file</a>\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
+        element = $(element);
+        element.find('.replace_media').click(function(e) {
+          var elem, input, parent;
+          e.preventDefault();
+          e.stopPropagation();
+          elem = $(this);
+          if (confirm(elem.data('confirm'))) {
+            parent = elem.parents('#drop_down, #museum_drop_down');
+            parent.click();
+            input = parent.find('.images :file');
+            return input.click();
+          }
+        });
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
             return scope.edit_mode = true;
           } else {
             scope.edit_mode = false;
-            console.log(newValue);
             $("#jquery_jplayer_" + scope.id).jPlayer({
               cssSelectorAncestor: "#jp_container_" + scope.id,
               swfPath: "/js",
@@ -445,11 +489,11 @@
               preload: "auto",
               smoothPlayBar: true,
               keyEnabled: true,
-              supplied: "m4a, oga"
+              supplied: "mp3, ogg"
             });
             return $("#jquery_jplayer_" + scope.id).jPlayer("setMedia", {
-              m4a: newValue,
-              oga: newValue
+              mp3: newValue.url,
+              ogg: newValue.thumbnailUrl
             });
           }
         });
@@ -495,71 +539,92 @@
         return true;
       }
     };
-  }).directive('canDragAndDrop', function($timeout) {
+  }).directive('canDragAndDrop', function() {
     return {
       restrict: 'A',
       require: '?ngModel',
       scope: {
         model: '=ngModel',
-        url: '@uploadTo'
+        url: '@uploadTo',
+        selector: '@selector',
+        selector_dropzone: '@selectorDropzone'
       },
       link: function(scope, element, attrs) {
-        console.log(scope.url, scope.model);
-        $(document).bind('drop dragover', function(e) {
-          return e.preventDefault();
-        });
-        $(document).bind("dragover", function(e) {
-          var doc, dropZone, found, node, timeout;
-          dropZone = $("#dropzone");
-          doc = $(".page");
-          timeout = scope.dropZoneTimeout;
-          if (!timeout) {
-            doc.addClass("in");
-          } else {
-            clearTimeout(timeout);
+        var checkExtension, correctFileSize, dropzone, fileSizeMb, hide_drop_area, initiate_progress;
+        scope.$parent.$parent.loading_in_progress = false;
+        fileSizeMb = 50;
+        element = $("#" + scope.selector);
+        dropzone = $("#" + scope.selector_dropzone);
+        checkExtension = function(object) {
+          var extension, type;
+          extension = object.files[0].name.split('.').pop().toLowerCase();
+          type = 'unsupported';
+          if ($.inArray(extension, gon.acceptable_extensions.image) !== -1) {
+            type = 'image';
           }
-          found = false;
-          node = e.target;
-          while (true) {
-            if (node === dropZone[0]) {
-              found = true;
-              break;
-            }
-            node = node.parentNode;
-            if (node == null) {
-              break;
-            }
+          if ($.inArray(extension, gon.acceptable_extensions.audio) !== -1) {
+            type = 'audio';
           }
-          if (found) {
-            dropZone.addClass("hover");
-          } else {
-            dropZone.removeClass("hover");
-          }
-          return scope.dropZoneTimeout = setTimeout(function() {
-            scope.dropZoneTimeout = null;
-            dropZone.removeClass("in hover");
-            if (!scope.loading_in_progress) {
-              return doc.removeClass("in");
-            }
-          }, 100);
-        });
-        $("#fileupload").fileupload({
+          return type;
+        };
+        correctFileSize = function(object) {
+          return object.files[0] && object.files[0].size < fileSizeMb * 1024 * 1024;
+        };
+        hide_drop_area = function() {
+          $(".progress").hide();
+          return setTimeout(function() {
+            $("body").removeClass("in");
+            return scope.$parent.$parent.loading_in_progress = false;
+          }, 1000);
+        };
+        initiate_progress = function() {
+          scope.$parent.$parent.loading_in_progress = true;
+          scope.$digest();
+          $("body").addClass("in");
+          $(".progress .progress-bar").css("width", 0 + "%");
+          return $(".progress").show();
+        };
+        element.fileupload({
           url: scope.url,
           dataType: "json",
-          dropZone: $(".dropdown_area"),
+          dropZone: dropzone,
+          change: function(e, data) {
+            return initiate_progress();
+          },
           drop: function(e, data) {
-            scope.loading_in_progress = true;
+            initiate_progress();
             return $.each(data.files, function(index, file) {
               return console.log("Dropped file: " + file.name);
             });
           },
+          add: function(e, data) {
+            if (checkExtension(data) === 'image' || checkExtension(data) === 'audio') {
+              if (correctFileSize(data)) {
+                return data.submit();
+              } else {
+                console.log('error: file size');
+                return hide_drop_area();
+              }
+            } else {
+              console.log('error: file type');
+              return hide_drop_area();
+            }
+          },
           success: function(result) {
-            var image, _i, _len, _results;
-            console.log(result);
+            var file, _i, _len, _results;
+            console.log(result, scope.model);
             _results = [];
             for (_i = 0, _len = result.length; _i < _len; _i++) {
-              image = result[_i];
-              _results.push(scope.model.images.push(image));
+              file = result[_i];
+              if (file.type === 'image') {
+                if (scope.model.images == null) {
+                  scope.model.images = [];
+                }
+                scope.$apply(scope.model.images.push(file));
+              } else if (file.type === 'audio') {
+                scope.$apply(scope.model.audio = file);
+              }
+              _results.push(scope.$digest());
             }
             return _results;
           },
@@ -581,18 +646,179 @@
           progressall: function(e, data) {
             var progress;
             progress = parseInt(data.loaded / data.total * 100, 10);
-            $("#progress .progress-bar").css("width", progress + "%");
-            if (progress === 100) {
-              return setTimeout(function() {
-                $(".page").removeClass("in");
-                return scope.loading_in_progress = false;
-              }, 1000);
+            $(".progress .progress-bar").css("width", progress + "%");
+            if (data.loaded === data.total) {
+              return hide_drop_area();
             }
           }
         }).prop("disabled", !$.support.fileInput).parent().addClass(($.support.fileInput ? undefined : "disabled"));
         return scope.$watch('url', function(newValue, oldValue) {
-          console.log(newValue);
-          return $("#fileupload").fileupload("option", "url", newValue);
+          if (newValue) {
+            return element.fileupload("option", "url", newValue);
+          }
+        });
+      }
+    };
+  }).directive("buttonFileUpload", function() {
+    return {
+      restrict: "A",
+      link: function(scope, element, attr) {
+        var elem;
+        elem = $(element);
+        return elem.click(function(e) {
+          var parent;
+          e.preventDefault();
+          elem = $(this);
+          parent = elem.parents('#drop_down, #museum_drop_down');
+          return parent.find('.images :file').click();
+        });
+      }
+    };
+  }).directive('deleteMedia', function() {
+    return {
+      restrict: 'A',
+      scope: {
+        model: '=parent',
+        media: '=media'
+      },
+      link: function(scope, element, attrs) {
+        element = $(element);
+        return element.click(function(e) {
+          var elem;
+          e.preventDefault();
+          e.stopPropagation();
+          elem = $(this);
+          if (confirm(elem.data('confirm'))) {
+            return $.ajax({
+              url: elem.data('link'),
+              type: elem.data('method'),
+              success: function(data) {
+                var image, index, _i, _len, _ref, _results;
+                if (scope.media.type === 'image') {
+                  _ref = scope.model.images;
+                  _results = [];
+                  for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                    image = _ref[index];
+                    if (image != null) {
+                      if (image._id === data) {
+                        scope.$apply(scope.model.images.splice(index, 1));
+                        _results.push(scope.$digest());
+                      } else {
+                        _results.push(void 0);
+                      }
+                    } else {
+                      _results.push(void 0);
+                    }
+                  }
+                  return _results;
+                } else if (scope.media.type === 'audio') {
+                  scope.model.audio = void 0;
+                  return scope.$digest();
+                }
+              }
+            });
+          }
+        });
+      }
+    };
+  }).directive('dragAndDropInit', function() {
+    return {
+      link: function(scope, element, attrs) {
+        $(document).bind('drop dragover', function(e) {
+          return e.preventDefault();
+        });
+        return $(document).bind("dragover", function(e) {
+          var doc, dropZone, found, found_index, node, timeout;
+          dropZone = $(".dropzone");
+          doc = $("body");
+          timeout = scope.dropZoneTimeout;
+          if (!timeout) {
+            doc.addClass("in");
+          } else {
+            clearTimeout(timeout);
+          }
+          found = false;
+          found_index = 0;
+          node = e.target;
+          while (true) {
+            if (node === dropZone[0]) {
+              found = true;
+              found_index = 0;
+              break;
+            } else if (node === dropZone[1]) {
+              found = true;
+              found_index = 1;
+              break;
+            }
+            node = node.parentNode;
+            if (node == null) {
+              break;
+            }
+          }
+          if (found) {
+            return dropZone[found_index].addClass("hover");
+          } else {
+            return scope.dropZoneTimeout = setTimeout(function() {
+              if (!scope.loading_in_progress) {
+                scope.dropZoneTimeout = null;
+                dropZone.removeClass("in hover");
+                return doc.removeClass("in");
+              }
+            }, 300);
+          }
+        });
+      }
+    };
+  }).directive('switchToggle', function($timeout) {
+    return {
+      restrict: 'A',
+      controller: function($scope, $rootScope, $element, $attrs, $http) {
+        var selector;
+        selector = $attrs['quizSwitch'];
+        $scope.quiz_state = function(form, item) {
+          $scope.mark_quiz_validity(form.$valid);
+          if (form.$valid) {
+            $timeout(function() {
+              $http.put("" + $scope.backend_url + "/quiz/" + item._id, item).success(function(data) {
+                return console.log(data);
+              }).error(function() {
+                return console.log('fail');
+              });
+              return true;
+            }, 0);
+          } else {
+            setTimeout(function() {
+              return $("#" + selector + "_disabled").click();
+            }, 300);
+          }
+          return true;
+        };
+        return $scope.mark_quiz_validity = function(valid) {
+          var form;
+          form = $("#" + selector + " form");
+          if (valid) {
+            form.removeClass('has_error');
+          } else {
+            form.addClass('has_error');
+          }
+          return true;
+        };
+      },
+      link: function(scope, element, attrs) {
+        var selector;
+        selector = attrs['quizSwitch'];
+        return $("#" + selector + "_enabled, #" + selector + "_disabled").change(function() {
+          var elem;
+          elem = $(this);
+          if (elem.attr('id') === ("" + selector + "_enabled")) {
+            $("label[for=" + selector + "_enabled]").text('Enabled');
+            $("label[for=" + selector + "_disabled]").text('Disable');
+            return true;
+          } else {
+            $("label[for=" + selector + "_disabled]").text('Disabled');
+            $("label[for=" + selector + "_enabled]").text('Enable');
+            return true;
+          }
         });
       }
     };

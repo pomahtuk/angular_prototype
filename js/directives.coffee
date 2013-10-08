@@ -60,6 +60,8 @@ angular.module("Museum.directives", [])
     elem = $ element
     elem.click ->
       $('.filters_bar').slideToggle(200)
+      scope.filters_opened = !scope.filters_opened
+      scope.$digest()
       setTimeout ->
         $('body').toggleClass('filers')
       , 100
@@ -101,12 +103,12 @@ angular.module("Museum.directives", [])
         Who can see it in mobile application
         <li class="divider"></li>
         <li ng-click="item[field] = 'published'; status_process()">
+        <span class="check"><i ng-show="item[field] == 'published'" class="icon-ok"></i></span>
           <i class="icon-globe"></i> Everyone
-          <span class="check" ng-show="item[field] == 'published'">✓</span>
         </li>
         <li ng-click="item[field] = 'passcode'; status_process()">
+          <span class="check"><i ng-show="item[field] == 'passcode'" class="icon-ok"></i></span>
           <i class="icon-user"></i> Only users who have passcode
-          <span class="check" ng-show="item[field] == 'passcode'">✓</span>
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">
               {{provider.passcode}}
@@ -148,23 +150,23 @@ angular.module("Museum.directives", [])
     field: '@field'
     field_type: '@type'
   template: """
-    <div class="btn-group">
+    <div class="btn-group pull-right">
       <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
         <div class="extra_right" ng-switch on="item[field]">
           <i class="icon-globe" ng-switch-when="published" ></i>
           <i class="icon-user" ng-switch-when="passcode" ></i>
         </div>
         <span class="caret"></span></button>
-      <ul class="dropdown-menu" role="menu">
+      <ul class="dropdown-menu pull-left" role="menu" >
         Who can see it in mobile application
         <li class="divider"></li>
         <li  ng-click="item[field] = 'published'; status_process()">
+          <span class="check"><i ng-show="item[field] == 'published'" class="icon-ok"></i></span>
           <i class="icon-globe"></i> Everyone
-          <span class="check" ng-show="item[field] == 'published'">✓</span>
         </li>
         <li ng-click="item[field] = 'passcode'; status_process()">
+          <span class="check"><i ng-show="item[field] == 'passcode'" class="icon-ok"></i></span>
           <i class="icon-user"></i> Only users who have passcode
-          <span class="check" ng-show="item[field] == 'passcode'">✓</span>
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">
               {{provider.passcode}}
@@ -183,7 +185,7 @@ angular.module("Museum.directives", [])
   link: (scope, element, attrs) ->
     true
 
-.directive "placeholderfield", ->
+.directive "placeholderfield", ($timeout) ->
   restrict: "E"
   replace: true
   require: "?ngModel"
@@ -208,7 +210,8 @@ angular.module("Museum.directives", [])
         <span class="placeholder" ng-click="update_old()">{{item[field]}}</span>
       </div>
       <div class="col-xs-6 triggered">
-        <input class="form-control" id="{{id}}" ng-model="item[field]" required placeholder="{{placeholder}}">
+        <input type="hidden" id="original_{{id}}" ng-model="item[field]" required">
+        <input type="text" class="form-control" id="{{id}}" value="{{item[field]}}" placeholder="{{placeholder}}">
         <div class="error_text {{field}}" >can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
@@ -220,14 +223,15 @@ angular.module("Museum.directives", [])
     $scope.update_old = ->
       $scope.oldValue = $scope.item[$scope.field]
     $scope.status_process = ->
-      if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0 
-        if $scope.item[$scope.field] isnt $scope.oldValue
-          $scope.status = 'progress'
-          if $scope.$parent.$parent.new_item_creation and $scope.field is 'name'
+      if $scope.item[$scope.field] isnt $scope.oldValue
+        $scope.status = 'progress'
+        $scope.$digest()
+        if $scope.$parent.$parent.new_item_creation and $scope.field is 'name'
+          if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0 
             console.log 'wow'
             $rootScope.$broadcast 'save_new_exhibit'
-          else
-            $rootScope.$broadcast 'changes_to_save', $scope
+            return true
+        $rootScope.$broadcast 'changes_to_save', $scope
   link: (scope, element, attrs) ->
     element = $ element
     trigger = element.find('.trigger')
@@ -235,27 +239,33 @@ angular.module("Museum.directives", [])
 
     element.find('span.placeholder').click ->
       trigger.hide()
-      triggered.show().children().first().focus()
+      triggered.show().children('.form-control').focus()
 
-    element.find('.triggered > *').blur ->
+    element.find('.triggered > .form-control').blur ->  
       elem = $ @
-      scope.status_process()
-      if elem.val() isnt ''
-        triggered.hide()
-        trigger.show()
+      unless (scope.$parent.$parent.new_item_creation && scope.field is 'number')
+        $timeout ->
+          scope.item[scope.field] = elem.val()
+          scope.$digest()
+          scope.status_process()
+        , 0, false
+        if elem.val() isnt ''
+          triggered.hide()
+          trigger.show()
 
     # scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
       scope.status = ''
       unless newValue
+        console.log 'hiding', scope.field
         trigger.hide()
+        triggered.show()
         if scope.filed is 'name'
           triggered.find('.form-control').focus()
       else
         if scope.$parent.$parent.element_switch is true
-          if triggered.is(':visible')
-            trigger.show()
-            triggered.hide()
+          trigger.show()
+          triggered.hide()
 
     # scope.$watch 'inv_sign', (newValue, oldValue) ->
     #   if newValue is true
@@ -268,7 +278,7 @@ angular.module("Museum.directives", [])
 
     true
 
-.directive "placeholdertextarea", ->
+.directive "placeholdertextarea", ($timeout) ->
   restrict: "E"
   replace: true
   require: "?ngModel"
@@ -282,20 +292,20 @@ angular.module("Museum.directives", [])
     placeholder: '=placeholder'
     field_type: '@type'
   template: """
-    <div class="form-group textfield">
+    <div class="form-group textfield large_field">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <span class="sumbols_left" ng-hide="status == 'progress' || status == 'done' || empty_val || !edit_mode ">
+      <span class="sumbols_left">
         {{length_text}}
       </span>
       <div class="col-lg-6 trigger">
         <span class="placeholder large" ng-click="update_old()">{{item[field]}}</span>
       </div>
       <div class="col-lg-6 triggered">
-        <textarea class="form-control" id="{{id}}" ng-model="item[field]" required placeholder="{{placeholder}}">
-        </textarea>
+        <input type="hidden" id="original_{{id}}" ng-model="item[field]" required">
+        <textarea class="form-control" id="{{id}}" placeholder="{{placeholder}}">{{item[field]}}</textarea>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
@@ -309,6 +319,7 @@ angular.module("Museum.directives", [])
       if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0 
         if $scope.item[$scope.field] isnt $scope.oldValue
           $scope.status = 'progress'
+          $scope.$digest()
           $rootScope.$broadcast 'changes_to_save', $scope
         $scope.empty_val = false
         $scope.edit_mode = false
@@ -320,17 +331,32 @@ angular.module("Museum.directives", [])
     element = $ element
     trigger = element.find('.trigger')
     triggered = element.find('.triggered')
+    sumbols_left = element.find('.sumbols_left')
 
     element.find('span.placeholder').click ->
       trigger.hide()
-      triggered.show().children().first().focus()
+      triggered.show().children('.form-control').focus()
+      sumbols_left.show()
 
-    element.find('.triggered > *').blur ->
+    element.find('.triggered > .form-control').blur ->
       elem = $ @
-      scope.status_process()
+      $timeout ->
+        scope.item[scope.field] = elem.val()
+        scope.$digest()
+        scope.status_process()
+      , 0, false
       if elem.val() isnt ''
         triggered.hide()
         trigger.show()
+        sumbols_left.hide()
+
+    element.find('.triggered > .form-control').keyup (e) ->
+      elem = $ @
+      value = elem.val()
+      if value.length >= scope.max_length
+        elem.val value.substr(0, scope.max_length-1)
+      scope.length_text = "осталось символов: #{scope.max_length - value.length - 1}"
+      scope.$digest()
 
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
@@ -339,13 +365,12 @@ angular.module("Museum.directives", [])
         triggered.show()
       else
         scope.max_length ||= 255
-        scope.length_text = "осталось символов: #{scope.max_length - newValue.length - 1}"
-        if newValue.length >= scope.max_length
-          scope.item[scope.field] = newValue.substr(0, scope.max_length-1)
+        # scope.length_text = "осталось символов: #{scope.max_length - newValue.length - 1}"
+        # if newValue.length >= scope.max_length
+        #   scope.item[scope.field] = newValue.substr(0, scope.max_length-1)
         if scope.$parent.$parent.element_switch is true
-          if triggered.is(':visible')
-            trigger.show()
-            triggered.hide()
+          trigger.show()
+          triggered.hide()
         true
     true
 
@@ -360,16 +385,16 @@ angular.module("Museum.directives", [])
     field: '@field'
     field_type: '@type'
   template: """
-    <div class="form-group string optional checkbox_added">
+    <div class="form-group textfield string optional checkbox_added">
       <label class="string optional control-label col-xs-2" for="{{id}}">
         <span class='correct_answer_indicator' ng-show="item.correct_saved">correct</span>
       </label>
       <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item._id}}" ng-model="checked" ng-click="check_items(item)">
-      <div class="col-xs-5 trigger" ng-hide="edit_mode || empty_val">
-        <span class="placeholder" ng-click="edit_mode = true; update_old()">{{item[field]}}</span>
+      <div class="col-xs-5 trigger">
+        <span class="placeholder" ng-click="update_old()">{{item[field]}}</span>
       </div>
-      <div class="col-xs-5 triggered" ng-show="edit_mode || empty_val">
-        <input class="form-control" id="{{id}}" name="{{item._id}}" placeholder="Enter option" type="text" ng-model="item[field]" focus-me="edit_mode" ng-blur="status_process()" required>
+      <div class="col-xs-5 triggered">
+        <input class="form-control" id="{{id}}" name="{{item._id}}" placeholder="Enter option" type="text" ng-model="item[field]" required>
         <div class="error_text">can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
@@ -387,20 +412,29 @@ angular.module("Museum.directives", [])
       $scope.oldValue = $scope.item[$scope.field]
 
     $scope.status_process = ->
-      console.log 'status_process'
-      if $scope.item[$scope.field] && $scope.item.content.length isnt 0
-        console.log $scope.oldValue, $scope.item[$scope.field]
-        if $scope.item[$scope.field] isnt $scope.oldValue 
-          $scope.status = 'progress'
-          $rootScope.$broadcast 'changes_to_save', $scope
-        $scope.empty_val = false
-        $scope.edit_mode = false
-      else
-        $scope.empty_val = true
+      if $scope.item[$scope.field] isnt $scope.oldValue 
+        $scope.status = 'progress'
+        $scope.$digest()
+        $rootScope.$broadcast 'changes_to_save', $scope
 
   link: (scope, element, attrs) ->
     scope.edit_mode = false
     scope.empty_val = false
+
+    element = $ element
+    trigger = element.find('.trigger')
+    triggered = element.find('.triggered')
+
+    element.find('span.placeholder').click ->
+      trigger.hide()
+      triggered.show().children().first().focus()
+
+    element.find('.triggered > *').blur ->
+      elem = $ @
+      scope.status_process()
+      if elem.val() isnt ''
+        triggered.hide()
+        trigger.show()
 
     scope.$watch 'collection', (newValue, oldValue) ->
       if newValue
@@ -467,6 +501,7 @@ angular.module("Museum.directives", [])
     id: '@ngId'
     title: '@ngTitle'
     field: '@ngField'
+    parent: '=parent'
   template: """
     <div class="form-group">
       <label class="col-xs-2 control-label" for="audio">Audio</label>
@@ -489,13 +524,16 @@ angular.module("Museum.directives", [])
               </ul>
             </div>
             <div class="dropdown">
-              <a data-toggle="dropdown" href="#" id="visibility_filter">Audioguide 01<span class="caret"></span></a>
-              <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="visibility_filter">{{item[field].name}}<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
                 <li role="presentation">
-                <a href="#" role="menuitem" tabindex="-1">Replace</a>
+                  <a href="#" class="replace_media" data-confirm="Are you sure you wish to replace this audio?" data-method="delete" data-link="{{$parent.$parent.backend_url}}/media/{{item[field]._id}}">Replace</a>
                 </li>
                 <li role="presentation">
-                <a href="#" role="menuitem" tabindex="-1">Download</a>
+                  <a href="{{item[field].url}}" target="_blank">Download</a>
+                </li>
+                <li role="presentation">
+                  <a class="remove" href="#" data-confirm="Are you sure you wish to delete this audio?" data-method="delete" data-link="{{$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="item[field]" parent="item">Delete</a>
                 </li>
               </ul>
             </div>
@@ -517,20 +555,37 @@ angular.module("Museum.directives", [])
           </div>
         </div>
       </div>
-      <div class="col-xs-6 triggered" ng-show="edit_mode">
-        <input type="file" id="exampleInputFile">
+      <div class="triggered" ng-show="edit_mode">
+        <a href="#" class="btn btn-default" button-file-upload="">Upload a file</a>
       </div>
       <status-indicator ng-binding="item" ng-field="field"></statusIndicator>
     </div>
   """
+  # controller: ($scope, $element, $attrs) ->
+  #   $scope.replace_media = ()  ->
+  #     true
   link: (scope, element, attrs) ->
+
     scope.edit_mode = false
+
+    element = $ element
+    element.find('.replace_media').click (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      elem   = $ @
+
+      if confirm elem.data('confirm')
+        parent = elem.parents('#drop_down, #museum_drop_down')
+        parent.click()
+        input = parent.find('.images :file')
+        input.click()
+
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.edit_mode = true
       else
         scope.edit_mode = false
-        console.log newValue
+        # console.log newValue
         $("#jquery_jplayer_#{scope.id}").jPlayer
           cssSelectorAncestor: "#jp_container_#{scope.id}"
           swfPath: "/js"
@@ -538,10 +593,10 @@ angular.module("Museum.directives", [])
           preload: "auto"
           smoothPlayBar: true
           keyEnabled: true
-          supplied: "m4a, oga"
+          supplied: "mp3, ogg"
         $("#jquery_jplayer_#{scope.id}").jPlayer "setMedia",
-          m4a: newValue
-          oga: newValue
+          mp3: newValue.url
+          ogg: newValue.thumbnailUrl
     true
 
 .directive "museumSearch", ->
@@ -585,57 +640,76 @@ angular.module("Museum.directives", [])
   link: (scope, element, attrs) ->
     true
 
-.directive 'canDragAndDrop', ($timeout) ->
+.directive 'canDragAndDrop', ->
   restrict : 'A'
   require: '?ngModel'
   scope:
     model: '=ngModel'
     url: '@uploadTo'
+    selector: '@selector'
+    selector_dropzone: '@selectorDropzone'
   link : (scope, element, attrs) ->
 
-    console.log scope.url, scope.model
+    scope.$parent.$parent.loading_in_progress = false
 
-    $(document).bind 'drop dragover', (e) ->
-      e.preventDefault()
+    fileSizeMb = 50
 
-    $(document).bind "dragover", (e) ->
-      dropZone = $("#dropzone")
-      doc      = $(".page")
-      timeout = scope.dropZoneTimeout
-      unless timeout
-        doc.addClass "in"
-      else
-        clearTimeout timeout
-      found = false
-      node = e.target
-      loop
-        if node is dropZone[0]
-          found = true
-          break
-        node = node.parentNode
-        break unless node?
-      if found
-        dropZone.addClass "hover"
-      else
-        dropZone.removeClass "hover"
-      scope.dropZoneTimeout = setTimeout(->
-        scope.dropZoneTimeout = null
-        dropZone.removeClass "in hover"
-        doc.removeClass "in" unless scope.loading_in_progress
-      , 100)
+    element = $("##{scope.selector}")
+    dropzone = $("##{scope.selector_dropzone}")
 
-    $("#fileupload").fileupload(
+    checkExtension = (object) ->
+      extension = object.files[0].name.split('.').pop().toLowerCase()
+      type = 'unsupported'
+      type = 'image' if $.inArray(extension, gon.acceptable_extensions.image) != -1
+      type = 'audio' if $.inArray(extension, gon.acceptable_extensions.audio) != -1
+      type
+
+    correctFileSize = (object) ->
+      object.files[0] && object.files[0].size < fileSizeMb * 1024 * 1024
+
+    hide_drop_area = ->
+      $(".progress").hide()
+      setTimeout ->
+        $("body").removeClass "in"
+        scope.$parent.$parent.loading_in_progress = false
+      , 1000
+
+    initiate_progress = ->
+      scope.$parent.$parent.loading_in_progress = true
+      scope.$digest()
+      $("body").addClass "in"
+      $(".progress .progress-bar").css "width", 0 + "%"
+      $(".progress").show()
+
+    element.fileupload(
       url: scope.url
       dataType: "json"
-      dropZone: $(".dropdown_area")
+      dropZone: dropzone
+      change: (e, data) ->
+        initiate_progress()
       drop: (e, data) ->
-        scope.loading_in_progress = true
+        initiate_progress()
         $.each data.files, (index, file) ->
           console.log "Dropped file: " + file.name
+      add: (e, data) ->
+        if checkExtension(data) is 'image' || checkExtension(data) is 'audio'
+          if correctFileSize(data)
+            data.submit()
+          else
+            console.log 'error: file size'
+            hide_drop_area()
+        else
+          console.log 'error: file type'
+          hide_drop_area()
       success: (result) ->
-        console.log result
-        for image in result
-          scope.model.images.push image
+        console.log result, scope.model
+        for file in result
+          if file.type is 'image'
+            scope.model.images = [] unless scope.model.images?
+            scope.$apply scope.model.images.push file
+          else if file.type is 'audio'
+            scope.$apply scope.model.audio = file
+          scope.$digest()
       error: (result, status, errorThrown) ->
         console.log status, result, errorThrown
         if errorThrown == 'abort'
@@ -649,15 +723,131 @@ angular.module("Museum.directives", [])
             console.log 'unknown error'
       progressall: (e, data) ->
         progress = parseInt(data.loaded / data.total * 100, 10)
-        $("#progress .progress-bar").css "width", progress + "%"
-        if progress is 100
-          setTimeout ->
-            $(".page").removeClass "in"
-            scope.loading_in_progress = false
-          , 1000
+        # console.log data, scope.$parent.$parent.loading_in_progress
+        $(".progress .progress-bar").css "width", progress + "%"
+        if data.loaded is data.total
+          hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
     scope.$watch 'url', (newValue, oldValue) ->
-      console.log newValue
-      $("#fileupload").fileupload "option", "url", newValue
+      # console.log newValue
+      if newValue
+        element.fileupload "option", "url", newValue
 
+.directive "buttonFileUpload", ->
+  restrict: "A"
+  link: (scope, element, attr) ->
+    elem = $ element
+    # upload = $("##{attr[selector]}")
+
+    elem.click (e) ->
+      e.preventDefault()
+      elem = $ @
+      parent = elem.parents('#drop_down, #museum_drop_down')
+      parent.find('.images :file').click()
+
+.directive 'deleteMedia', ->
+  restrict : 'A'
+  scope:
+    model: '=parent'
+    media: '=media'
+  link : (scope, element, attrs) ->
+    element = $ element
+    element.click (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      elem   = $ @
+
+      if confirm elem.data('confirm')
+        $.ajax
+          url: elem.data('link')
+          type: elem.data('method')
+          success: (data) ->
+            if scope.media.type is 'image'
+              for image, index in scope.model.images
+                if image?
+                  if image._id is data
+                    scope.$apply scope.model.images.splice index, 1
+                    scope.$digest()
+            else if scope.media.type is 'audio'
+              scope.model.audio = undefined
+              scope.$digest()
+
+.directive 'dragAndDropInit', ->
+  link: (scope, element, attrs) ->
+
+    $(document).bind 'drop dragover', (e) ->
+      e.preventDefault()
+
+    $(document).bind "dragover", (e) ->
+      dropZone = $(".dropzone")
+      doc      = $("body")
+      timeout = scope.dropZoneTimeout
+      unless timeout
+        doc.addClass "in"
+      else
+        clearTimeout timeout
+      found = false
+      found_index = 0
+      node = e.target
+      loop
+        if node is dropZone[0]
+          found = true
+          found_index = 0
+          break
+        else if node is dropZone[1]
+          found = true
+          found_index = 1
+          break
+        node = node.parentNode
+        break unless node?
+      if found
+        dropZone[found_index].addClass "hover"
+      else
+        scope.dropZoneTimeout = setTimeout ->
+          unless scope.loading_in_progress
+            scope.dropZoneTimeout = null
+            dropZone.removeClass "in hover"
+            doc.removeClass "in"
+        , 300
+
+.directive 'switchToggle', ($timeout) ->
+  restrict: 'A'
+  controller:  ($scope, $rootScope, $element, $attrs, $http) ->
+    selector = $attrs['quizSwitch']
+    $scope.quiz_state = (form, item) ->
+      $scope.mark_quiz_validity(form.$valid)
+      if form.$valid
+        $timeout ->
+          $http.put("#{$scope.backend_url}/quiz/#{item._id}", item).success (data) ->
+            console.log data
+          .error ->
+            console.log 'fail'
+          true
+        , 0
+      else
+        setTimeout ->
+          $("##{selector}_disabled").click()
+        , 300     
+      true
+
+    $scope.mark_quiz_validity = (valid) ->
+      form = $("##{selector} form")
+      if valid
+        form.removeClass 'has_error'
+      else
+        form.addClass 'has_error'
+      true
+
+  link: (scope, element, attrs) ->
+    selector = attrs['quizSwitch']
+    $("##{selector}_enabled, ##{selector}_disabled").change ->
+      elem = $ @
+      if elem.attr('id') is "#{selector}_enabled"
+        $("label[for=#{selector}_enabled]").text('Enabled')
+        $("label[for=#{selector}_disabled]").text('Disable')
+        true
+      else
+        $("label[for=#{selector}_disabled]").text('Disabled')
+        $("label[for=#{selector}_enabled]").text('Enable')
+        true
