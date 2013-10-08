@@ -95,7 +95,7 @@ html lang="en" ng-app="Museum"
           .btn-group
         .right_content
           span.autosaved_info ng-show="last_save_time" Changes autosaved at {{ last_save_time | date:'HH:mm'}}
-          switchpubitem ng-item="current_museum" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story_set' field="status"
+          switchpubitem ng-item="current_museum" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story_set' field="status" root="current_museum"
 
       .museum_edit
         #museum_edit_dropdown ng-controller="MuseumEditController"
@@ -337,7 +337,7 @@ html lang="en" ng-app="Museum"
             .description
               .close
               .hider ng-hide="active_exhibit.stories[current_museum.language].publish_state == 'dummy'"
-                switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status"
+                switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="active_exhibit"
 
               a.delete_story ng-click="delete_modal_open()" href="#" 
                 i.icon-trash
@@ -428,7 +428,7 @@ html lang="en" ng-app="Museum"
                   i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
               .visibility ng-switch="" on="exhibit.stories[current_museum.language].status"
                 i class="icon-globe placeholder" ng-switch-when="published"
-                i class="icon-user placeholder" ng-switch-when="passcode"
+                i class="icon-lock placeholder" ng-switch-when="passcode"
                 .on_hover
                   switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field="status"
 

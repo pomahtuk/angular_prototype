@@ -156,7 +156,7 @@ $noConflictColor: #444
     margin-left: -403px
 
 body
-  background: #ededed
+  background: #e5e5e5
   text-rendering: optimizeLegibility
   -webkit-font-smoothing: antialiased  
 
@@ -377,6 +377,8 @@ body
 
 .navbar
   margin-bottom: 0px
+  background: #f1f1f1
+  border-color: #e5e5e5
  
 .left_content
   padding-left: 40px
@@ -482,12 +484,16 @@ body
   padding: 0px 10px
   font-size: 18px
 
+.actions_bar
+  +box-shadow( rgba(0, 0, 0, .1)  0 2px 4px )
+
 .actions_bar, .filters_bar
   position: relative
   padding-top: 4px
   height: 44px
   background: white
-  border-bottom: 1px solid $border_color
+  // border-bottom: 1px solid $border_color
+  border-bottom: 1px solid #d9d9d9
 
   input.search
     +inline-block
@@ -527,13 +533,9 @@ ul.exhibits
     vertical-align: top
 
     >.opener
-      background: white
-      border: 1px solid white
       +border-radius(3px)
-      width: 200px
       position: relative
       text-align: left
-
       display: block
       text-decoration: none
       width: 200px
@@ -556,7 +558,8 @@ ul.exhibits
           left: 3px
 
       .image
-        width: 198px
+        +border-top-radius(3px)
+        width: 200px
         overflow-x: hidden
 
       img
@@ -568,7 +571,7 @@ ul.exhibits
         cursor: pointer
 
       .description
-        background: $exhibitBackgroundColor
+        background: #fff
         border-color: #fff
         border-radius: 0 0 2px 2px
         border-style: solid
@@ -961,17 +964,6 @@ ul.exhibits
           border: 1px solid transparent
           margin-left: 13px
 
-      &.checkbox_added
-        margin-left: 0px
-        .coorect_answer_radio
-          float: left
-          vertical-align: center
-          margin: 10px 0px 10px 20px
-          cursor: pointer
-
-        .error_text
-          margin-left: 65px
-
       .triggered
         & > input, & > textarea
           min-width: 300px
@@ -983,6 +975,21 @@ ul.exhibits
           +box-sizing(border-box)
           height: 130px
           margin-left: 13px
+
+      &.checkbox_added
+        margin-left: 0px
+        .coorect_answer_radio
+          float: left
+          vertical-align: center
+          margin: 10px 0px 10px 20px
+          cursor: pointer
+
+        .error_text
+          margin-left: 65px
+
+        .triggered > *, .trigger .placeholder
+          min-width: 267px
+
 
       &.textfield .triggered
         display: none
@@ -1021,7 +1028,6 @@ ul.exhibits
           line-height: 32px
           background: white
           border: 1px solid darken($border_color, 20%)
-          min-width: 300px
 
           &.large
             padding: 6px 12px
@@ -1031,6 +1037,7 @@ ul.exhibits
       .form-control.ng-invalid, .form-control.number_invalid
         border-color: #b94a48
         +box-shadow(rgba(0, 0, 0, 0.075) 1px 1px 0 inset)
+        background: #F1E2E2
 
         & + .error_text
           +inline-block
@@ -1302,3 +1309,8 @@ a
   +box-shadow(none)
   border-color: #fd6e3b
   outline: 0
+
+.btn-success
+  color: #ffffff
+  background-color: #35AA47
+  border-color: #35AA47

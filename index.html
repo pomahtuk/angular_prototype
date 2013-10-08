@@ -70,7 +70,7 @@
           <div class="btn-group"></div>
         </div>
         <div class="right_content">
-          <span class="autosaved_info" ng-show="last_save_time">Changes autosaved at {{ last_save_time | date:'HH:mm'}}</span><switchpubitem field="status" ng-item="current_museum" ng-museum="current_museum" ng-provider="provider" translations="translations" type="story_set"></switchpubitem>
+          <span class="autosaved_info" ng-show="last_save_time">Changes autosaved at {{ last_save_time | date:'HH:mm'}}</span><switchpubitem field="status" ng-item="current_museum" ng-museum="current_museum" ng-provider="provider" root="current_museum" translations="translations" type="story_set"></switchpubitem>
         </div>
       </div>
       <div class="museum_edit">
@@ -290,7 +290,7 @@
             <div class="description">
               <div class="close"></div>
               <div class="hider" ng-hide="active_exhibit.stories[current_museum.language].publish_state == &#39;dummy&#39;">
-                <switchpubitem field="status" ng-item="active_exhibit.stories[current_museum.language]" ng-museum="current_museum" ng-provider="provider" translations="translations" type="story"></switchpubitem>
+                <switchpubitem field="status" ng-item="active_exhibit.stories[current_museum.language]" ng-museum="current_museum" ng-provider="provider" root="active_exhibit" translations="translations" type="story"></switchpubitem>
               </div>
               <a class="delete_story" href="#" ng-click="delete_modal_open()"><i class="icon-trash"></i></a>
               <script id="myModalContent.html" type="text/ng-template">
@@ -383,7 +383,7 @@
                 </div>
               </div>
               <div class="visibility" ng-switch="" on="exhibit.stories[current_museum.language].status">
-                <i class="icon-globe placeholder" ng-switch-when="published"></i><i class="icon-user placeholder" ng-switch-when="passcode"></i>
+                <i class="icon-globe placeholder" ng-switch-when="published"></i><i class="icon-lock placeholder" ng-switch-when="passcode"></i>
                 <div class="on_hover">
                   <switchpub field="status" ng-item="exhibit.stories[current_museum.language]" ng-provider="provider" type="story"></switchpub>
                 </div>

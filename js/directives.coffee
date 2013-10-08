@@ -88,12 +88,13 @@ angular.module("Museum.directives", [])
     trans: '=translations'
     field: '@field'
     field_type: '@type'
+    root: '=root'
   template: """
     <div class="btn-group pull-right item_publish_settings">
       <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" type="button" ng-switch on="item[field]">
         <div class="extra" ng-switch on="item[field]">
           <i class="icon-globe" ng-switch-when="published" ></i>
-          <i class="icon-user" ng-switch-when="passcode" ></i>
+          <i class="icon-lock" ng-switch-when="passcode" ></i>
         </div>
         <span ng-switch-when="passcode">Publish</span>
         <span ng-switch-when="published">Published</span>
@@ -108,7 +109,7 @@ angular.module("Museum.directives", [])
         </li>
         <li ng-click="item[field] = 'passcode'; status_process()">
           <span class="check"><i ng-show="item[field] == 'passcode'" class="icon-ok"></i></span>
-          <i class="icon-user"></i> Only users who have passcode
+          <i class="icon-lock"></i> Only users who have passcode
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">
               {{provider.passcode}}
@@ -120,10 +121,10 @@ angular.module("Museum.directives", [])
         <li class="other_list">
           <span class="other_lang" ng-click="hidden_list=!hidden_list" stop-event="click">Other languages</a>
           <ul class="other" ng-hide="hidden_list">
-            <li ng-repeat="(name, story) in item.stories" ng-switch on="story.status">
+            <li ng-repeat="(name, story) in root.stories" ng-switch on="story.status">
               <span class="col-lg-4">{{trans[name]}} </span>
               <i class="icon-globe" ng-switch-when="published" ></i>
-              <i class="icon-user" ng-switch-when="passcode" ></i>
+              <i class="icon-lock" ng-switch-when="passcode" ></i>
             </li>
           </ul>
         </li>
@@ -154,7 +155,7 @@ angular.module("Museum.directives", [])
       <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
         <div class="extra_right" ng-switch on="item[field]">
           <i class="icon-globe" ng-switch-when="published" ></i>
-          <i class="icon-user" ng-switch-when="passcode" ></i>
+          <i class="icon-lock" ng-switch-when="passcode" ></i>
         </div>
         <span class="caret"></span></button>
       <ul class="dropdown-menu pull-left" role="menu" >
@@ -166,7 +167,7 @@ angular.module("Museum.directives", [])
         </li>
         <li ng-click="item[field] = 'passcode'; status_process()">
           <span class="check"><i ng-show="item[field] == 'passcode'" class="icon-ok"></i></span>
-          <i class="icon-user"></i> Only users who have passcode
+          <i class="icon-lock"></i> Only users who have passcode
           <div class="limited-pass-hint hidden">
             <div class="limited-pass">
               {{provider.passcode}}
@@ -252,6 +253,17 @@ angular.module("Museum.directives", [])
         if elem.val() isnt ''
           triggered.hide()
           trigger.show()
+        else
+          if scope.field is 'name'
+            $timeout ->
+              elem.val scope.oldValue
+              scope.item[scope.field] = scope.oldValue
+              scope.$digest()
+              scope.status_process()
+            , 0, false
+
+    element.find('.triggered > .form-control').keyup ->  
+      true
 
     # scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
@@ -418,9 +430,6 @@ angular.module("Museum.directives", [])
         $rootScope.$broadcast 'changes_to_save', $scope
 
   link: (scope, element, attrs) ->
-    scope.edit_mode = false
-    scope.empty_val = false
-
     element = $ element
     trigger = element.find('.trigger')
     triggered = element.find('.triggered')
@@ -444,10 +453,12 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'item.content', (newValue, oldValue) ->
       unless newValue
-        scope.edit_mode = true
-        scope.empty_val = true
+        trigger.hide()
+        triggered.show()
       else
-        scope.empty_val = false
+        if scope.$parent.$parent.element_switch is true
+          trigger.show()
+          triggered.hide()
 
     scope.$watch 'item.correct_saved', (newValue, oldValue) ->
       if newValue is true
@@ -672,10 +683,12 @@ angular.module("Museum.directives", [])
       setTimeout ->
         $("body").removeClass "in"
         scope.$parent.$parent.loading_in_progress = false
+        scope.$parent.$parent.forbid_switch = false
       , 1000
 
     initiate_progress = ->
       scope.$parent.$parent.loading_in_progress = true
+      scope.$parent.$parent.forbid_switch = true
       scope.$digest()
       $("body").addClass "in"
       $(".progress .progress-bar").css "width", 0 + "%"
@@ -726,6 +739,7 @@ angular.module("Museum.directives", [])
         # console.log data, scope.$parent.$parent.loading_in_progress
         $(".progress .progress-bar").css "width", progress + "%"
         if data.loaded is data.total
+          scope.$parent.$parent.last_save_time = new Date()
           hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
@@ -772,6 +786,7 @@ angular.module("Museum.directives", [])
             else if scope.media.type is 'audio'
               scope.model.audio = undefined
               scope.$digest()
+            scope.$parent.$parent.last_save_time = new Date()
 
 .directive 'dragAndDropInit', ->
   link: (scope, element, attrs) ->

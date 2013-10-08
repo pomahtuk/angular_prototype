@@ -53,17 +53,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $routeParams.museum_id?
     $routeParams.museum_id
   else
-    "52490d0a0c80244085000002"
-    # "5253db2f24ee39583e000002"
+    # "52490d0a0c80244085000002"
+    "5253db2f24ee39583e000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    "52490d0a0c80244085000001"
-    # "5253db2f24ee39583e000001"
+    # "52490d0a0c80244085000001"
+    "5253db2f24ee39583e000001"
 
-  $scope.backend_url = "http://192.168.216.128:3000"
-  # $scope.backend_url = "http://prototype.izi.travel"
+  # $scope.backend_url = "http://192.168.216.128:3000"
+  $scope.backend_url = "http://prototype.izi.travel"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -399,6 +399,7 @@ angular.module("Museum.controllers", [])
   }
 
   $scope.element_switch = true
+  $scope.forbid_switch  = false
 
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
@@ -468,6 +469,11 @@ angular.module("Museum.controllers", [])
 
   $scope.open_dropdown = (event, elem) ->
     clicked = $(event.target).parents('li')
+
+    if $scope.forbid_switch is true
+      event.stopPropagation()
+      return false
+
     if clicked.hasClass('active')
       $scope.closeDropDown()
       return false
@@ -584,12 +590,6 @@ angular.module("Museum.controllers", [])
       $scope.new_exhibit.number = number
       $scope.new_exhibit.images = []
       console.log $scope.new_exhibit
-      #   {
-      #     image: "http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg"
-      #     parent: "52472b44774dd1e650000069" #redefine!
-      #     thumb: "http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg"
-      #   }
-      # ]
       for lang of $scope.current_museum.stories
         $scope.new_exhibit.stories[lang] = {
           playback_algorithm: 'generic'
@@ -600,10 +600,10 @@ angular.module("Museum.controllers", [])
           name:               ''
           short_description:  ''
           long_description:   ''
-          story_set:          "52472b44774dd1e650000069" #redefine!
+          story_set:          ""
         }
         $scope.new_exhibit.stories[lang].quiz = {
-          story:     "52472b44774dd1e650000069" # redefine!
+          story:     ""
           question:  ''
           comment:   ''
           status:    'passcode'
@@ -611,9 +611,11 @@ angular.module("Museum.controllers", [])
         }
         for i in [0..3]
           $scope.new_exhibit.stories[lang].quiz.answers.push
-            quiz:     "52472b44774dd1e650000069" # redefine!
+            quiz:     ""
             content:  ''
             correct:  false
+            _id:      i
+        $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true
 
       $scope.new_item_creation = true
       e = {}
@@ -622,9 +624,6 @@ angular.module("Museum.controllers", [])
 
       #hack to tile grid when adding an item to new line
       $scope.grid()    
-
-      # hack, cant find out what exactly happening and why new exhibit created before saving
-      # $scope.exhibits.splice $scope.exhibits.length-1, 1 
 
   $scope.check_selected = ->
     count = 0
@@ -776,11 +775,13 @@ angular.module("Museum.controllers", [])
       console.log 'error'
 
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
-    $http.put("#{$scope.backend_url}/story_set/#{$scope.current_museum._id}", $scope.current_museum).success (data) ->
-      console.log data
-      $scope.last_save_time = new Date()
-    .error ->
-      console.log 'fail'
+    if newValue
+      if $scope.current_museum._id
+        $http.put("#{$scope.backend_url}/story_set/#{$scope.current_museum._id}", $scope.current_museum).success (data) ->
+          console.log data
+          $scope.last_save_time = new Date()
+        .error ->
+          console.log 'fail'
 
   $scope.$on 'save_new_exhibit', ->
     console.log 'saving!'
@@ -802,6 +803,7 @@ angular.module("Museum.controllers", [])
       $scope.last_save_time = new Date()
     .error ->
       console.log 'fail'
+    $scope.forbid_switch  = false
 
   $scope.$on 'quiz_changes_to_save', (event, child_scope, correct_item) ->
     for sub_item in child_scope.collection
@@ -816,6 +818,7 @@ angular.module("Museum.controllers", [])
         $scope.last_save_time = new Date()
       .error ->
         console.log 'fail'
+    $scope.forbid_switch  = false
 ])
 
 .controller('DropDownController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', ($scope, $http, $filter, $window, $modal, storage, $rootScope) ->

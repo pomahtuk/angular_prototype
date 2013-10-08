@@ -73,9 +73,9 @@
           }
         };
       };
-      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "52490d0a0c80244085000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "52490d0a0c80244085000001";
-      $scope.backend_url = "http://192.168.216.128:3000";
+      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "5253db2f24ee39583e000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "5253db2f24ee39583e000001";
+      $scope.backend_url = "http://prototype.izi.travel";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -382,6 +382,7 @@
         new_story_link: '/1/1/1/'
       };
       $scope.element_switch = true;
+      $scope.forbid_switch = false;
       dropDown = $('#drop_down').removeClass('hidden').hide();
       findActive = function() {
         return $('ul.exhibits li.exhibit.active');
@@ -467,6 +468,10 @@
       $scope.open_dropdown = function(event, elem) {
         var clicked, delete_story, exhibit, item_publish_settings, number, previous, _i, _len, _ref;
         clicked = $(event.target).parents('li');
+        if ($scope.forbid_switch === true) {
+          event.stopPropagation();
+          return false;
+        }
         if (clicked.hasClass('active')) {
           $scope.closeDropDown();
           return false;
@@ -592,10 +597,10 @@
               name: '',
               short_description: '',
               long_description: '',
-              story_set: "52472b44774dd1e650000069"
+              story_set: ""
             };
             $scope.new_exhibit.stories[lang].quiz = {
-              story: "52472b44774dd1e650000069",
+              story: "",
               question: '',
               comment: '',
               status: 'passcode',
@@ -603,11 +608,13 @@
             };
             for (i = _i = 0; _i <= 3; i = ++_i) {
               $scope.new_exhibit.stories[lang].quiz.answers.push({
-                quiz: "52472b44774dd1e650000069",
+                quiz: "",
                 content: '',
-                correct: false
+                correct: false,
+                _id: i
               });
             }
+            $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true;
           }
           $scope.new_item_creation = true;
           e = {};
@@ -830,12 +837,16 @@
         });
       };
       $scope.$watch('current_museum.language', function(newValue, oldValue) {
-        return $http.put("" + $scope.backend_url + "/story_set/" + $scope.current_museum._id, $scope.current_museum).success(function(data) {
-          console.log(data);
-          return $scope.last_save_time = new Date();
-        }).error(function() {
-          return console.log('fail');
-        });
+        if (newValue) {
+          if ($scope.current_museum._id) {
+            return $http.put("" + $scope.backend_url + "/story_set/" + $scope.current_museum._id, $scope.current_museum).success(function(data) {
+              console.log(data);
+              return $scope.last_save_time = new Date();
+            }).error(function() {
+              return console.log('fail');
+            });
+          }
+        }
       });
       $scope.$on('save_new_exhibit', function() {
         console.log('saving!');
@@ -859,30 +870,30 @@
         return $scope.new_item_creation = false;
       });
       $scope.$on('changes_to_save', function(event, child_scope) {
-        return $http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
+        $http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
           child_scope.satus = 'done';
           return $scope.last_save_time = new Date();
         }).error(function() {
           return console.log('fail');
         });
+        return $scope.forbid_switch = false;
       });
       return $scope.$on('quiz_changes_to_save', function(event, child_scope, correct_item) {
-        var sign, sub_item, _i, _len, _ref, _results;
+        var sign, sub_item, _i, _len, _ref;
         _ref = child_scope.collection;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           sub_item = _ref[_i];
           sign = sub_item._id === correct_item._id ? true : false;
           sub_item.correct = sign;
           sub_item.correct_saved = sign;
-          _results.push($http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + sub_item._id, sub_item).success(function(data) {
+          $http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + sub_item._id, sub_item).success(function(data) {
             console.log(data);
             return $scope.last_save_time = new Date();
           }).error(function() {
             return console.log('fail');
-          }));
+          });
         }
-        return _results;
+        return $scope.forbid_switch = false;
       });
     }
   ]).controller('DropDownController', [

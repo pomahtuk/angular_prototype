@@ -113,9 +113,10 @@
         current_museum: '=ngMuseum',
         trans: '=translations',
         field: '@field',
-        field_type: '@type'
+        field_type: '@type',
+        root: '=root'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\">\n  <button class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n    <span class=\"caret\"></span>\n  </button>\n  <ul class=\"dropdown-menu status-select-dropdown\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li ng-click=\"item[field] = 'published'; status_process()\">\n    <span class=\"check\"><i ng-show=\"item[field] == 'published'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-globe\"></i> Everyone\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'passcode'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n    <li class=\"divider\"></li>\n    <li class=\"other_list\">\n      <span class=\"other_lang\" ng-click=\"hidden_list=!hidden_list\" stop-event=\"click\">Other languages</a>\n      <ul class=\"other\" ng-hide=\"hidden_list\">\n        <li ng-repeat=\"(name, story) in item.stories\" ng-switch on=\"story.status\">\n          <span class=\"col-lg-4\">{{trans[name]}} </span>\n          <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n          <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\">\n  <button class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-lock\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n    <span class=\"caret\"></span>\n  </button>\n  <ul class=\"dropdown-menu status-select-dropdown\" role=\"menu\">\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li ng-click=\"item[field] = 'published'; status_process()\">\n    <span class=\"check\"><i ng-show=\"item[field] == 'published'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-globe\"></i> Everyone\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'passcode'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-lock\"></i> Only users who have passcode\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n    <li class=\"divider\"></li>\n    <li class=\"other_list\">\n      <span class=\"other_lang\" ng-click=\"hidden_list=!hidden_list\" stop-event=\"click\">Other languages</a>\n      <ul class=\"other\" ng-hide=\"hidden_list\">\n        <li ng-repeat=\"(name, story) in root.stories\" ng-switch on=\"story.status\">\n          <span class=\"col-lg-4\">{{trans[name]}} </span>\n          <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n          <i class=\"icon-lock\" ng-switch-when=\"passcode\" ></i>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         return $scope.status_process = function() {
           var valid;
@@ -142,7 +143,7 @@
         field: '@field',
         field_type: '@type'
       },
-      template: "<div class=\"btn-group pull-right\">\n  <button class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\">\n    <div class=\"extra_right\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-user\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span class=\"caret\"></span></button>\n  <ul class=\"dropdown-menu pull-left\" role=\"menu\" >\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li  ng-click=\"item[field] = 'published'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'published'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-globe\"></i> Everyone\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'passcode'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-user\"></i> Only users who have passcode\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right\">\n  <button class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" type=\"button\">\n    <div class=\"extra_right\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ></i>\n      <i class=\"icon-lock\" ng-switch-when=\"passcode\" ></i>\n    </div>\n    <span class=\"caret\"></span></button>\n  <ul class=\"dropdown-menu pull-left\" role=\"menu\" >\n    Who can see it in mobile application\n    <li class=\"divider\"></li>\n    <li  ng-click=\"item[field] = 'published'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'published'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-globe\"></i> Everyone\n    </li>\n    <li ng-click=\"item[field] = 'passcode'; status_process()\">\n      <span class=\"check\"><i ng-show=\"item[field] == 'passcode'\" class=\"icon-ok\"></i></span>\n      <i class=\"icon-lock\"></i> Only users who have passcode\n      <div class=\"limited-pass-hint hidden\">\n        <div class=\"limited-pass\">\n          {{provider.passcode}}\n        </div>\n        <a href=\"{{provider.passcode_edit_link}}\" target=\"_blank\">Edit</a>\n      </div>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         return $scope.status_process = function() {
           var valid;
@@ -216,8 +217,20 @@
             if (elem.val() !== '') {
               triggered.hide();
               return trigger.show();
+            } else {
+              if (scope.field === 'name') {
+                return $timeout(function() {
+                  elem.val(scope.oldValue);
+                  scope.item[scope.field] = scope.oldValue;
+                  scope.$digest();
+                  return scope.status_process();
+                }, 0, false);
+              }
             }
           }
+        });
+        element.find('.triggered > .form-control').keyup(function() {
+          return true;
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           scope.status = '';
@@ -366,8 +379,6 @@
       },
       link: function(scope, element, attrs) {
         var trigger, triggered;
-        scope.edit_mode = false;
-        scope.empty_val = false;
         element = $(element);
         trigger = element.find('.trigger');
         triggered = element.find('.triggered');
@@ -402,10 +413,13 @@
         });
         scope.$watch('item.content', function(newValue, oldValue) {
           if (!newValue) {
-            scope.edit_mode = true;
-            return scope.empty_val = true;
+            trigger.hide();
+            return triggered.show();
           } else {
-            return scope.empty_val = false;
+            if (scope.$parent.$parent.element_switch === true) {
+              trigger.show();
+              return triggered.hide();
+            }
           }
         });
         return scope.$watch('item.correct_saved', function(newValue, oldValue) {
@@ -574,11 +588,13 @@
           $(".progress").hide();
           return setTimeout(function() {
             $("body").removeClass("in");
-            return scope.$parent.$parent.loading_in_progress = false;
+            scope.$parent.$parent.loading_in_progress = false;
+            return scope.$parent.$parent.forbid_switch = false;
           }, 1000);
         };
         initiate_progress = function() {
           scope.$parent.$parent.loading_in_progress = true;
+          scope.$parent.$parent.forbid_switch = true;
           scope.$digest();
           $("body").addClass("in");
           $(".progress .progress-bar").css("width", 0 + "%");
@@ -648,6 +664,7 @@
             progress = parseInt(data.loaded / data.total * 100, 10);
             $(".progress .progress-bar").css("width", progress + "%");
             if (data.loaded === data.total) {
+              scope.$parent.$parent.last_save_time = new Date();
               return hide_drop_area();
             }
           }
@@ -693,28 +710,23 @@
               url: elem.data('link'),
               type: elem.data('method'),
               success: function(data) {
-                var image, index, _i, _len, _ref, _results;
+                var image, index, _i, _len, _ref;
                 if (scope.media.type === 'image') {
                   _ref = scope.model.images;
-                  _results = [];
                   for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
                     image = _ref[index];
                     if (image != null) {
                       if (image._id === data) {
                         scope.$apply(scope.model.images.splice(index, 1));
-                        _results.push(scope.$digest());
-                      } else {
-                        _results.push(void 0);
+                        scope.$digest();
                       }
-                    } else {
-                      _results.push(void 0);
                     }
                   }
-                  return _results;
                 } else if (scope.media.type === 'audio') {
                   scope.model.audio = void 0;
-                  return scope.$digest();
+                  scope.$digest();
                 }
+                return scope.$parent.$parent.last_save_time = new Date();
               }
             });
           }
