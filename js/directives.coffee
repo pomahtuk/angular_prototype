@@ -217,7 +217,7 @@ angular.module("Museum.directives", [])
         <span class="placeholder" ng-click="update_old()">{{item[field]}}</span>
       </div>
       <div class="col-xs-6 triggered">
-        <input type="hidden" id="original_{{id}}" ng-model="item[field]" required">
+        <input type="hidden" id="original_{{id}}" ng-model="item[field]" required>
         <input type="text" class="form-control" id="{{id}}" value="{{item[field]}}" placeholder="{{placeholder}}">
         <div class="error_text {{field}}" >can't be blank</div>
       </div>
@@ -277,7 +277,6 @@ angular.module("Museum.directives", [])
     scope.$watch 'item[field]', (newValue, oldValue) ->
       scope.status = ''
       unless newValue
-        console.log 'hiding', scope.field
         trigger.hide()
         triggered.show()
         if scope.filed is 'name'
@@ -465,7 +464,6 @@ angular.module("Museum.directives", [])
         trigger.hide()
         triggered.show()
       else
-        console.log scope.$parent.$parent.element_switch
         if scope.$parent.$parent.element_switch is true
           trigger.show()
           triggered.hide()

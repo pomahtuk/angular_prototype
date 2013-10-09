@@ -41,6 +41,8 @@ angular.module("Museum.controllers", [])
 
   $scope.exhibit_search = ''
 
+  # $scope.route_params = $routeParams
+
   $scope.criteriaMatch = ( criteria ) ->
     ( item ) ->
       if item.stories[$scope.current_museum.language].name
@@ -53,13 +55,13 @@ angular.module("Museum.controllers", [])
   museum_id = if $routeParams.museum_id?
     $routeParams.museum_id
   else
-    "52490d0a0c80244085000002"
+    "524a0bd2c4e48d499c000002"
     # "5253db2f24ee39583e000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    "52490d0a0c80244085000001"
+    "524a0bd2c4e48d499c000001"
     # "5253db2f24ee39583e000001"
 
   $scope.backend_url = "http://192.168.216.128:3000"
@@ -72,8 +74,9 @@ angular.module("Museum.controllers", [])
 
   $scope.reload_exhibits = (sort_field, sort_direction) ->
     # $http.get("#{$scope.backend_url}/provider/524c2a72856ee97345000001/museums/524c2a72856ee97345000002/exhibits").success (data) ->
-    ngProgress.color('#fd6e3b')
-    ngProgress.start()
+    # ngProgress.color('#fd6e3b')
+    # ngProgress.start()
+    console.log museum_id
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
       exhibits = []
       for item in data
@@ -92,15 +95,105 @@ angular.module("Museum.controllers", [])
       $scope.exhibits = exhibits
       $scope.active_exhibit =  $scope.exhibits[0]
       $scope.ajax_progress  = false
+      if exhibits.length is 0
+        $scope.active_exhibit = {
+          index: 0
+          name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+          number: '1'
+          image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+          thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+          publish_state: 'all'
+          description: ''
+          qr_code: {
+            url: '/img/qr_code.png'
+            print_link: 'http://localhost:8000/img/qr_code.png'
+          }
+          images: [
+            {
+              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+              id: 1
+              edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+            }
+            {
+              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+              id: 2
+              edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+            }
+          ]
+          stories: {
+            ru: {
+              name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+              description: 'test description'
+              publish_state: 'all'
+              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+              quiz: {
+                question: 'are you sure?'
+                description: 'can you tell me?'
+                state: 'published'
+                answers: [
+                  {
+                    title: 'yes'
+                    correct: false
+                    id: 0
+                  }
+                  {
+                    title: 'may be'
+                    correct: true
+                    id: 1
+                  }
+                  {
+                    title: 'who cares?'
+                    correct: false
+                    id: 2
+                  }
+                  {
+                    title: 'nope'
+                    correct: false
+                    id: 3
+                  }
+                ]
+              }
+            }
+          }
+        }
 
-  $scope.reload_museums = () ->
-    # ngProgress.color('#fd6e3b')
-    # ngProgress.start()
+  $scope.reload_museums = (sort_field, sort_direction) ->
+    ngProgress.color('#fd6e3b')
+    ngProgress.start()
+    $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums").success (data) ->
+      $scope.museums = []
+      found = false
+      for item in data
+        museum = item.exhibit
+        museum.def_lang = "ru"
+        museum.language = "ru"
+        museum.package_status = "process"
+        museum.stories = {}
+        for story in item.stories
+          story.story.city = "Saint-Petersburg"
+          story.story.quiz = story.quiz.quiz
+          story.story.images = story.images
+          story.story.audio = story.audio
+          story.story.quiz.answers = story.quiz.answers
+          museum.stories[story.story.language] = story.story
+        $scope.museums.push museum
+        if museum._id is museum_id
+          $scope.current_museum = museum
+          found = true
+      unless found
+        $scope.current_museum = $scope.museums[0]
+        $scope.current_museum.def_lang = "ru"
+        $scope.current_museum.language = "ru"
+        museum_id = $scope.current_museum._id
+      $scope.reload_exhibits $scope.sort_field, $scope.sort_direction
+
+  $scope.reload_museum = () ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}").success (data) ->
       museum = data.exhibit
       museum.def_lang = "ru"
       museum.language = "ru"
-      # museum.images = data.images
       museum.stories = {}
       for story in data.stories
         story.story.quiz = story.quiz.quiz
@@ -108,14 +201,9 @@ angular.module("Museum.controllers", [])
         story.story.images = story.images
         story.story.audio = story.audio
         museum.stories[story.story.language] = story.story
-      console.log museum
       $scope.current_museum = museum
-      # ngProgress.complete()
-      # $scope.ajax_progress  = false
 
   $scope.reload_museums()
-
-  $scope.reload_exhibits($scope.sort_field, $scope.sort_direction)
 
   $scope.museums = [
     {
@@ -835,7 +923,8 @@ angular.module("Museum.controllers", [])
 
   $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz', (newValue, oldValue) ->
     if newValue.status is 'published'
-      if $("#story_quiz_enabled").is(':checked')
+      console.log 'pub'
+      unless $("#story_quiz_enabled").is(':checked')
         setTimeout ->
           unless $scope.quizform.$valid
             setTimeout ->
@@ -920,6 +1009,18 @@ angular.module("Museum.controllers", [])
         $http.get("#{$scope.$parent.backend_url}/qr_code/#{$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id}").success (d) ->
           $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d
   , true
+
+  # $rootScope.$on "$locationChangeStart", (event, next, current) ->
+  #   next = next.split('/')
+  #   next = next[next.length-1]
+  #   console.log next
+  #   if next.length isnt ''
+  #     $scope.$apply $scope.museum_id = next
+
+
+  # $scope.$watch 'museum_id', (newValue, oldValue) ->
+  #   $scope.reload_museums()
+  # , true
 
   true
 

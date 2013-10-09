@@ -65,13 +65,13 @@ html lang="en" ng-app="Museum"
 
           li.museum ng-repeat='museum in museums | filter:museum_search | filter:{type:museum_type_filter}'
             a href="#"
-              span class="package_status {{museum.packege_status}}"
-                i ng-class="{'icon-ok-sign':museum.packege_status=='generated', 'icon-refresh':museum.packege_status=='process'}"
-              img src="{{museum.image}}"
+              span class="package_status {{museum.stories.ru.package_status}}"
+                i ng-class="{'icon-ok-sign':museum.package_status=='generated', 'icon-refresh':museum.package_status=='process'}"
+              img src="{{museum.stories.ru.images[0].thumbnailUrl}}"
               h4 
-                | {{museum.name}}, 
+                | {{museum.stories.ru.name}}, 
                 span 
-                  | {{museum.city}}
+                  | {{museum.stories.ru.city}}
 
       .navbar.navbar-default ng-mouseover="show_museum_edit_dropdown=true"
         .left_content

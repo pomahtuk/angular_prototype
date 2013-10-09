@@ -45,9 +45,9 @@
         </div>
         <ul class="museum_list row">
           <li class="museum" ng-repeat="museum in museums | filter:museum_search | filter:{type:museum_type_filter}">
-            <a href="#"><span class="package_status {{museum.packege_status}}"><i ng-class="{&#39;icon-ok-sign&#39;:museum.packege_status==&#39;generated&#39;, &#39;icon-refresh&#39;:museum.packege_status==&#39;process&#39;}"></i></span><img src="{{museum.image}}">
+            <a href="#"><span class="package_status {{museum.stories.ru.package_status}}"><i ng-class="{&#39;icon-ok-sign&#39;:museum.package_status==&#39;generated&#39;, &#39;icon-refresh&#39;:museum.package_status==&#39;process&#39;}"></i></span><img src="{{museum.stories.ru.images[0].thumbnailUrl}}">
               <h4>
-                {{museum.name}}, <span>{{museum.city}}</span>
+                {{museum.stories.ru.name}}, <span>{{museum.stories.ru.city}}</span>
               </h4>
             </a>
           </li>

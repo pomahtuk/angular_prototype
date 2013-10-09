@@ -73,16 +73,15 @@
           }
         };
       };
-      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "52490d0a0c80244085000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "52490d0a0c80244085000001";
+      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "524a0bd2c4e48d499c000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "524a0bd2c4e48d499c000001";
       $scope.backend_url = "http://192.168.216.128:3000";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
       $scope.ajax_progress = true;
       $scope.reload_exhibits = function(sort_field, sort_direction) {
-        ngProgress.color('#fd6e3b');
-        ngProgress.start();
+        console.log(museum_id);
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
           exhibits = [];
@@ -104,10 +103,109 @@
           ngProgress.complete();
           $scope.exhibits = exhibits;
           $scope.active_exhibit = $scope.exhibits[0];
-          return $scope.ajax_progress = false;
+          $scope.ajax_progress = false;
+          if (exhibits.length === 0) {
+            return $scope.active_exhibit = {
+              index: 0,
+              name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+              number: '1',
+              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+              publish_state: 'all',
+              description: '',
+              qr_code: {
+                url: '/img/qr_code.png',
+                print_link: 'http://localhost:8000/img/qr_code.png'
+              },
+              images: [
+                {
+                  image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+                  thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+                  id: 1,
+                  edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+                }, {
+                  image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+                  thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+                  id: 2,
+                  edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+                }
+              ],
+              stories: {
+                ru: {
+                  name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+                  description: 'test description',
+                  publish_state: 'all',
+                  audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
+                  quiz: {
+                    question: 'are you sure?',
+                    description: 'can you tell me?',
+                    state: 'published',
+                    answers: [
+                      {
+                        title: 'yes',
+                        correct: false,
+                        id: 0
+                      }, {
+                        title: 'may be',
+                        correct: true,
+                        id: 1
+                      }, {
+                        title: 'who cares?',
+                        correct: false,
+                        id: 2
+                      }, {
+                        title: 'nope',
+                        correct: false,
+                        id: 3
+                      }
+                    ]
+                  }
+                }
+              }
+            };
+          }
         });
       };
-      $scope.reload_museums = function() {
+      $scope.reload_museums = function(sort_field, sort_direction) {
+        ngProgress.color('#fd6e3b');
+        ngProgress.start();
+        return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
+          var found, item, museum, story, _i, _j, _len, _len1, _ref;
+          $scope.museums = [];
+          found = false;
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            item = data[_i];
+            museum = item.exhibit;
+            museum.def_lang = "ru";
+            museum.language = "ru";
+            museum.package_status = "process";
+            museum.stories = {};
+            _ref = item.stories;
+            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+              story = _ref[_j];
+              story.story.city = "Saint-Petersburg";
+              story.story.quiz = story.quiz.quiz;
+              story.story.images = story.images;
+              story.story.audio = story.audio;
+              story.story.quiz.answers = story.quiz.answers;
+              museum.stories[story.story.language] = story.story;
+            }
+            $scope.museums.push(museum);
+            if (museum._id === museum_id) {
+              $scope.current_museum = museum;
+              found = true;
+            }
+          }
+          if (!found) {
+            $scope.current_museum = $scope.museums[0];
+            $scope.current_museum.def_lang = "ru";
+            $scope.current_museum.language = "ru";
+            museum_id = $scope.current_museum._id;
+          }
+          return $scope.reload_exhibits($scope.sort_field, $scope.sort_direction);
+        });
+      };
+      $scope.reload_museum = function() {
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id).success(function(data) {
           var museum, story, _i, _len, _ref;
           museum = data.exhibit;
@@ -123,12 +221,10 @@
             story.story.audio = story.audio;
             museum.stories[story.story.language] = story.story;
           }
-          console.log(museum);
           return $scope.current_museum = museum;
         });
       };
       $scope.reload_museums();
-      $scope.reload_exhibits($scope.sort_field, $scope.sort_direction);
       $scope.museums = [
         {
           name: 'Imperial Peace Museum',
@@ -912,7 +1008,8 @@
     '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', function($scope, $http, $filter, $window, $modal, storage, $rootScope) {
       $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language].quiz', function(newValue, oldValue) {
         if (newValue.status === 'published') {
-          if ($("#story_quiz_enabled").is(':checked')) {
+          console.log('pub');
+          if (!$("#story_quiz_enabled").is(':checked')) {
             return setTimeout(function() {
               if (!$scope.quizform.$valid) {
                 return setTimeout(function() {
