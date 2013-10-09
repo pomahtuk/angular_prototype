@@ -73,9 +73,9 @@
           }
         };
       };
-      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "5253db2f24ee39583e000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "5253db2f24ee39583e000001";
-      $scope.backend_url = "http://prototype.izi.travel";
+      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "52490d0a0c80244085000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "52490d0a0c80244085000001";
+      $scope.backend_url = "http://192.168.216.128:3000";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -476,6 +476,11 @@
           $scope.closeDropDown();
           return false;
         }
+        if ($scope.new_item_creation) {
+          if (findActive().length > 0) {
+            $scope.closeDropDown();
+          }
+        }
         _ref = $scope.exhibits;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           exhibit = _ref[_i];
@@ -485,6 +490,9 @@
         }
         elem.active = true;
         $scope.element_switch = true;
+        setTimeout(function() {
+          return $scope.element_switch = false;
+        }, 200);
         $scope.active_exhibit = elem;
         previous = findActive();
         if (previous.hasClass('dummy')) {
@@ -652,86 +660,90 @@
       };
       $scope.delete_modal_open = function() {
         var ModalDeleteInstance;
-        $scope.modal_options = {
-          current_language: {
-            name: $scope.translations[$scope.current_museum.language],
-            language: $scope.current_museum.language
-          },
-          languages: $scope.current_museum.stories
-        };
-        ModalDeleteInstance = $modal.open({
-          templateUrl: "myModalContent.html",
-          controller: ModalDeleteInstanceCtrl,
-          resolve: {
-            modal_options: function() {
-              return $scope.modal_options;
-            }
-          }
-        });
-        return ModalDeleteInstance.result.then((function(selected) {
-          var exhibit, index, item, st_index, story, _i, _len, _ref, _ref1, _results, _results1;
-          $scope.selected = selected;
-          if (Object.keys($scope.active_exhibit.stories).length === selected.length) {
-            $scope.closeDropDown();
-            _ref = $scope.exhibits;
-            _results = [];
-            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-              exhibit = _ref[index];
-              if (exhibit._id === $scope.active_exhibit._id) {
-                $scope.exhibits.splice(index, 1);
-                $scope.grid();
-                $http["delete"]("" + $scope.backend_url + "/story_set/" + $scope.active_exhibit._id + "/").success(function(data) {
-                  console.log(data);
-                  return $scope.active_exhibit = $scope.exhibits[0];
-                }).error(function() {
-                  return console.log('error');
-                });
-                break;
-              } else {
-                _results.push(void 0);
+        if (!$scope.new_item_creation) {
+          $scope.modal_options = {
+            current_language: {
+              name: $scope.translations[$scope.current_museum.language],
+              language: $scope.current_museum.language
+            },
+            languages: $scope.current_museum.stories
+          };
+          ModalDeleteInstance = $modal.open({
+            templateUrl: "myModalContent.html",
+            controller: ModalDeleteInstanceCtrl,
+            resolve: {
+              modal_options: function() {
+                return $scope.modal_options;
               }
             }
-            return _results;
-          } else {
-            _ref1 = $scope.active_exhibit.stories;
-            _results1 = [];
-            for (st_index in _ref1) {
-              story = _ref1[st_index];
-              _results1.push((function() {
-                var _j, _len1, _results2;
-                _results2 = [];
-                for (_j = 0, _len1 = selected.length; _j < _len1; _j++) {
-                  item = selected[_j];
-                  if (item === st_index) {
-                    story = $scope.active_exhibit.stories[st_index];
-                    story.status = 'dummy';
-                    story.name = '';
-                    story.short_description = '';
-                    story.long_description = '';
-                    story.quiz.question = '';
-                    story.quiz.comment = '';
-                    story.quiz.status = '';
-                    story.quiz.answers[0].content = '';
-                    story.quiz.answers[0].correct = true;
-                    story.quiz.answers[1].content = '';
-                    story.quiz.answers[1].correct = false;
-                    story.quiz.answers[2].content = '';
-                    story.quiz.answers[2].correct = false;
-                    story.quiz.answers[3].content = '';
-                    story.quiz.answers[3].correct = false;
-                    _results2.push($scope.update_story(story));
-                  } else {
-                    _results2.push(void 0);
-                  }
+          });
+          return ModalDeleteInstance.result.then((function(selected) {
+            var exhibit, index, item, st_index, story, _i, _len, _ref, _ref1, _results, _results1;
+            $scope.selected = selected;
+            if (Object.keys($scope.active_exhibit.stories).length === selected.length) {
+              $scope.closeDropDown();
+              _ref = $scope.exhibits;
+              _results = [];
+              for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                exhibit = _ref[index];
+                if (exhibit._id === $scope.active_exhibit._id) {
+                  $scope.exhibits.splice(index, 1);
+                  $scope.grid();
+                  $http["delete"]("" + $scope.backend_url + "/story_set/" + $scope.active_exhibit._id + "/").success(function(data) {
+                    console.log(data);
+                    return $scope.active_exhibit = $scope.exhibits[0];
+                  }).error(function() {
+                    return console.log('error');
+                  });
+                  break;
+                } else {
+                  _results.push(void 0);
                 }
-                return _results2;
-              })());
+              }
+              return _results;
+            } else {
+              _ref1 = $scope.active_exhibit.stories;
+              _results1 = [];
+              for (st_index in _ref1) {
+                story = _ref1[st_index];
+                _results1.push((function() {
+                  var _j, _len1, _results2;
+                  _results2 = [];
+                  for (_j = 0, _len1 = selected.length; _j < _len1; _j++) {
+                    item = selected[_j];
+                    if (item === st_index) {
+                      story = $scope.active_exhibit.stories[st_index];
+                      story.status = 'dummy';
+                      story.name = '';
+                      story.short_description = '';
+                      story.long_description = '';
+                      story.quiz.question = '';
+                      story.quiz.comment = '';
+                      story.quiz.status = '';
+                      story.quiz.answers[0].content = '';
+                      story.quiz.answers[0].correct = true;
+                      story.quiz.answers[1].content = '';
+                      story.quiz.answers[1].correct = false;
+                      story.quiz.answers[2].content = '';
+                      story.quiz.answers[2].correct = false;
+                      story.quiz.answers[3].content = '';
+                      story.quiz.answers[3].correct = false;
+                      _results2.push($scope.update_story(story));
+                    } else {
+                      _results2.push(void 0);
+                    }
+                  }
+                  return _results2;
+                })());
+              }
+              return _results1;
             }
-            return _results1;
-          }
-        }), function() {
-          return console.log("Modal dismissed at: " + new Date());
-        });
+          }), function() {
+            return console.log("Modal dismissed at: " + new Date());
+          });
+        } else {
+          return true;
+        }
       };
       $scope.dummy_modal_open = function() {
         var ModalDummyInstance;
@@ -952,13 +964,6 @@
               }
             }
           }
-        }
-      });
-      $scope.$watch('$parent.element_switch', function(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          return setTimeout(function() {
-            return $scope.$parent.element_switch = false;
-          }, 100);
         }
       });
       $scope.$watch('$parent.active_exhibit.number', function(newValue, oldValue) {

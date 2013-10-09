@@ -59,7 +59,13 @@ angular.module("Museum.directives", [])
   link: (scope, element, attr) ->
     elem = $ element
     elem.click ->
-      $('.filters_bar').slideToggle(200)
+      filters = $('.filters_bar')
+      # actions = $('.actions_bar')
+      margin = filters.css('top')
+      if margin is '0px'
+        filters.animate {'top': '-44px'}, 300
+      else
+        filters.animate {'top': '0px'}, 300
       scope.filters_opened = !scope.filters_opened
       scope.$digest()
       setTimeout ->
@@ -241,26 +247,28 @@ angular.module("Museum.directives", [])
     element.find('span.placeholder').click ->
       trigger.hide()
       triggered.show().children('.form-control').focus()
+      element.find('.triggered > .form-control').removeClass 'ng-invalid'
 
     element.find('.triggered > .form-control').blur ->  
       elem = $ @
-      unless (scope.$parent.$parent.new_item_creation && scope.field is 'number')
-        $timeout ->
-          scope.item[scope.field] = elem.val()
-          scope.$digest()
-          scope.status_process()
-        , 0, false
-        if elem.val() isnt ''
-          triggered.hide()
-          trigger.show()
-        else
-          if scope.field is 'name'
-            $timeout ->
-              elem.val scope.oldValue
-              scope.item[scope.field] = scope.oldValue
-              scope.$digest()
-              scope.status_process()
-            , 0, false
+      # unless (scope.$parent.$parent.new_item_creation && scope.field is 'number')
+      $timeout ->
+        scope.item[scope.field] = elem.val()
+        scope.$digest()
+        scope.status_process()
+      , 0, false
+      if elem.val() isnt ''
+        triggered.hide()
+        trigger.show()
+      else
+        elem.addClass 'ng-invalid'
+        if scope.field is 'name'
+          $timeout ->
+            elem.val scope.oldValue
+            scope.item[scope.field] = scope.oldValue
+            scope.$digest()
+            scope.status_process()
+          , 0, false
 
     element.find('.triggered > .form-control').keyup ->  
       true
@@ -309,9 +317,6 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <span class="sumbols_left">
-        {{length_text}}
-      </span>
       <div class="col-lg-6 trigger">
         <span class="placeholder large" ng-click="update_old()">{{item[field]}}</span>
       </div>
@@ -319,6 +324,9 @@ angular.module("Museum.directives", [])
         <input type="hidden" id="original_{{id}}" ng-model="item[field]" required">
         <textarea class="form-control" id="{{id}}" placeholder="{{placeholder}}">{{item[field]}}</textarea>
       </div>
+      <span class="sumbols_left">
+        {{length_text}}
+      </span>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
   """ 
@@ -399,7 +407,7 @@ angular.module("Museum.directives", [])
   template: """
     <div class="form-group textfield string optional checkbox_added">
       <label class="string optional control-label col-xs-2" for="{{id}}">
-        <span class='correct_answer_indicator' ng-show="item.correct_saved">correct</span>
+        <span class='correct_answer_indicator'>correct</span>
       </label>
       <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item._id}}" ng-model="checked" ng-click="check_items(item)">
       <div class="col-xs-5 trigger">
@@ -433,6 +441,7 @@ angular.module("Museum.directives", [])
     element = $ element
     trigger = element.find('.trigger')
     triggered = element.find('.triggered')
+    indicator = element.find('.correct_answer_indicator')
 
     element.find('span.placeholder').click ->
       trigger.hide()
@@ -456,13 +465,16 @@ angular.module("Museum.directives", [])
         trigger.hide()
         triggered.show()
       else
+        console.log scope.$parent.$parent.element_switch
         if scope.$parent.$parent.element_switch is true
           trigger.show()
           triggered.hide()
 
     scope.$watch 'item.correct_saved', (newValue, oldValue) ->
       if newValue is true
+        indicator.show()
         setTimeout ->
+          indicator.hide()
           scope.$apply scope.item.correct_saved = false
         , 1000
 
@@ -567,7 +579,7 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="triggered" ng-show="edit_mode">
-        <a href="#" class="btn btn-default" button-file-upload="">Upload a file</a>
+        <a href="#" class="btn btn-default" button-file-upload="">Upload a file</a> or drag an audio here
       </div>
       <status-indicator ng-binding="item" ng-field="field"></statusIndicator>
     </div>
@@ -852,6 +864,8 @@ angular.module("Museum.directives", [])
         form.removeClass 'has_error'
       else
         form.addClass 'has_error'
+        question = form.find('#story_quiz_attributes_question, #museum_story_quiz_attributes_question')
+        question.addClass 'ng-invalid' if question.val() is ''
       true
 
   link: (scope, element, attrs) ->

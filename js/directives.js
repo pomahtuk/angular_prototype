@@ -82,7 +82,18 @@
         var elem;
         elem = $(element);
         return elem.click(function() {
-          $('.filters_bar').slideToggle(200);
+          var filters, margin;
+          filters = $('.filters_bar');
+          margin = filters.css('top');
+          if (margin === '0px') {
+            filters.animate({
+              'top': '-44px'
+            }, 300);
+          } else {
+            filters.animate({
+              'top': '0px'
+            }, 300);
+          }
           scope.filters_opened = !scope.filters_opened;
           scope.$digest();
           return setTimeout(function() {
@@ -203,29 +214,29 @@
         triggered = element.find('.triggered');
         element.find('span.placeholder').click(function() {
           trigger.hide();
-          return triggered.show().children('.form-control').focus();
+          triggered.show().children('.form-control').focus();
+          return element.find('.triggered > .form-control').removeClass('ng-invalid');
         });
         element.find('.triggered > .form-control').blur(function() {
           var elem;
           elem = $(this);
-          if (!(scope.$parent.$parent.new_item_creation && scope.field === 'number')) {
-            $timeout(function() {
-              scope.item[scope.field] = elem.val();
-              scope.$digest();
-              return scope.status_process();
-            }, 0, false);
-            if (elem.val() !== '') {
-              triggered.hide();
-              return trigger.show();
-            } else {
-              if (scope.field === 'name') {
-                return $timeout(function() {
-                  elem.val(scope.oldValue);
-                  scope.item[scope.field] = scope.oldValue;
-                  scope.$digest();
-                  return scope.status_process();
-                }, 0, false);
-              }
+          $timeout(function() {
+            scope.item[scope.field] = elem.val();
+            scope.$digest();
+            return scope.status_process();
+          }, 0, false);
+          if (elem.val() !== '') {
+            triggered.hide();
+            return trigger.show();
+          } else {
+            elem.addClass('ng-invalid');
+            if (scope.field === 'name') {
+              return $timeout(function() {
+                elem.val(scope.oldValue);
+                scope.item[scope.field] = scope.oldValue;
+                scope.$digest();
+                return scope.status_process();
+              }, 0, false);
             }
           }
         });
@@ -266,7 +277,7 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield large_field\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <span class=\"sumbols_left\">\n    {{length_text}}\n  </span>\n  <div class=\"col-lg-6 trigger\">\n    <span class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required\">\n    <textarea class=\"form-control\" id=\"{{id}}\" placeholder=\"{{placeholder}}\">{{item[field]}}</textarea>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield large_field\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-lg-6 trigger\">\n    <span class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-lg-6 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required\">\n    <textarea class=\"form-control\" id=\"{{id}}\" placeholder=\"{{placeholder}}\">{{item[field]}}</textarea>\n  </div>\n  <span class=\"sumbols_left\">\n    {{length_text}}\n  </span>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -354,7 +365,7 @@
         field: '@field',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator' ng-show=\"item.correct_saved\">correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator'>correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -378,10 +389,11 @@
         };
       },
       link: function(scope, element, attrs) {
-        var trigger, triggered;
+        var indicator, trigger, triggered;
         element = $(element);
         trigger = element.find('.trigger');
         triggered = element.find('.triggered');
+        indicator = element.find('.correct_answer_indicator');
         element.find('span.placeholder').click(function() {
           trigger.hide();
           return triggered.show().children().first().focus();
@@ -416,6 +428,7 @@
             trigger.hide();
             return triggered.show();
           } else {
+            console.log(scope.$parent.$parent.element_switch);
             if (scope.$parent.$parent.element_switch === true) {
               trigger.show();
               return triggered.hide();
@@ -424,7 +437,9 @@
         });
         return scope.$watch('item.correct_saved', function(newValue, oldValue) {
           if (newValue === true) {
+            indicator.show();
             return setTimeout(function() {
+              indicator.hide();
               return scope.$apply(scope.item.correct_saved = false);
             }, 1000);
           }
@@ -475,7 +490,7 @@
         field: '@ngField',
         parent: '=parent'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">Audio</label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-6 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"dropdown\">\n          <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\" role=\"menu\">\n            <li role=\"presentation\">\n              <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n            </li>\n            <li role=\"presentation\">\n              <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n            </li>\n            <li role=\"presentation\">\n              <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode\">\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Upload a file</a>\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">Audio</label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-6 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"dropdown\">\n          <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\" role=\"menu\">\n            <li role=\"presentation\">\n              <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n            </li>\n            <li role=\"presentation\">\n              <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n            </li>\n            <li role=\"presentation\">\n              <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode\">\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Upload a file</a> or drag an audio here\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
         element = $(element);
@@ -806,12 +821,16 @@
           return true;
         };
         return $scope.mark_quiz_validity = function(valid) {
-          var form;
+          var form, question;
           form = $("#" + selector + " form");
           if (valid) {
             form.removeClass('has_error');
           } else {
             form.addClass('has_error');
+            question = form.find('#story_quiz_attributes_question, #museum_story_quiz_attributes_question');
+            if (question.val() === '') {
+              question.addClass('ng-invalid');
+            }
           }
           return true;
         };

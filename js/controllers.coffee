@@ -53,17 +53,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $routeParams.museum_id?
     $routeParams.museum_id
   else
-    # "52490d0a0c80244085000002"
-    "5253db2f24ee39583e000002"
+    "52490d0a0c80244085000002"
+    # "5253db2f24ee39583e000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    # "52490d0a0c80244085000001"
-    "5253db2f24ee39583e000001"
+    "52490d0a0c80244085000001"
+    # "5253db2f24ee39583e000001"
 
-  # $scope.backend_url = "http://192.168.216.128:3000"
-  $scope.backend_url = "http://prototype.izi.travel"
+  $scope.backend_url = "http://192.168.216.128:3000"
+  # $scope.backend_url = "http://prototype.izi.travel"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -478,12 +478,19 @@ angular.module("Museum.controllers", [])
       $scope.closeDropDown()
       return false
 
+    if $scope.new_item_creation
+      if findActive().length > 0
+        $scope.closeDropDown()
+
     for exhibit in $scope.exhibits
       if exhibit?
         exhibit.active = false
 
     elem.active = true
     $scope.element_switch = true
+    setTimeout ->
+      $scope.element_switch = false
+    , 200
     $scope.active_exhibit = elem
 
     previous = findActive()
@@ -643,56 +650,59 @@ angular.module("Museum.controllers", [])
     $scope.select_all_enabled = sign
 
   $scope.delete_modal_open = ->
-    $scope.modal_options = {
-      current_language: 
-        name: $scope.translations[$scope.current_museum.language]
-        language: $scope.current_museum.language
-      languages: $scope.current_museum.stories
-    }
-    ModalDeleteInstance = $modal.open(
-      templateUrl: "myModalContent.html"
-      controller: ModalDeleteInstanceCtrl
-      resolve:
-        modal_options: ->
-          $scope.modal_options
-    )
-    ModalDeleteInstance.result.then ((selected) ->
-      $scope.selected = selected
-      if Object.keys($scope.active_exhibit.stories).length is selected.length
-        $scope.closeDropDown()
-        for exhibit, index in $scope.exhibits
-          if exhibit._id is $scope.active_exhibit._id
-            $scope.exhibits.splice index, 1
-            $scope.grid()
-            $http.delete("#{$scope.backend_url}/story_set/#{$scope.active_exhibit._id}/").success (data) ->
-              console.log data
-              $scope.active_exhibit = $scope.exhibits[0]
-            .error ->
-              console.log 'error'
-            break
-      else
-        for st_index, story of $scope.active_exhibit.stories
-          for item in selected
-            if item is st_index
-              story = $scope.active_exhibit.stories[st_index]
-              story.status = 'dummy'
-              story.name = ''
-              story.short_description = ''
-              story.long_description = ''
-              story.quiz.question = ''
-              story.quiz.comment = ''
-              story.quiz.status = ''
-              story.quiz.answers[0].content = ''
-              story.quiz.answers[0].correct = true
-              story.quiz.answers[1].content = ''
-              story.quiz.answers[1].correct = false
-              story.quiz.answers[2].content = ''
-              story.quiz.answers[2].correct = false
-              story.quiz.answers[3].content = ''
-              story.quiz.answers[3].correct = false
-              $scope.update_story(story)
-    ), ->
-      console.log "Modal dismissed at: " + new Date()
+    unless $scope.new_item_creation
+      $scope.modal_options = {
+        current_language: 
+          name: $scope.translations[$scope.current_museum.language]
+          language: $scope.current_museum.language
+        languages: $scope.current_museum.stories
+      }
+      ModalDeleteInstance = $modal.open(
+        templateUrl: "myModalContent.html"
+        controller: ModalDeleteInstanceCtrl
+        resolve:
+          modal_options: ->
+            $scope.modal_options
+      )
+      ModalDeleteInstance.result.then ((selected) ->
+        $scope.selected = selected
+        if Object.keys($scope.active_exhibit.stories).length is selected.length
+          $scope.closeDropDown()
+          for exhibit, index in $scope.exhibits
+            if exhibit._id is $scope.active_exhibit._id
+              $scope.exhibits.splice index, 1
+              $scope.grid()
+              $http.delete("#{$scope.backend_url}/story_set/#{$scope.active_exhibit._id}/").success (data) ->
+                console.log data
+                $scope.active_exhibit = $scope.exhibits[0]
+              .error ->
+                console.log 'error'
+              break
+        else
+          for st_index, story of $scope.active_exhibit.stories
+            for item in selected
+              if item is st_index
+                story = $scope.active_exhibit.stories[st_index]
+                story.status = 'dummy'
+                story.name = ''
+                story.short_description = ''
+                story.long_description = ''
+                story.quiz.question = ''
+                story.quiz.comment = ''
+                story.quiz.status = ''
+                story.quiz.answers[0].content = ''
+                story.quiz.answers[0].correct = true
+                story.quiz.answers[1].content = ''
+                story.quiz.answers[1].correct = false
+                story.quiz.answers[2].content = ''
+                story.quiz.answers[2].correct = false
+                story.quiz.answers[3].content = ''
+                story.quiz.answers[3].correct = false
+                $scope.update_story(story)
+      ), ->
+        console.log "Modal dismissed at: " + new Date()
+    else
+      true
 
   $scope.dummy_modal_open = ->
     ModalDummyInstance = $modal.open(
@@ -871,11 +881,13 @@ angular.module("Museum.controllers", [])
         #   if newValue and $scope.$parent.new_item_creation
         #     $rootScope.$broadcast 'save_new_exhibit'
 
-  $scope.$watch '$parent.element_switch', (newValue, oldValue) ->
-    if newValue isnt oldValue
-      setTimeout ->
-        $scope.$parent.element_switch = false
-      , 100
+  # $scope.$watch '$parent.element_switch', (newValue, oldValue) ->
+  #   console.log  newValue, $scope
+  #   if newValue isnt oldValue
+  #     setTimeout ->
+  #       $scope.$parent.element_switch = false
+  #       $scope.$digest()
+  #     , 100
 
   $scope.$watch '$parent.active_exhibit.number', (newValue, oldValue) ->
     form = $('#media form')

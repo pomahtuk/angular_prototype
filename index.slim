@@ -92,7 +92,6 @@ html lang="en" ng-app="Museum"
               / li.divider
               / li
               /   a href="{{current_museum.new_story_link}}" New language
-          .btn-group
         .right_content
           span.autosaved_info ng-show="last_save_time" Changes autosaved at {{ last_save_time | date:'HH:mm'}}
           switchpubitem ng-item="current_museum" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story_set' field="status" root="current_museum"
@@ -108,7 +107,8 @@ html lang="en" ng-app="Museum"
 
           .images
             a.btn.btn-default.upload href="#" button-file-upload=""
-              | Upload images
+              | Upload images 
+            span.or_drag or drag images here
             input.fileupload id="museum_fileupload" type="file" name="files[]" multiple=""
             ul
               li ng-repeat="image in current_museum.stories[current_museum.language].images"
@@ -133,7 +133,6 @@ html lang="en" ng-app="Museum"
                   | Save
                 a.btn data-dismiss="modal"
                   | Cancel
-
 
           .description
             .close ng-click="museum_edit_dropdown_close()"
@@ -309,6 +308,7 @@ html lang="en" ng-app="Museum"
             .images
               a.btn.btn-default.upload href="#" button-file-upload=""
                 | Upload images
+              span.or_drag or drag images here
               input.fileupload id="fileupload" type="file" name="files[]" multiple=""
               ul
                 li ng-repeat="image in active_exhibit.stories[current_museum.language].images"
@@ -423,7 +423,7 @@ html lang="en" ng-app="Museum"
                   | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
                 .media_types
                   i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
-                  / i class="icon-qrcode"
+                  i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
                   i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length > 0"
                   i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
               .visibility ng-switch="" on="exhibit.stories[current_museum.language].status"
@@ -431,7 +431,6 @@ html lang="en" ng-app="Museum"
                 i class="icon-lock placeholder" ng-switch-when="passcode"
                 .on_hover
                   switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field="status"
-
 
           li.exhibit.dummy data-big-image='/img/img-bg.png' ng-show="new_item_creation"
             div class="opener draft"
@@ -441,7 +440,6 @@ html lang="en" ng-app="Museum"
               .description ng-click="open_dropdown($event, new_exhibit)"
                 h4 
                   | {{new_exhibit.number || '' }} {{new_exhibit.stories[current_museum.language].name || '' }}
-
 
           li ng-repeat="story in stories"
             | {{story}}

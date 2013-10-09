@@ -67,7 +67,6 @@
               </li>
             </ul>
           </div>
-          <div class="btn-group"></div>
         </div>
         <div class="right_content">
           <span class="autosaved_info" ng-show="last_save_time">Changes autosaved at {{ last_save_time | date:'HH:mm'}}</span><switchpubitem field="status" ng-item="current_museum" ng-museum="current_museum" ng-provider="provider" root="current_museum" translations="translations" type="story_set"></switchpubitem>
@@ -86,7 +85,7 @@
             </div>
           </div>
           <div class="images">
-            <a button-file-upload="" class="btn btn-default upload" href="#">Upload images</a><input class="fileupload" id="museum_fileupload" multiple="" name="files[]" type="file">
+            <a button-file-upload="" class="btn btn-default upload" href="#">Upload images </a><span class="or_drag">or drag images here</span><input class="fileupload" id="museum_fileupload" multiple="" name="files[]" type="file">
             <ul>
               <li ng-repeat="image in current_museum.stories[current_museum.language].images">
                 <a class="img_thumbnail" href="#"><img alt="" data-crop-url="{{image.url}}" src="{{image.thumbnailUrl}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="current_museum.stories[current_museum.language]" rel="nofollow" stop-event="">×</a>
@@ -258,7 +257,7 @@
             </div>
             <div class="prev-ex"></div>
             <div class="images">
-              <a button-file-upload="" class="btn btn-default upload" href="#">Upload images</a><input class="fileupload" id="fileupload" multiple="" name="files[]" type="file">
+              <a button-file-upload="" class="btn btn-default upload" href="#">Upload images</a><span class="or_drag">or drag images here</span><input class="fileupload" id="fileupload" multiple="" name="files[]" type="file">
               <ul>
                 <li ng-repeat="image in active_exhibit.stories[current_museum.language].images">
                   <a class="img_thumbnail" href="#"><img alt="" data-crop-url="{{image.url}}" src="{{image.thumbnailUrl}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit.stories[current_museum.language]" rel="nofollow" stop-event="">×</a>
@@ -379,7 +378,7 @@
                   {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
                 </h4>
                 <div class="media_types">
-                  <i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"></i><i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length &gt; 0"></i><i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == &#39;published&#39;"></i>
+                  <i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"></i><i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"></i><i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length &gt; 0"></i><i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == &#39;published&#39;"></i>
                 </div>
               </div>
               <div class="visibility" ng-switch="" on="exhibit.stories[current_museum.language].status">

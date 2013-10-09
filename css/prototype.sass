@@ -163,6 +163,11 @@ body
   &.fixed_navbar
     padding-top: 100px
 
+    .navigation
+      z-index: 1000
+      top: 0
+      height: 100px
+
     &.filers
       padding-top: 144px
 
@@ -379,6 +384,7 @@ body
   margin-bottom: 0px
   background: #f1f1f1
   border-color: #e5e5e5
+  z-index: 1
  
 .left_content
   padding-left: 40px
@@ -484,7 +490,7 @@ body
   padding: 0px 10px
   font-size: 18px
 
-.actions_bar
+.filters_bar
   +box-shadow( rgba(0, 0, 0, .1)  0 2px 4px )
 
 .actions_bar, .filters_bar
@@ -492,8 +498,8 @@ body
   padding-top: 4px
   height: 44px
   background: white
-  // border-bottom: 1px solid $border_color
   border-bottom: 1px solid #d9d9d9
+  z-index: 3
 
   input.search
     +inline-block
@@ -505,7 +511,10 @@ body
   text-align: right
   padding: 0px 40px
   line-height: 38px
-  display: none
+  position: relative
+  top: -44px
+  z-index: 2
+  // display: none
 
   .clear_fiters
     color: $slideDownTextColorHover
@@ -650,8 +659,8 @@ ul.exhibits
 
       &.border
         +box-sizing(border-box)
-        +box-shadow($exhibitTextColorHover 0 0 1px 1px)
-        border: 1px solid $exhibitTextColorHover
+        +box-shadow($exhibitTextColorHover 0 0 1px 2px)
+        // border: 1px solid $exhibitTextColorHover
 
         .checkbox
           display: block
@@ -833,8 +842,6 @@ ul.exhibits
     #fileupload, #museum_fileupload
       display: none
   
-
-
   >.description
     background: url('../img/images-separator.png') repeat-y 0 0
     padding: 30px 60px 0 55px
@@ -899,16 +906,25 @@ ul.exhibits
         position: absolute
         top: 0px
         left: 100%
+        min-width: 100px
+
+      .statuses
+        float: left
+        width: 100px
+        margin-top: 5px
+        margin-left: 10px
+        background: #f8f8f8
+        z-index: 2
+        position: relative
 
       .preloader
-        float: left
         width: 16px
         height: 16px
-        margin: 7px 0px 0px 20px
+        margin: 3px 0px 0px 12px
         background: url('../img/small_loader.gif')
 
-
       .sumbols_left
+        float: left
         padding-left: 10px
         line-height: 34px
         color: $dark_gray_color
@@ -926,15 +942,15 @@ ul.exhibits
         background: #f8f8f8
 
       .save_status
-        line-height: 34px
+        line-height: 21px
         color: #888
 
         i
-          margin: 0px 5px 0px 20px
+          margin: 0px 5px 0px 12px
           color: #13b013
 
-      &.large_field .save_status, &.large_field .preloader
-        margin: 7px 0px 0px 30px
+      &.large_field .statuses
+        margin-left: 22px
 
       .trigger
         min-height: 34px
@@ -965,6 +981,7 @@ ul.exhibits
           margin-left: 13px
 
       .triggered
+        z-index: 1
         & > input, & > textarea
           min-width: 300px
 
@@ -984,8 +1001,12 @@ ul.exhibits
           margin: 10px 0px 10px 20px
           cursor: pointer
 
+        .correct_answer_indicator
+          display: none
+          font-weight: normal
+
         .error_text
-          margin-left: 65px
+          margin-left: 40px
 
         .triggered > *, .trigger .placeholder
           min-width: 267px
@@ -1032,6 +1053,9 @@ ul.exhibits
           &.large
             padding: 6px 12px
             line-height: 1.44
+
+        .statuses
+          background: #e5e5e5
 
     form.has_error
       .form-control.ng-invalid, .form-control.number_invalid
@@ -1314,3 +1338,10 @@ a
   color: #ffffff
   background-color: #35AA47
   border-color: #35AA47
+
+
+.or_drag
+  +inline-block
+  position: absolute
+  top: 27px
+  left: 220px
