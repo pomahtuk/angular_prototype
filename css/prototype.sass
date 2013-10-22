@@ -160,19 +160,12 @@ body
   text-rendering: optimizeLegibility
   -webkit-font-smoothing: antialiased  
 
-  &.fixed_navbar
-    padding-top: 100px
+.navigation
+  z-index: 1000
+  top: 0
 
-    .navigation
-      z-index: 1000
-      top: 0
-      height: 100px
-
-    &.filers
-      padding-top: 144px
-
-    .museum_edit_guaranter
-      height: 548px
+  &.bottom-padding
+    padding-bottom: 88px
 
 html, body
   width: 100%
@@ -371,7 +364,7 @@ body
   +box-shadow(#666, 0px 1px)
   +border-top-radius(3px)
   position: absolute
-  top: -24px
+  top: 28px
   height: 24px
   z-index: 1000
   background: $dark_gray_color
@@ -382,6 +375,7 @@ body
   left: 50%
   margin-left: -80px
   cursor: pointer
+  z-index: 999
 
   i
     font-size: 12px
@@ -390,7 +384,7 @@ body
   margin-bottom: 0px
   background: #f1f1f1
   border-color: #e5e5e5
-  z-index: 1
+  z-index: 5
  
 .left_content
   padding-left: 40px
@@ -513,6 +507,22 @@ body
     margin-right: 10px
     max-width: 500px
 
+  .error_notifications
+    position: absolute
+    top: 6px
+    left: 50%
+    margin-left: -250px
+    width: 500px
+    z-index: 1000
+    height: 31px
+
+    .alert
+      padding: 5px 15px
+      position: absolute
+      top: 0px
+      left: 0px
+      width: 100%
+
 .filters_bar
   text-align: right
   padding: 0px 40px
@@ -536,16 +546,57 @@ body
       top: 30px
 
 ul.exhibits
-  margin: 30px 0 90px
+  margin: 0 0 90px
   text-align: justify
   padding: 0px
 
-  >li.exhibit // class fix ie8 bug
+  .exhibit // class fix ie8 bug
     display: inline-block
     margin: 0 20px
     padding-bottom: 30px
     position: relative
     vertical-align: top
+
+    .image
+      +border-top-radius(3px)
+      width: 200px
+      overflow-x: hidden
+
+    img
+      background: #f7f7f7
+      border-radius: 3px 3px 0 0
+      display: block
+      height: 150px
+      width: 200px
+      cursor: pointer
+
+    .description
+      background: #fff
+      border-color: #fff
+      border-radius: 0 0 2px 2px
+      border-style: solid
+      border-width: 0 1px 1px
+      box-shadow: #ccc 0px 1px 2px
+      padding: 10px
+      height: 80px
+      position: relative
+      cursor: pointer
+
+      h4
+        color: $exhibitTextColor
+        font-size: 14px
+        max-height: 32px
+        line-height: 16px
+        margin: 0px
+        overflow: hidden
+        cursor: pointer
+
+      .extra_info
+        color: $unmain_text_color
+        position: absolute
+        bottom: 5px
+        left: 10px
+
 
     >.opener
       +border-radius(3px)
@@ -571,46 +622,6 @@ ul.exhibits
           position: relative
           top: -1px
           left: 3px
-
-      .image
-        +border-top-radius(3px)
-        width: 200px
-        overflow-x: hidden
-
-      img
-        background: #f7f7f7
-        border-radius: 3px 3px 0 0
-        display: block
-        height: 150px
-        width: 200px
-        cursor: pointer
-
-      .description
-        background: #fff
-        border-color: #fff
-        border-radius: 0 0 2px 2px
-        border-style: solid
-        border-width: 0 1px 1px
-        box-shadow: #ccc 0px 1px 2px
-        padding: 10px
-        height: 70px
-        position: relative
-        cursor: pointer
-
-        h4
-          color: $exhibitTextColor
-          font-size: 14px
-          max-height: 16px
-          line-height: 16px
-          margin: 0px
-          overflow: hidden
-          cursor: pointer
-
-        .extra_info
-          color: $unmain_text_color
-          position: absolute
-          bottom: 5px
-          left: 10px
 
       .visibility
         bottom: 10px
@@ -653,6 +664,10 @@ ul.exhibits
             float: left
             margin-right: 5px
 
+        &.invalid
+          i.placeholder, .on_hover .extra_right i
+            color: #d9534f
+
       .media_types
         position: absolute
         left: 15px
@@ -662,6 +677,14 @@ ul.exhibits
           margin-right: 15px
           font-size: 14px
           color: $unmain_text_color
+
+          &.empty
+            display: none
+
+        &.invalid
+          i.empty
+            display: inline
+            color: #d9534f
 
       &.border
         +box-sizing(border-box)
@@ -733,35 +756,15 @@ ul.exhibits
   &.hidden
     display: none
 
-  // #dropzone
-  //   // background: palegreen
-  //   // width: 150px
-  //   // height: 50px
-  //   // line-height: 50px
-  //   // text-align: center
-  //   // font-weight: bold
-
-    // &.in
-    //   background: rgba(0,0,0, 1)
-
-    // &.hover
-    //   background: #fff !important
-    
-    // &.fade
-    //   +transition(all 0.7s ease-out)
-    //   opacity: 1
-
-
-  >.dropdown_area
+  >.dropdown_area, .lightbox_area
     position: absolute
     top: 0px
     left: 0px
     height: 100%
     width: 100%
-    background: rgba(0,0,0, .75)
+    background: rgba(0,0,0, .90)
     z-index: 998
     display: none
-    // opacity: 0
 
     .wrapper
       +border-radius(20px)
@@ -795,6 +798,80 @@ ul.exhibits
         -ms-user-select: none
         user-select: none
 
+  .lightbox_area
+    +box-sizing(border-box)
+    // display: block
+    padding: 30px 90px
+    z-index: 999
+
+    .explain_text
+      color: #fff
+      margin-bottom: 20px
+      font-size: 14px
+
+    .apply_resize
+      position: absolute
+      top: 30px
+      right: 25px
+
+    .content
+      height: 360px
+      margin-bottom: 20px
+
+      .preview
+        width: 220px
+        float: left
+        min-height: 300px
+        line-height: 34px
+        margin-top: -10px
+        color: #fff
+
+        .exhibit
+          margin: 0
+
+          .image
+            width: 200px
+            height: 150px
+            overflow: hidden
+
+      .cropping_area
+        float: left
+        width: calc(100% - 220px)
+        overflow: hidden
+        img
+          display: block
+          margin: 0 auto
+          max-height: 350px
+
+        .jcrop-holder
+          margin: 0 auto
+
+    .slider
+      +inline-block
+      margin: 0 auto
+      width: 100%
+      font-size: 0px
+      text-align: center
+
+      .left, .right
+        margin: 0px 10px
+        color: #fff
+        font-size: 36px
+        font-weight: 100
+
+        &:hover
+          color: $exhibitTextColorHover
+
+      img.thumb
+        +inline-block
+        width: 105px
+        height: 80px
+        margin: 0px 10px
+        cursor: pointer
+
+        &.active
+          border: 2px solid $exhibitTextColorHover
+
   >.prev-ex, >.next-ex
     background: url('../img/popin-left-arrow.png') no-repeat
     cursor: pointer
@@ -803,7 +880,7 @@ ul.exhibits
     position: absolute
     top: $slideDownHeight/2 - 75px/2
     width: 60px
-    z-index: 1000
+    z-index: 998
 
   >.next-ex
     background-image: url('../img/popin-right-arrow.png')
@@ -831,7 +908,7 @@ ul.exhibits
       position: absolute
       top: 20px
       left: 80px
-      z-index: 999
+      z-index: 99
       overflow: hidden
 
       input
@@ -872,12 +949,18 @@ ul.exhibits
       font-size: 24px
       margin-top: -3px
 
+      &.museum
+        margin-right: 40px
+        margin-top: 1px
+
       &.no_margin
         margin-right: 0px
 
       &:hover
         color: #000
         text-decoration: none
+
+
 
     #tabs_content
       margin-top: 20px
@@ -892,176 +975,6 @@ ul.exhibits
 
       label
         cursor: pointer
-
-    .form-group
-      width: 100%
-      position: relative
-
-      .col-lg-2
-        min-width: 150px
-
-      .col-lg-6
-        margin-left: -13px
-
-      .error_text
-        +inline-block
-        margin-left: 20px
-        line-height: 34px
-        color: #b94a48
-        display: none
-        position: absolute
-        top: 0px
-        left: 100%
-        min-width: 100px
-
-      .statuses
-        float: left
-        width: 100px
-        margin-top: 5px
-        margin-left: 10px
-        background: #f8f8f8
-        z-index: 2
-        position: relative
-
-      .preloader
-        width: 16px
-        height: 16px
-        margin: 3px 0px 0px 12px
-        background: url('../img/small_loader.gif')
-
-      .sumbols_left
-        float: left
-        padding-left: 10px
-        line-height: 34px
-        color: $dark_gray_color
-        display: none
-        margin-left: 20px
-
-      .empty_name_error
-        color: red
-        display: none
-        position: absolute
-        top: 0px
-        line-height: 34px
-        height: 34px
-        left: 70%
-        background: #f8f8f8
-
-      .save_status
-        line-height: 21px
-        color: #888
-
-        i
-          margin: 0px 5px 0px 12px
-          color: #13b013
-
-      &.large_field .statuses
-        margin-left: 22px
-
-      .trigger
-        min-height: 34px
-        line-height: 34px
-
-        .placeholder
-          padding-left: 13px
-          min-width: 300px
-
-          &:not(.large)
-            display: block
-            max-height: 34px
-            white-space: nowrap
-            overflow: hidden
-            text-overflow: ellipsis
-            font-size: 14px
-
-        .large
-          width: 100%
-          height: 130px
-          padding: 6px 12px
-          font-size: 14px
-          line-height: 1.44
-          overflow-y: auto
-          display: block
-          max-height: 200px
-          border: 1px solid transparent
-          margin-left: 13px
-
-      .triggered
-        z-index: 1
-        & > input, & > textarea
-          min-width: 300px
-
-        & > a
-          margin-left: 23px
-
-        textarea
-          +box-sizing(border-box)
-          height: 130px
-          margin-left: 13px
-
-      &.checkbox_added
-        margin-left: 0px
-        .coorect_answer_radio
-          float: left
-          vertical-align: center
-          margin: 10px 0px 10px 20px
-          cursor: pointer
-
-        .correct_answer_indicator
-          display: none
-          font-weight: normal
-
-        .error_text
-          margin-left: 40px
-
-        .triggered > *, .trigger .placeholder
-          min-width: 267px
-
-
-      &.textfield .triggered
-        display: none
-
-      .help
-        width: 15px
-        height: 34px
-        line-height: 34px
-        float: left
-        position: relative
-        left: -10px
-        visibility: hidden
-
-      .dropdown
-        position: absolute
-        top: 15px
-        left: 60px
-        font-size: 14px
-
-        a
-          color: #222
-
-      &:not(.last):hover
-        background: #e5e5e5
-
-        .help
-          visibility: visible
-          cursor: pointer
-
-        .placeholder
-          +border-radius(4px)
-          +box-sizing(border-box)
-          display: block
-          padding: 0px 12px
-          min-height: 34px
-          line-height: 32px
-          background: white
-          border: 1px solid darken($border_color, 20%)
-
-          &.large
-            padding: 6px 12px
-            line-height: 1.44
-
-        .statuses
-          background: #e5e5e5
 
     form.has_error
       .form-control.ng-invalid, .form-control.number_invalid
@@ -1084,6 +997,23 @@ ul.exhibits
 
     .extra
       margin-right: 5px
+
+  .label.label-danger
+    display: none
+
+  &.invalid
+    .label.label-danger
+      display: block
+      position: absolute
+      left: 13px
+      top: 25px
+
+      &.images_label
+        top: 60px
+        left: 80px
+
+    // +box-sizing(border-box)
+    // border: 3px solid red
 
 
 #museum_edit_dropdown
@@ -1269,7 +1199,7 @@ textarea
 label
   font-weight: normal
 
-.modal-dialog#delete_story, #dummyModal
+.modal-dialog#delete_story, #dummyModal, #delete_museum_story
   width: 350px
   .btn
     margin-left: 5px
@@ -1291,6 +1221,16 @@ label
     .other_variants
       margin-left: 20px
       /*display: none*/
+
+    .password
+      label
+        font-size: 12px
+        padding-left: 0px
+      input
+        width: 100%
+
+  &#delete_museum_story
+    min-width: 525px
 
 #ngProgress
   margin: 0
@@ -1345,9 +1285,254 @@ a
   background-color: #35AA47
   border-color: #35AA47
 
-
 .or_drag
   +inline-block
   position: absolute
   top: 27px
   left: 220px
+  font-size: 14px
+
+.progress-text
+  position: absolute
+
+.dropdown-submenu
+  position: relative
+
+.dropdown-submenu>.dropdown-menu
+  +border-radius(0 6px 6px 6px)
+  top: 0
+  left: 100%
+  margin-top: -6px
+  margin-left: -1px
+
+.dropdown-submenu:hover>.dropdown-menu
+  display: block
+
+.dropup .dropdown-submenu>.dropdown-menu
+  +border-radius(5px 5px 5px 0)
+  top: auto
+  bottom: 0
+  margin-top: 0
+  margin-bottom: -2px
+
+.dropdown-submenu>a:after
+  display: block
+  content: " "
+  float: right
+  width: 0
+  height: 0
+  border-color: transparent
+  border-style: solid
+  border-width: 5px 0 5px 5px
+  border-left-color: #cccccc
+  margin-top: 5px
+  margin-right: -10px
+
+.dropdown-submenu:hover>a:after
+  border-left-color: #ffffff
+
+.dropdown-submenu.pull-left
+  float: none
+
+.dropdown-submenu.pull-left>.dropdown-menu
+  +border-radius(6px 0 6px 6px)
+  left: -100%
+  margin-left: 10px
+
+
+// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.description
+  .form-group
+    width: 100%
+    position: relative
+
+    .col-lg-2
+      min-width: 150px
+
+    .col-lg-6
+      margin-left: -13px
+
+    .error_text
+      +inline-block
+      margin-left: 20px
+      line-height: 34px
+      color: #b94a48
+      display: none
+      position: absolute
+      top: 0px
+      left: 100%
+      min-width: 100px
+
+    .statuses
+      float: left
+      width: 100px
+      margin-top: 5px
+      margin-left: 10px
+      background: #f8f8f8
+      z-index: 2
+      position: relative
+
+    .preloader
+      width: 16px
+      height: 16px
+      margin: 3px 0px 0px 12px
+      background: url('../img/small_loader.gif')
+
+    .sumbols_left
+      float: left
+      padding-left: 10px
+      line-height: 34px
+      color: $dark_gray_color
+      display: none
+      margin-left: 20px
+
+    .empty_name_error
+      color: red
+      display: none
+      position: absolute
+      top: 0px
+      line-height: 34px
+      height: 34px
+      left: 70%
+      background: #f8f8f8
+
+    .save_status
+      line-height: 21px
+      color: #888
+
+      i
+        margin: 0px 5px 0px 12px
+        color: #13b013
+
+    &.large_field .statuses
+      margin-left: 22px
+
+    .trigger
+      min-height: 34px
+      line-height: 34px
+
+      .placeholder
+        padding-left: 13px
+        min-width: 300px
+
+        &:not(.large)
+          display: block
+          max-height: 34px
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+          font-size: 14px
+
+      .large
+        width: 100%
+        height: 130px
+        padding: 6px 12px
+        font-size: 14px
+        line-height: 1.44
+        overflow-y: auto
+        display: block
+        max-height: 200px
+        border: 1px solid transparent
+        margin-left: 13px
+
+    .triggered
+      z-index: 1
+      & > input, & > textarea, & > select
+        min-width: 300px
+
+      & > select
+        // margin-left: 15px
+        cursor: pointer
+
+      & > a
+        margin-left: 15px
+
+      textarea
+        +box-sizing(border-box)
+        height: 130px
+        margin-left: 13px
+
+      .or_drag
+        position: relative
+        top: 0px
+        left: 0px
+        margin-left: 5px
+
+    &.checkbox_added
+      margin-left: 0px
+      .coorect_answer_radio
+        float: left
+        vertical-align: center
+        margin: 10px 0px 10px 20px
+        cursor: pointer
+
+      .correct_answer_indicator
+        display: none
+        font-weight: normal
+
+      .error_text
+        margin-left: 40px
+
+      .triggered > *, .trigger .placeholder
+        min-width: 267px
+
+
+    &.textfield .triggered
+      display: none
+
+    .help
+      width: 15px
+      height: 34px
+      line-height: 34px
+      float: left
+      position: relative
+      left: -10px
+      visibility: hidden
+
+    .dropdown
+      position: absolute
+      top: 15px
+      left: 60px
+      font-size: 14px
+
+      a
+        color: #222
+
+    &:not(.last):hover
+      background: #e5e5e5
+
+      .help
+        visibility: visible
+        cursor: pointer
+
+      .placeholder
+        +border-radius(4px)
+        +box-sizing(border-box)
+        display: block
+        padding: 0px 12px
+        min-height: 34px
+        line-height: 32px
+        background: white
+        border: 1px solid darken($border_color, 20%)
+
+        &.large
+          padding: 6px 12px
+          line-height: 1.44
+
+      .statuses
+        background: #e5e5e5
+
+
+
+#new_museum
+  width: 600px
+
+  .modal-body
+    padding: 20px 20px 0px 20px
+
+  .form-group
+    margin-left: 0px
+
+    .statuses
+      display: none

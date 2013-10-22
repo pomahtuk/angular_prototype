@@ -28,43 +28,45 @@ tileGrid = (collection, tileWidth, tileSpace, tileListMargin) ->
     return if i % lineSize != 0
     $(@).css 'margin-left': marginLeft
 
-@gon = {"google_api_key":"AIzaSyCPyGutBfuX48M72FKpF4X_CxxPadq6r4w","acceptable_extensions":{"audio":["mp3","ogg","aac","wav","amr","3ga","m4a","wma","mp4","mp2","flac"],"image":["jpg","jpeg","gif","png","tiff","bmp"],"video":["mp4","m4v"]},"development":false}
+@gon = {"google_api_key":"AIzaSyCPyGutBfuX48M72FKpF4X_CxxPadq6r4w","acceptable_extensions":{"audio":["mp3","ogg","aac","wav","amr","3ga","m4a","wma","mp4","mp2","flac"],"image":["jpg","jpeg","gif","png","tiff","bmp"],"video":["mp4","m4v","avi", "ogv"]},"development":false}
 
 # #
 # App controllers
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', 'ngProgress', ($scope, $http, $filter, $window, $modal, $routeParams, ngProgress) ->
+.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', 'ngProgress', 'storySetValidation', 'errorProcessing', ($scope, $http, $filter, $window, $modal, $routeParams, ngProgress, storySetValidation, errorProcessing) ->
   
   window.sc = $scope
 
   $scope.exhibit_search = ''
 
-  # $scope.route_params = $routeParams
-
   $scope.criteriaMatch = ( criteria ) ->
     ( item ) ->
-      if item.stories[$scope.current_museum.language].name
-        in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
-        $scope.grid()
-        return in_string || criteria is ''
+      if item.stories[$scope.current_museum.language]?
+        if item.stories[$scope.current_museum.language].name
+          in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
+          $scope.grid()
+          return in_string || criteria is ''
+        else
+          true
       else
         true
 
   museum_id = if $routeParams.museum_id?
     $routeParams.museum_id
   else
-    "524a0bd2c4e48d499c000002"
-    # "5253db2f24ee39583e000002"
+    "5260c63ceb6688e516000002"
+    # "5260e108d8831a0e67000002"
+
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    "524a0bd2c4e48d499c000001"
-    # "5253db2f24ee39583e000001"
+    "5260c63ceb6688e516000001"
+    # "5260e108d8831a0e67000001"
 
-  $scope.backend_url = "http://192.168.216.128:3000"
+  $scope.backend_url = "http://192.168.158.128:3000"
   # $scope.backend_url = "http://prototype.izi.travel"
 
   $scope.sort_field     = 'number'
@@ -76,24 +78,28 @@ angular.module("Museum.controllers", [])
     # $http.get("#{$scope.backend_url}/provider/524c2a72856ee97345000001/museums/524c2a72856ee97345000002/exhibits").success (data) ->
     # ngProgress.color('#fd6e3b')
     # ngProgress.start()
-    console.log museum_id
+    # console.log museum_id
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
       exhibits = []
+      $scope.modal_translations = {}
+      # console.log data
       for item in data
-        exhibit = item.exhibit
-        # exhibit.images = item.images
-        exhibit.stories = {}
-        for story in item.stories
-          story.story.quiz = story.quiz.quiz
-          story.story.images = story.images
-          story.story.audio = story.audio
-          story.story.quiz.answers = story.quiz.answers
-          exhibit.stories[story.story.language] = story.story
-        exhibits.push exhibit
+        if item?
+          exhibit = item.exhibit
+          exhibit.images = item.images
+          exhibit.stories = {}
+          for story in item.stories
+            story.story.quiz = story.quiz.quiz
+            story.story.audio = story.audio
+            story.story.video = story.video
+            story.story.quiz.answers = story.quiz.answers
+            exhibit.stories[story.story.language] = story.story
+            $scope.modal_translations[story.story.language] = {name: $scope.translations[story.story.language]}
+          exhibits.push exhibit
       ngProgress.complete()
       # console.log exhibits
+      $scope.active_exhibit =  exhibits[0]
       $scope.exhibits = exhibits
-      $scope.active_exhibit =  $scope.exhibits[0]
       $scope.ajax_progress  = false
       if exhibits.length is 0
         $scope.active_exhibit = {
@@ -168,14 +174,15 @@ angular.module("Museum.controllers", [])
       for item in data
         museum = item.exhibit
         museum.def_lang = "ru"
-        museum.language = "ru"
+        museum.language = "ru" unless museum.language
         museum.package_status = "process"
         museum.stories = {}
+        museum.images = item.images
         for story in item.stories
           story.story.city = "Saint-Petersburg"
           story.story.quiz = story.quiz.quiz
-          story.story.images = story.images
           story.story.audio = story.audio
+          story.story.video = story.video
           story.story.quiz.answers = story.quiz.answers
           museum.stories[story.story.language] = story.story
         $scope.museums.push museum
@@ -287,6 +294,33 @@ angular.module("Museum.controllers", [])
     ru: 'Russian'
     en: 'English'
     es: 'Spanish'
+    ge: 'German'
+    fi: 'Finnish'
+    sw: 'Sweedish'
+    it: 'Italian'
+    fr: 'French'
+    kg: 'Klingon'
+  }
+
+  $scope.modal_translations = {
+    ru:
+      name: 'Russian'
+    en:
+      name: 'English'
+    es:
+      name: 'Spanish'
+    ge: 
+      name: 'German'
+    fi: 
+      name: 'Finnish'
+    sw: 
+      name: 'Sweedish'
+    it: 
+      name: 'Italian'
+    fr: 
+      name: 'French'
+    kg: 
+      name: 'Klingon'
   }
 
   $scope.exhibits = [
@@ -318,6 +352,72 @@ angular.module("Museum.controllers", [])
       ]
       stories: {
         ru: {
+          name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+          description: 'test description'
+          publish_state: 'all'
+          audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+          quiz: {
+            question: 'are you sure?'
+            description: 'can you tell me?'
+            state: 'published'
+            answers: [
+              {
+                title: 'yes'
+                correct: false
+                id: 0
+              }
+              {
+                title: 'may be'
+                correct: true
+                id: 1
+              }
+              {
+                title: 'who cares?'
+                correct: false
+                id: 2
+              }
+              {
+                title: 'nope'
+                correct: false
+                id: 3
+              }
+            ]
+          }
+        }
+        en: {
+          name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+          description: 'test description'
+          publish_state: 'all'
+          audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+          quiz: {
+            question: 'are you sure?'
+            description: 'can you tell me?'
+            state: 'published'
+            answers: [
+              {
+                title: 'yes'
+                correct: false
+                id: 0
+              }
+              {
+                title: 'may be'
+                correct: true
+                id: 1
+              }
+              {
+                title: 'who cares?'
+                correct: false
+                id: 2
+              }
+              {
+                title: 'nope'
+                correct: false
+                id: 3
+              }
+            ]
+          }
+        }
+        es: {
           name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
           description: 'test description'
           publish_state: 'all'
@@ -488,6 +588,7 @@ angular.module("Museum.controllers", [])
 
   $scope.element_switch = true
   $scope.forbid_switch  = false
+  $scope.create_new_language = false
 
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
@@ -645,8 +746,22 @@ angular.module("Museum.controllers", [])
 
   $scope.all_selected = false
 
+  $scope.modal_options = {
+    current_language: 
+      name: $scope.translations[$scope.current_museum.language]
+      language: $scope.current_museum.language
+    languages: $scope.modal_translations
+    exhibits: $scope.exhibits
+    deletion_password: '123456'
+  }
+
   get_number = ->
-    parseInt($scope.exhibits[$scope.exhibits.length-1].number, 10) + 1
+    res = 0
+    if $scope.exhibits[$scope.exhibits.length-1]
+      res = parseInt($scope.exhibits[$scope.exhibits.length-1].number, 10) + 1
+    else
+      res = 1
+    return res
 
   get_lang = ->
     $scope.current_museum.language
@@ -663,11 +778,111 @@ angular.module("Museum.controllers", [])
     else
       ''
 
+  $scope.create_dummy_story = (id) ->
+    dummy_story = {
+      playback_algorithm: 'generic'
+      content_provider:   content_provider_id
+      story_type:         'story'
+      status:             'draft'
+      language:           'dummy'
+      name:               ''
+      short_description:  ''
+      long_description:   ''
+      story_set:          id
+    }
+    dummy_story.quiz = {
+      story:     ""
+      question:  ''
+      comment:   ''
+      status:    'passcode'
+      answers:   []
+    }
+    for i in [0..3]
+      dummy_story.quiz.answers.push
+        quiz:     ""
+        content:  ''
+        correct:  false
+
+    dummy_story.quiz.answers[0].correct = true
+
+    dummy_story
+
+  $scope.new_museum_language = () ->
+    $scope.create_new_language = true
+
+    dummy_story = $scope.create_dummy_story $scope.current_museum._id
+
+    dummy_story.quiz.answers[0].correct = true
+
+    $scope.dummy_museum = angular.copy $scope.current_museum
+
+    $scope.dummy_museum.stories.dummy = dummy_story
+    # $scope.dummy_museum.stories.dummy.name = $scope.current_museum.stories[$scope.current_museum.def_lang].name
+    $scope.dummy_museum.stories.dummy.status = 'passcode'
+
+    # for exhibit in $scope.exhibits
+    #   exhibit.stories.dummy = dummy_story
+
+    $scope.dummy_museum.language = 'dummy'
+
+
+    $scope.modal_options = {
+      museum: $scope.dummy_museum
+      translations: $scope.translations
+    }
+
+    ModalMuseumInstance = $modal.open(
+      templateUrl: "myMuseumModalContent.html"
+      controller: ModalMuseumInstanceCtrl
+      resolve:
+        modal_options: ->
+          $scope.modal_options
+    )
+    ModalMuseumInstance.result.then ((result_string) ->
+      switch result_string
+        when 'save'
+          true
+          console.log $scope.dummy_museum
+
+          lang = $scope.dummy_museum.language
+          $scope.dummy_museum.stories[lang] = $scope.dummy_museum.stories.dummy
+          $scope.dummy_museum.stories[lang].language = lang
+
+          for exhibit in $scope.exhibits
+            exhibit.stories[lang] = $scope.dummy_museum.stories[lang]
+            exhibit.stories[lang].language = lang
+            exhibit.stories[lang].name = ""
+            exhibit.stories[lang].status = 'draft'
+            exhibit.stories[lang].story_set = exhibit._id
+
+            story = angular.copy exhibit.stories[lang]
+
+            $scope.post_stories story
+
+          $scope.current_museum.stories[lang] = $scope.dummy_museum.stories[lang]
+          $scope.current_museum.language = lang
+
+          story = angular.copy $scope.dummy_museum.stories[lang]
+          story.story_set = $scope.current_museum._id
+
+          $scope.post_stories story
+
+          $scope.create_new_language = false
+
+        when 'discard'
+          true
+    ), ->
+      console.log "Modal dismissed at: " + new Date()
+
+
+    true
+
   $scope.create_new_item = () ->
     unless $scope.new_item_creation is true
       number = get_number()
       $scope.new_exhibit = {
         content_provider: content_provider_id
+        number:           number
         type:             'exhibit'
         distance:         20
         duration:         20
@@ -682,15 +897,13 @@ angular.module("Museum.controllers", [])
         }
         stories: {}
       }
-      $scope.new_exhibit.number = number
       $scope.new_exhibit.images = []
-      console.log $scope.new_exhibit
       for lang of $scope.current_museum.stories
         $scope.new_exhibit.stories[lang] = {
           playback_algorithm: 'generic'
           content_provider:   content_provider_id
           story_type:         'story'
-          status:             'passcode'
+          status:             'draft'
           language:           lang
           name:               ''
           short_description:  ''
@@ -709,7 +922,6 @@ angular.module("Museum.controllers", [])
             quiz:     ""
             content:  ''
             correct:  false
-            _id:      i
         $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true
 
       $scope.new_item_creation = true
@@ -739,12 +951,6 @@ angular.module("Museum.controllers", [])
 
   $scope.delete_modal_open = ->
     unless $scope.new_item_creation
-      $scope.modal_options = {
-        current_language: 
-          name: $scope.translations[$scope.current_museum.language]
-          language: $scope.current_museum.language
-        languages: $scope.current_museum.stories
-      }
       ModalDeleteInstance = $modal.open(
         templateUrl: "myModalContent.html"
         controller: ModalDeleteInstanceCtrl
@@ -753,44 +959,82 @@ angular.module("Museum.controllers", [])
             $scope.modal_options
       )
       ModalDeleteInstance.result.then ((selected) ->
-        $scope.selected = selected
-        if Object.keys($scope.active_exhibit.stories).length is selected.length
-          $scope.closeDropDown()
-          for exhibit, index in $scope.exhibits
-            if exhibit._id is $scope.active_exhibit._id
-              $scope.exhibits.splice index, 1
-              $scope.grid()
-              $http.delete("#{$scope.backend_url}/story_set/#{$scope.active_exhibit._id}/").success (data) ->
-                console.log data
-                $scope.active_exhibit = $scope.exhibits[0]
-              .error ->
-                console.log 'error'
-              break
-        else
-          for st_index, story of $scope.active_exhibit.stories
-            for item in selected
-              if item is st_index
-                story = $scope.active_exhibit.stories[st_index]
-                story.status = 'dummy'
-                story.name = ''
-                story.short_description = ''
-                story.long_description = ''
-                story.quiz.question = ''
-                story.quiz.comment = ''
-                story.quiz.status = ''
-                story.quiz.answers[0].content = ''
-                story.quiz.answers[0].correct = true
-                story.quiz.answers[1].content = ''
-                story.quiz.answers[1].correct = false
-                story.quiz.answers[2].content = ''
-                story.quiz.answers[2].correct = false
-                story.quiz.answers[3].content = ''
-                story.quiz.answers[3].correct = false
-                $scope.update_story(story)
+        $scope.delete_exhibit $scope.active_exhibit, selected
       ), ->
         console.log "Modal dismissed at: " + new Date()
     else
       true
+
+  $scope.delete_museum_modal_open = ->
+    unless $scope.new_item_creation
+      museumDeleteInstance = $modal.open(
+        templateUrl: "museumDelete.html"
+        controller: museumDeleteCtrl
+        resolve:
+          modal_options: ->
+            $scope.modal_options
+      )
+      museumDeleteInstance.result.then ((selected) ->
+        lang = $scope.current_museum.language
+        if selected is 'lang'
+          $scope.current_museum.language = $scope.current_museum.def_lang
+          for exhibit in $scope.exhibits
+            $scope.delete_story exhibit.stories, lang, (stories, lang) ->
+              delete stories[lang]
+              true
+          $scope.delete_story $scope.current_museum.stories, lang, (stories, lang) ->
+            delete stories[lang]
+            true
+        else
+          console.log 'deleting museum story or whole museum'
+          museum = $scope.current_museum
+
+          # and now we need to switch museums
+
+          for exhibit in $scope.exhibits
+            $scope.delete_story_set exhibit
+          $scope.delete_story_set museum
+
+      ), ->
+        console.log "Modal dismissed at: " + new Date()
+    else
+      true
+
+  $scope.delete_exhibit = (target_exhibit, languages) ->
+    if Object.keys(target_exhibit.stories).length is languages.length
+      $scope.closeDropDown()
+      for exhibit, index in $scope.exhibits
+        if exhibit._id is target_exhibit._id
+          $scope.exhibits.splice index, 1
+          $scope.grid()
+          if target_exhibit._id is $scope.active_exhibit._id
+            $scope.active_exhibit = $scope.exhibits[0]
+          $scope.delete_story_set target_exhibit
+          break
+    else
+      console.log target_exhibit._id
+      for st_index, story of target_exhibit.stories
+        for item in languages
+          # console.log item, st_index
+          if item is st_index
+            story = target_exhibit.stories[st_index]
+            story.status = 'dummy'
+            story.name = ''
+            story.short_description = ''
+            story.long_description = ''
+            story.quiz.question = ''
+            story.quiz.comment = ''
+            story.quiz.status = ''
+            story.quiz.answers = [] unless story.quiz.answers
+            story.quiz.answers[0].content = ''
+            story.quiz.answers[0].correct = true
+            story.quiz.answers[1].content = ''
+            story.quiz.answers[1].correct = false
+            story.quiz.answers[2].content = ''
+            story.quiz.answers[2].correct = false
+            story.quiz.answers[3].content = ''
+            story.quiz.answers[3].correct = false
+            $scope.update_story(story)
 
   $scope.dummy_modal_open = ->
     ModalDummyInstance = $modal.open(
@@ -820,15 +1064,29 @@ angular.module("Museum.controllers", [])
 
   $scope.show_museum_edit = (event) ->
     elem = $ event.target
-    $('.navigation .museum_edit, .page .museum_edit_guaranter').slideToggle(1000, "easeOutQuint")
-    elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
-    $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened
+    unless museum_anim_in_progress
+      museum_anim_in_progress = true
+      elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
+      elem.hide()
+      $('.navigation .museum_edit').slideToggle(1000, "easeOutQuint")
+      value_sign = if $scope.museum_edit_dropdown_opened
+          "28px"
+        else
+          "576px"
+      $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened
+      setTimeout ->
+        elem.css({top: "#{value_sign}"})
+        elem.show()
+        museum_anim_in_progress = false
+      , 1000
     false
 
   $scope.museum_edit_dropdown_close = () ->
-    setTimeout ->
-      $('.actions_bar .museum_edit_opener').click()
-    , 10
+    e = {
+      target: $('.museum_edit_opener')
+    }
+    if $scope.museum_edit_dropdown_opened
+      $scope.show_museum_edit(e)
 
   $scope.update_story = (story) ->
     $http.put("#{$scope.backend_url}/story/#{story._id}", story).success (data) ->
@@ -836,22 +1094,20 @@ angular.module("Museum.controllers", [])
         for answer in story.quiz.answers
           $scope.put_answers answer
       .error ->
-        console.log 'error'
+        errorProcessing.addError 'Failed to update a quiz for story'
     .error ->
-      console.log 'error'
+      errorProcessing.addError 'Failed update a story'
 
   $scope.put_answers = (answer) ->
     $http.put("#{$scope.backend_url}/quiz_answer/#{answer._id}", answer).success (data) ->
       console.log 'done'
     .error ->
-      console.log 'error'
+      errorProcessing.addError 'Failed to save quiz answer'
 
-  $scope.museum_edit_dropdown_close = () ->
-    setTimeout ->
-      $('.actions_bar .museum_edit_opener').click()
-    , 10
+  $scope.post_stories = (original_story) ->
 
-  $scope.post_stories = (story) ->
+    story = angular.copy original_story
+
     $http.post("#{$scope.backend_url}/story/", story).success (data) ->
       story._id = data._id
       story.quiz.story = data._id
@@ -861,28 +1117,84 @@ angular.module("Museum.controllers", [])
           answer.quiz = data._id
           $scope.post_answers answer
       .error ->
-        console.log 'error'
+       errorProcessing.addError 'Failed to save quiz for new story'
     .error ->
-      console.log 'error'
+      errorProcessing.addError 'Failed to save new story'
 
   $scope.post_answers = (answer) ->
     $http.post("#{$scope.backend_url}/quiz_answer/", answer).success (data) ->
-      # console.log data
+      console.log data
       answer._id = data._id
     .error ->
-      console.log 'error'
+      errorProcessing.addError 'Failed to save quiz answer'
+
+  $scope.mass_switch_pub = (value) ->
+    for exhibit in $scope.exhibits
+      if exhibit.selected is true
+        validation_item = {}
+        validation_item.item = exhibit.stories[$scope.current_museum.language]
+        validation_item.root = exhibit
+        validation_item.field_type = 'story'
+        switch value
+          when 'passcode'
+            validation_item.item.status = 'passcode'
+          when 'published'
+            validation_item.item.status = 'published'
+        storySetValidation.checkValidity validation_item
+    # $scope.$digest()
+
+  $scope.delete_selected_exhibits = () ->
+    $scope.modal_options = {
+      current_language: 
+        name: $scope.translations[$scope.current_museum.language]
+        language: $scope.current_museum.language
+      languages: $scope.modal_translations
+      exhibits: $scope.exhibits
+      deletion_password: '123456'
+    }
+    ModalDeleteInstance = $modal.open(
+      templateUrl: "myModalContent.html"
+      controller: ModalDeleteInstanceCtrl
+      resolve:
+        modal_options: ->
+          $scope.modal_options
+    )
+
+    ModalDeleteInstance.result.then ((selected, ids_to_delete) ->
+      for exhibit in $scope.exhibits
+        if exhibit.selected is true
+          exhibit.selected = false
+          $scope.delete_exhibit exhibit, selected
+    ), ->
+      console.log "Modal dismissed at: " + new Date()
+
+  $scope.delete_story = (stories, lang, callback) ->
+    $http.delete("#{$scope.backend_url}/story/#{stories[lang]._id}").success (data) ->
+      console.log data
+      callback(stories, lang) if callback?
+    .error ->
+      errorProcessing.addError 'Failed to delete story in languane: ' + $scope.translations[lang]
+
+  $scope.delete_story_set = (target_exhibit) ->
+    $http.delete("#{$scope.backend_url}/story_set/#{target_exhibit._id}/").success (data) ->
+      console.log data
+    .error ->
+      errorProcessing.addError 'Failed to delete exhibit with number' + target_exhibit.number
 
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
     if newValue
-      if $scope.current_museum._id
-        $http.put("#{$scope.backend_url}/story_set/#{$scope.current_museum._id}", $scope.current_museum).success (data) ->
-          console.log data
-          $scope.last_save_time = new Date()
-        .error ->
-          console.log 'fail'
+      if newValue isnt 'dummy'
+        if $scope.current_museum._id
+          $scope.create_new_language = false
+          $http.put("#{$scope.backend_url}/story_set/#{$scope.current_museum._id}", $scope.current_museum).success (data) ->
+            console.log data
+            $scope.last_save_time = new Date()
+          .error (error) ->
+            errorProcessing.addError 'Failed to save museum language'
 
   $scope.$on 'save_new_exhibit', ->
     console.log 'saving!'
+    $scope.new_exhibit.stories[$scope.current_museum.language].status = 'passcode'
     $http.post("#{$scope.backend_url}/story_set/", $scope.new_exhibit).success (data) ->
       $scope.exhibits.push $scope.new_exhibit
       $scope.new_exhibit._id = data._id
@@ -891,16 +1203,19 @@ angular.module("Museum.controllers", [])
         story.publish_state = 'passcode'
         story.story_set = data._id
         $scope.post_stories story
+      dropDown.find('.item_publish_settings').show()
+      dropDown.find('.delete_story').removeClass 'no_margin'
     .error ->
-      console.log 'fail'
+      errorProcessing.addError 'Failed to save new exhibit'
     $scope.new_item_creation = false
 
   $scope.$on 'changes_to_save', (event, child_scope) ->
     $http.put("#{$scope.backend_url}/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
       child_scope.satus = 'done'
       $scope.last_save_time = new Date()
+      console.log data
     .error ->
-      console.log 'fail'
+      errorProcessing.addError 'Server error - Prototype error.'
     $scope.forbid_switch  = false
 
   $scope.$on 'quiz_changes_to_save', (event, child_scope, correct_item) ->
@@ -915,120 +1230,19 @@ angular.module("Museum.controllers", [])
         console.log data
         $scope.last_save_time = new Date()
       .error ->
-        console.log 'fail'
+        errorProcessing.addError 'Failed to update quiz'
     $scope.forbid_switch  = false
-])
-
-.controller('DropDownController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', ($scope, $http, $filter, $window, $modal, storage, $rootScope) ->
-
-  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz', (newValue, oldValue) ->
-    if newValue.status is 'published'
-      console.log 'pub'
-      unless $("#story_quiz_enabled").is(':checked')
-        setTimeout ->
-          unless $scope.quizform.$valid
-            setTimeout ->
-              $("#story_quiz_disabled").click()
-            , 10
-        , 100
-      else
-        setTimeout ->
-          $("#story_quiz_enabled").click()
-        , 10
-    else
-      unless $("#story_quiz_disabled").is(':checked')
-        setTimeout ->
-          $("#story_quiz_disabled").click()
-        , 10
-  , true
-
-  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].quiz.question', (newValue, oldValue) ->
-    if $scope.quizform?
-      # console.log $scope.quizform
-      if $scope.quizform.$valid
-        $scope.mark_quiz_validity($scope.quizform.$valid)
-      else
-        setTimeout ->
-          $("#story_quiz_disabled").click()
-          $scope.mark_quiz_validity($scope.quizform.$valid)
-        , 10
-
-  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language].name', (newValue, oldValue) ->
-    form = $('#media form')
-    if form.length > 0
-      if $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status is 'dummy'
-        $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status = 'passcode' if newValue
-      else
-        unless $scope.$parent.new_item_creation
-          unless newValue 
-            $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue
-            $('.empty_name_error.name').show()
-            setTimeout ->
-              $('.empty_name_error.name').hide()
-            , 1500
-        # else
-        #   if newValue and $scope.$parent.new_item_creation
-        #     $rootScope.$broadcast 'save_new_exhibit'
-
-  # $scope.$watch '$parent.element_switch', (newValue, oldValue) ->
-  #   console.log  newValue, $scope
-  #   if newValue isnt oldValue
-  #     setTimeout ->
-  #       $scope.$parent.element_switch = false
-  #       $scope.$digest()
-  #     , 100
-
-  $scope.$watch '$parent.active_exhibit.number', (newValue, oldValue) ->
-    form = $('#media form')
-    if form.length > 0
-      unless $scope.$parent.new_item_creation || $scope.$parent.item_deletion
-        unless newValue 
-          $scope.$parent.active_exhibit.number = oldValue
-          $('.empty_name_error.number').show()
-          setTimeout ->
-            $('.empty_name_error.number').hide()
-          , 1500
-
-  $scope.$watch ->
-    angular.toJson($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].quiz.answers)
-  , (newValue, oldValue) ->
-    if $scope.quizform?
-      if $scope.quizform.$valid
-        $scope.mark_quiz_validity($scope.quizform.$valid)
-      else
-        setTimeout ->
-          $("#story_quiz_disabled").click()
-        , 10
-
-  , true
-
-  # qr_code workaround
-  $scope.$watch '$parent.active_exhibit.stories[$parent.current_museum.language]', (newValue, oldValue) ->
-    if newValue
-      unless $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code
-        $http.get("#{$scope.$parent.backend_url}/qr_code/#{$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id}").success (d) ->
-          $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d
-  , true
-
-  # $rootScope.$on "$locationChangeStart", (event, next, current) ->
-  #   next = next.split('/')
-  #   next = next[next.length-1]
-  #   console.log next
-  #   if next.length isnt ''
-  #     $scope.$apply $scope.museum_id = next
-
-
-  # $scope.$watch 'museum_id', (newValue, oldValue) ->
-  #   $scope.reload_museums()
-  # , true
-
-  true
 
 ])
 
 .controller('MuseumEditController', [ '$scope', '$http', '$filter', '$window', '$modal', 'storage', ($scope, $http, $filter, $window, $modal, storage) ->
 
-  $scope.$watch '$parent.current_museum.stories[$parent.current_museum.language].quiz', (newValue, oldValue) ->
+  setTimeout ->
+    $scope.$parent.museumQuizform = $scope.museumQuizform
+    $scope = $scope.$parent
+  , 100
+
+  $scope.$watch 'current_museum.stories[current_museum.language].quiz', (newValue, oldValue) ->
     if newValue.state is 'limited'
       unless $("#museum_story_quiz_disabled").is(':checked')
         setTimeout ->
@@ -1048,25 +1262,25 @@ angular.module("Museum.controllers", [])
         , 10
   , true
 
-  $scope.$watch '$parent.current_museum.stories[$parent.current_museum.language].quiz.question', (newValue, oldValue) ->
+  $scope.$watch 'current_museum.stories[current_museum.language].quiz.question', (newValue, oldValue) ->
     if $scope.museumQuizform?
       if $scope.museumQuizform.$valid
         $scope.mark_quiz_validity($scope.museumQuizform.$valid)
       else
         setTimeout ->
-          $("#story_quiz_disabled").click()
+          $("#museum_story_quiz_disabled").click()
           $scope.mark_quiz_validity($scope.museumQuizform.$valid)
         , 10
 
   $scope.$watch ->
-    angular.toJson($scope.$parent.current_museum.stories[$scope.$parent.current_museum.language].quiz.answers)
+    angular.toJson($scope.current_museum.stories[$scope.current_museum.language].quiz.answers)
   , (newValue, oldValue) ->
     if $scope.museumQuizform?
       if $scope.museumQuizform.$valid
         $scope.mark_quiz_validity($scope.museumQuizform.$valid)
       else
         setTimeout ->
-          $("#museum_#story_quiz_disabled").click()
+          $("#museum_story_quiz_disabled").click()
         , 10
 
   , true
@@ -1079,13 +1293,28 @@ angular.module("Museum.controllers", [])
 
   $scope.modal_options = modal_options
 
+  $scope.deletion_password = ''
+
   $scope.only_one = $scope.modal_options.languages.length is 1
+
+  $scope.password_input_shown = false
 
   $scope.ok = ->
     $scope.selected = []
+    $scope.ids_to_delete = []
     for language, value of $scope.modal_options.languages
       $scope.selected.push language if value.checked is true
-    $modalInstance.close $scope.selected
+
+    for exhibit in modal_options.exhibits
+      if exhibit.selected is true
+        $scope.ids_to_delete.push exhibit
+
+    if $scope.ids_to_delete.length <= 1
+      $modalInstance.close $scope.selected
+    else
+      $scope.password_input_shown = true
+      if $scope.deletion_password is modal_options.deletion_password
+        $modalInstance.close $scope.selected
 
   $scope.cancel = ->
     $modalInstance.dismiss()
@@ -1101,6 +1330,24 @@ angular.module("Museum.controllers", [])
 
   $scope.mark_default_only()
 
+@museumDeleteCtrl = ($scope, $modalInstance, modal_options) ->
+
+  $scope.modal_options = modal_options
+
+  $scope.deletion_password = ''
+
+  $scope.variant = {
+    checked: 'lang'
+  }
+
+  $scope.ok = ->
+    if $scope.deletion_password is modal_options.deletion_password
+      $modalInstance.close $scope.variant.checked
+
+  $scope.cancel = ->
+    $modalInstance.dismiss()
+
+
 @ModalDummyInstanceCtrl = ($scope, $modalInstance, modal_options) ->
   $scope.exhibit = modal_options.exhibit
 
@@ -1109,3 +1356,15 @@ angular.module("Museum.controllers", [])
 
   $scope.save_as = ->
     $modalInstance.close "save_as"
+
+@ModalMuseumInstanceCtrl = ($scope, $modalInstance, modal_options) ->
+
+  $scope.museum = modal_options.museum
+
+  $scope.translations = modal_options.translations
+
+  $scope.discard = ->
+    $modalInstance.close 'discard'
+
+  $scope.save_as = ->
+    $modalInstance.close "save", $scope.museum

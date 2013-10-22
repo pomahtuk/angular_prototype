@@ -47,9 +47,7 @@ angular.module("Museum.directives", [])
   link: (scope, element, attr) ->
     elem = $ element
     elem.click ->
-      $('.navigation').toggleClass 'navbar-fixed-top'
       $('.museum_navigation_menu').slideToggle(300)
-      $('body').toggleClass('fixed_navbar')
       setTimeout ->
         $.scrollTo(0,0)
       , 0
@@ -67,10 +65,6 @@ angular.module("Museum.directives", [])
       else
         filters.animate {'top': '0px'}, 300
       scope.filters_opened = !scope.filters_opened
-      scope.$digest()
-      setTimeout ->
-        $('body').toggleClass('filers')
-      , 100
 
 .directive 'postRender', ($timeout) ->
   restrict : 'A',
@@ -82,7 +76,7 @@ angular.module("Museum.directives", [])
     true
 
 # Custom HTML elements
-.directive "switchpubitem", ->
+.directive "switchpubitem", ($timeout, storySetValidation) ->
   restrict: "E"
   replace: true
   transclude: true
@@ -96,7 +90,7 @@ angular.module("Museum.directives", [])
     field_type: '@type'
     root: '=root'
   template: """
-    <div class="btn-group pull-right item_publish_settings">
+    <div class="btn-group pull-right item_publish_settings" ng-hide="item.status == 'draft'">
       <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" type="button" ng-switch on="item[field]">
         <div class="extra" ng-switch on="item[field]">
           <i class="icon-globe" ng-switch-when="published" ></i>
@@ -137,16 +131,15 @@ angular.module("Museum.directives", [])
       </ul>
     </div>
   """ 
-  controller: ($scope, $rootScope, $element, $attrs) ->
+  controller: ($scope, $rootScope, $element, $attrs, storySetValidation) ->
     $scope.status_process = ->
-      valid = true
-      if valid
-        $rootScope.$broadcast 'changes_to_save', $scope
+      storySetValidation.checkValidity $scope
+
   link: (scope, element, attrs) ->
     scope.hidden_list = true
     true
 
-.directive "switchpub", ->
+.directive "switchpub", ($timeout) ->
   restrict: "E"
   replace: true
   transclude: true
@@ -156,6 +149,7 @@ angular.module("Museum.directives", [])
     provider: '=ngProvider'
     field: '@field'
     field_type: '@type'
+    root: '=root'
   template: """
     <div class="btn-group pull-right">
       <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
@@ -184,12 +178,43 @@ angular.module("Museum.directives", [])
       </ul>
     </div>
   """  
-  controller: ($scope, $rootScope, $element, $attrs) ->
+  controller: ($scope, $rootScope, $element, $attrs, storySetValidation) ->
     $scope.status_process = ->
-      valid = true
-      if valid
-        $rootScope.$broadcast 'changes_to_save', $scope
+      storySetValidation.checkValidity $scope
+
   link: (scope, element, attrs) ->
+    true
+
+.directive "newLangSwitch", ($rootScope) ->
+  restrict: "E"
+  replace: true
+  scope:
+    museum: '=museum'
+  template: """
+    <div class="form-group">
+      <label class="col-xs-2 control-label" for="museum_language_select">Language</label>
+      <div class="help ng-scope" popover="Select language" popover-animation="true" popover-placement="bottom" popover-trigger="mouseenter">
+        <i class="icon-question-sign"></i>
+      </div>
+      <div class="col-xs-6 triggered">
+        <select class="form-control" ng-model="museum.language">
+          <option disabled="" selected="" value="dummy">Select a new language</option>
+          <option value="{{translation}}" ng-repeat="(translation, lang) in $parent.$parent.translations">{{lang}}</option>
+        </select>
+     </div>
+    </div>
+  """
+  controller: ($scope, $element, $attrs) ->
+    true
+  link: (scope, element, attrs) ->
+    
+    scope.$watch 'museum.language', (newValue, oldValue) ->
+      if newValue?
+        if newValue isnt 'new_lang'
+          console.log 'select', newValue
+          # scope.$parent.create_new_language = false
+          # $rootScope.$broadcast 'new_museum_language', newValue
+
     true
 
 .directive "placeholderfield", ($timeout) ->
@@ -206,7 +231,7 @@ angular.module("Museum.directives", [])
     placeholder: '=placeholder'
     field_type: '@type'
   template: """
-    <div class="form-group textfield">
+    <div class="form-group textfield {{field}}">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
@@ -233,9 +258,8 @@ angular.module("Museum.directives", [])
       if $scope.item[$scope.field] isnt $scope.oldValue
         $scope.status = 'progress'
         $scope.$digest()
-        if $scope.$parent.$parent.new_item_creation and $scope.field is 'name'
+        if $scope.$parent.new_item_creation and $scope.field is 'name'
           if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0 
-            console.log 'wow'
             $rootScope.$broadcast 'save_new_exhibit'
             return true
         $rootScope.$broadcast 'changes_to_save', $scope
@@ -243,20 +267,23 @@ angular.module("Museum.directives", [])
     element = $ element
     trigger = element.find('.trigger')
     triggered = element.find('.triggered')
+    control = element.find('.triggered > .form-control')
 
     element.find('span.placeholder').click ->
       trigger.hide()
-      triggered.show().children('.form-control').focus()
-      element.find('.triggered > .form-control').removeClass 'ng-invalid'
+      triggered.show()
+      control.val scope.item[scope.field]
+      control.focus()
+      control.removeClass 'ng-invalid'
 
     element.find('.triggered > .form-control').blur ->  
       elem = $ @
-      # unless (scope.$parent.$parent.new_item_creation && scope.field is 'number')
-      $timeout ->
-        scope.item[scope.field] = elem.val()
-        scope.$digest()
-        scope.status_process()
-      , 0, false
+      unless scope.$parent.new_item_creation && scope.field is 'number'
+        $timeout ->
+          scope.item[scope.field] = elem.val()
+          scope.$digest()
+          scope.status_process()
+        , 0, false
       if elem.val() isnt ''
         triggered.hide()
         trigger.show()
@@ -267,33 +294,47 @@ angular.module("Museum.directives", [])
             elem.val scope.oldValue
             scope.item[scope.field] = scope.oldValue
             scope.$digest()
+            # element.find('.error_text').show()
+            # setTimeout ->
+            #   element.find('.error_text').hide()
+            # , 2000
+            triggered.hide()
+            trigger.show()
             scope.status_process()
           , 0, false
 
     element.find('.triggered > .form-control').keyup ->  
+      elem = $ @
+      val = elem.val()
+      if val is '' and scope.field is 'name'
+        $timeout ->
+          elem.val scope.oldValue
+          scope.item[scope.field] = scope.oldValue
+          scope.$digest()
+          element.find('.error_text').show()
+          setTimeout ->
+            element.find('.error_text').hide()
+          , 2000
+          scope.status_process()
+        , 0, false
       true
 
-    # scope.edit_mode = false
     scope.$watch 'item[field]', (newValue, oldValue) ->
       scope.status = ''
-      unless newValue
+      criteria = if scope.field is 'number'
+        newValue?
+      else
+        newValue
+      unless criteria
         trigger.hide()
         triggered.show()
+        control.val ''
         if scope.filed is 'name'
           triggered.find('.form-control').focus()
       else
-        if scope.$parent.$parent.element_switch is true
+        if scope.$parent.element_switch is true
           trigger.show()
           triggered.hide()
-
-    # scope.$watch 'inv_sign', (newValue, oldValue) ->
-    #   if newValue is true
-    #     setTimeout ->
-    #       scope.name_error = false
-    #       console.log scope.name_error
-    #     , 1000
-    #   else
-    #     scope.empty_val = false
 
     true
 
@@ -312,7 +353,10 @@ angular.module("Museum.directives", [])
     field_type: '@type'
   template: """
     <div class="form-group textfield large_field">
-      <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
+      <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">
+        {{title}}
+        <span class="label label-danger" ng-show="field == 'long_description' && item[field].length == 0">Fill to publish</span>
+      </label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
@@ -335,29 +379,27 @@ angular.module("Museum.directives", [])
     $scope.update_old = ->
       $scope.oldValue = $scope.item[$scope.field]
     $scope.status_process = ->
-      if $scope.item[$scope.field] && $scope.item[$scope.field].length isnt 0 
-        if $scope.item[$scope.field] isnt $scope.oldValue
-          $scope.status = 'progress'
-          $scope.$digest()
-          $rootScope.$broadcast 'changes_to_save', $scope
-        $scope.empty_val = false
-        $scope.edit_mode = false
-      else
-        $scope.empty_val = true
+      if $scope.item[$scope.field] isnt $scope.oldValue
+        $scope.status = 'progress'
+        $scope.$digest()
+        $rootScope.$broadcast 'changes_to_save', $scope
   link: (scope, element, attrs) ->
-    scope.length_text = "осталось символов: 255"
+    scope.length_text = "осталось символов: #{scope.max_length}"
 
     element = $ element
     trigger = element.find('.trigger')
     triggered = element.find('.triggered')
     sumbols_left = element.find('.sumbols_left')
+    control = triggered.children('.form-control')
 
     element.find('span.placeholder').click ->
       trigger.hide()
-      triggered.show().children('.form-control').focus()
+      triggered.show()
+      control.val scope.item[scope.field]
+      control.focus()
       sumbols_left.show()
 
-    element.find('.triggered > .form-control').blur ->
+    control.blur ->
       elem = $ @
       $timeout ->
         scope.item[scope.field] = elem.val()
@@ -368,8 +410,9 @@ angular.module("Museum.directives", [])
         triggered.hide()
         trigger.show()
         sumbols_left.hide()
+        scope.status_process()
 
-    element.find('.triggered > .form-control').keyup (e) ->
+    control.keyup (e) ->
       elem = $ @
       value = elem.val()
       if value.length >= scope.max_length
@@ -380,6 +423,7 @@ angular.module("Museum.directives", [])
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.length_text = "осталось символов: 255"
+        control.val ''
         trigger.hide()
         triggered.show()
       else
@@ -387,7 +431,7 @@ angular.module("Museum.directives", [])
         # scope.length_text = "осталось символов: #{scope.max_length - newValue.length - 1}"
         # if newValue.length >= scope.max_length
         #   scope.item[scope.field] = newValue.substr(0, scope.max_length-1)
-        if scope.$parent.$parent.element_switch is true
+        if scope.$parent.element_switch is true
           trigger.show()
           triggered.hide()
         true
@@ -464,7 +508,7 @@ angular.module("Museum.directives", [])
         trigger.hide()
         triggered.show()
       else
-        if scope.$parent.$parent.element_switch is true
+        if scope.$parent.element_switch is true
           trigger.show()
           triggered.hide()
 
@@ -524,8 +568,11 @@ angular.module("Museum.directives", [])
     field: '@ngField'
     parent: '=parent'
   template: """
-    <div class="form-group">
-      <label class="col-xs-2 control-label" for="audio">Audio</label>
+    <div class="form-group audio">
+      <label class="col-xs-2 control-label" for="audio">
+        Audio
+        <span class="label label-danger" ng-show="edit_mode">Fill to publish</span>
+      </label>
       <div class="help">
         <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
       </div>
@@ -577,7 +624,8 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="triggered" ng-show="edit_mode">
-        <a href="#" class="btn btn-default" button-file-upload="">Upload a file</a> or drag an audio here
+        <a href="#" class="btn btn-default" button-file-upload="">Upload a file</a>
+        <span class="or_drag">or drag an audio here</span>
       </div>
       <status-indicator ng-binding="item" ng-field="field"></statusIndicator>
     </div>
@@ -663,15 +711,14 @@ angular.module("Museum.directives", [])
 
 .directive 'canDragAndDrop', ->
   restrict : 'A'
-  require: '?ngModel'
   scope:
-    model: '=ngModel'
+    model: '=model'
     url: '@uploadTo'
     selector: '@selector'
     selector_dropzone: '@selectorDropzone'
   link : (scope, element, attrs) ->
 
-    scope.$parent.$parent.loading_in_progress = false
+    scope.$parent.loading_in_progress = false
 
     fileSizeMb = 50
 
@@ -683,6 +730,7 @@ angular.module("Museum.directives", [])
       type = 'unsupported'
       type = 'image' if $.inArray(extension, gon.acceptable_extensions.image) != -1
       type = 'audio' if $.inArray(extension, gon.acceptable_extensions.audio) != -1
+      type = 'video' if $.inArray(extension, gon.acceptable_extensions.video) != -1
       type
 
     correctFileSize = (object) ->
@@ -692,13 +740,13 @@ angular.module("Museum.directives", [])
       $(".progress").hide()
       setTimeout ->
         $("body").removeClass "in"
-        scope.$parent.$parent.loading_in_progress = false
-        scope.$parent.$parent.forbid_switch = false
+        scope.$parent.loading_in_progress = false
+        scope.$parent.forbid_switch = false
       , 1000
 
     initiate_progress = ->
-      scope.$parent.$parent.loading_in_progress = true
-      scope.$parent.$parent.forbid_switch = true
+      scope.$parent.loading_in_progress = true
+      scope.$parent.forbid_switch = true
       scope.$digest()
       $("body").addClass "in"
       $(".progress .progress-bar").css "width", 0 + "%"
@@ -715,8 +763,15 @@ angular.module("Museum.directives", [])
         $.each data.files, (index, file) ->
           console.log "Dropped file: " + file.name
       add: (e, data) ->
-        if checkExtension(data) is 'image' || checkExtension(data) is 'audio'
+        type = checkExtension(data)
+        if type is 'image' || type is 'audio' || type is 'video'
           if correctFileSize(data)
+            parent = scope.model._id
+            parent = scope.model.stories[scope.$parent.current_museum.language]._id if type is 'audio' || type is 'video'
+            data.formData = {
+              type: type
+              parent: parent
+            }
             data.submit()
           else
             console.log 'error: file size'
@@ -731,7 +786,9 @@ angular.module("Museum.directives", [])
             scope.model.images = [] unless scope.model.images?
             scope.$apply scope.model.images.push file
           else if file.type is 'audio'
-            scope.$apply scope.model.audio = file
+            scope.$apply scope.model.stories[scope.$parent.current_museum.language].audio = file
+          else if file.type is 'video'
+            scope.$apply scope.model.stories[scope.$parent.current_museum.language].video = file
           scope.$digest()
       error: (result, status, errorThrown) ->
         console.log status, result, errorThrown
@@ -746,10 +803,16 @@ angular.module("Museum.directives", [])
             console.log 'unknown error'
       progressall: (e, data) ->
         progress = parseInt(data.loaded / data.total * 100, 10)
-        # console.log data, scope.$parent.$parent.loading_in_progress
+        delimiter = 102.4
+        speed = Math.round(data.bitrate / delimiter) / 10
+        speed_text = "#{speed} Кб/с"
+        if speed > 1000
+          speed =  Math.round(speed / delimiter) / 10
+          speed_text = "#{speed} Мб/с"
+        $(".progress .progress-text").html "&nbsp;&nbsp; Загружено #{Math.round(data.loaded / 1024)} Кб из #{Math.round(data.total / 1024)} Кб, скорость: #{speed_text}"
         $(".progress .progress-bar").css "width", progress + "%"
         if data.loaded is data.total
-          scope.$parent.$parent.last_save_time = new Date()
+          scope.$parent.last_save_time = new Date()
           hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
@@ -767,7 +830,7 @@ angular.module("Museum.directives", [])
     elem.click (e) ->
       e.preventDefault()
       elem = $ @
-      parent = elem.parents('#drop_down, #museum_drop_down')
+      parent = elem.parents('#drop_down, #museum_edit_dropdown')
       parent.find('.images :file').click()
 
 .directive 'deleteMedia', ->
@@ -796,7 +859,7 @@ angular.module("Museum.directives", [])
             else if scope.media.type is 'audio'
               scope.model.audio = undefined
               scope.$digest()
-            scope.$parent.$parent.last_save_time = new Date()
+            scope.$parent.last_save_time = new Date()
 
 .directive 'dragAndDropInit', ->
   link: (scope, element, attrs) ->
@@ -836,6 +899,286 @@ angular.module("Museum.directives", [])
             doc.removeClass "in"
         , 300
 
+.directive 'dropDownEdit', ($timeout, $http) ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+
+    quiz_watcher     = null
+    question_watcher = null
+    name_watcher     = null
+    answers_watcher  = null
+    qr_code_watcher  = null
+
+    # console.log scope
+    scope.$watch 'active_exhibit.stories[current_museum.language]', (newValue, oldValue) ->
+      quiz_watcher() if quiz_watcher?
+      question_watcher() if question_watcher?
+      name_watcher() if name_watcher?
+      answers_watcher() if answers_watcher?
+      qr_code_watcher() if qr_code_watcher?
+      if newValue?
+        quiz_watcher = scope.$watch 'active_exhibit.stories[current_museum.language].quiz', (newValue, oldValue) ->
+          if newValue?
+            if newValue isnt oldValue
+              if newValue.status is 'published'
+                console.log 'pub'
+                unless $("#story_quiz_enabled").is(':checked')
+                  setTimeout ->
+                    unless scope.quizform.$valid
+                      setTimeout ->
+                        $("#story_quiz_disabled").click()
+                      , 10
+                  , 100
+                else
+                  setTimeout ->
+                    $("#story_quiz_enabled").click()
+                  , 10
+              else
+                unless $("#story_quiz_disabled").is(':checked')
+                  setTimeout ->
+                    $("#story_quiz_disabled").click()
+                  , 10
+
+        question_watcher = scope.$watch 'active_exhibit.stories[current_museum.language].quiz.question', (newValue, oldValue) ->
+          if scope.quizform? && newValue isnt oldValue
+            # console.log $scope.quizform
+            if scope.quizform.$valid
+              scope.mark_quiz_validity(scope.quizform.$valid)
+            else
+              setTimeout ->
+                $("#story_quiz_disabled").click()
+                scope.mark_quiz_validity(scope.quizform.$valid)
+              , 10
+
+        name_watcher = scope.$watch 'active_exhibit.stories[current_museum.language].name', (newValue, oldValue) ->
+          if newValue?
+            form = $('#media form')
+            if form.length > 0
+              if scope.active_exhibit.stories[scope.current_museum.language].status is 'dummy'
+                scope.active_exhibit.stories[scope.current_museum.language].status = 'passcode' if newValue
+              else
+                unless scope.new_item_creation
+                  unless newValue 
+                    scope.active_exhibit.stories[scope.current_museum.language].name = oldValue
+                    $('.empty_name_error.name').show()
+                    setTimeout ->
+                      $('.empty_name_error.name').hide()
+                    , 1500
+                # else
+                #   if newValue and $scope.$parent.new_item_creation
+                #     $rootScope.$broadcast 'save_new_exhibit'
+
+        answers_watcher = scope.$watch ->
+          if scope.active_exhibit.stories[scope.current_museum.language]?
+            angular.toJson(scope.active_exhibit.stories[scope.current_museum.language].quiz.answers)
+          else
+            undefined
+        , (newValue, oldValue) ->
+          if newValue?
+            if scope.quizform?
+              if scope.quizform.$valid
+                scope.mark_quiz_validity(scope.quizform.$valid)
+              else
+                setTimeout ->
+                  $("#story_quiz_disabled").click()
+                , 10
+
+        # qr_code workaround
+        qr_code_watcher =  scope.$watch 'active_exhibit.stories[current_museum.language]', (newValue, oldValue) ->
+          if newValue
+            unless scope.active_exhibit.stories[scope.current_museum.language].qr_code
+              $http.get("#{scope.backend_url}/qr_code/#{scope.active_exhibit.stories[scope.current_museum.language]._id}").success (d) ->
+                scope.active_exhibit.stories[scope.current_museum.language].qr_code = d
+
+.directive 'openLightbox', ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+    element = $ element
+    lightbox = element.parents('#drop_down, #museum_edit_dropdown').find('.lightbox_area')
+    element.click ->
+      lightbox.show()
+      lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
+    true
+
+.directive 'lightboxCropper', ($http) ->
+  restrict: "E"
+  replace: true
+  transclude: true
+  scope:
+    model: '=model'
+  template: """
+    <div class="lightbox_area">
+      <div class="explain_text">
+        Select the preview area. Images won't crop. You can always return to this later on.
+      </div>
+      <button class="btn btn-warning apply_resize" type="button">Done</button>
+      <div class="content">
+        <div class="preview">
+          PREVIEW
+          <div class="exhibit">
+            <div class="image">
+              <img src="{{model.images[active_image_index].url}}">
+            </div>
+            <div class="description">
+              <h4>
+                {{model.number}} {{model.stories[$parent.current_museum.language].name}}
+              </h4>
+            </div>
+          </div>
+        </div>
+        <div class="cropping_area">
+          <img src="{{model.images[active_image_index].url}}">
+        </div>
+      </div>
+      <div class="slider">
+        <a class="left" href="#" ng-click="set_index(active_imge_index - 1)">
+          <i class="icon-angle-left"></i>
+        </a>
+        <img class="thumb item_{{$index}}" ng-click="set_index($index)" ng-class="{'active':image.active}" src="{{image.thumbnailUrl}}" ng-repeat="image in model.images">
+        <a class="right" href="#" ng-click="set_index(active_image_index + 1)">
+          <i class="icon-angle-right"></i>
+        </a>
+      </div>
+    </div>
+  """
+  controller: ($scope, $element, $attrs) ->
+
+    $scope.set_index = (index) ->
+      $scope.update_media $scope.active_image_index, ->
+        $scope.active_image_index = index
+        console.log $scope.active_image_index, index
+
+    $scope.check_active_image = ->
+      for image, index in $scope.model.images
+        image.active = if index is $scope.active_image_index
+          true
+        else
+          false
+      
+  link: (scope, element, attrs) ->
+    element = $ element
+    right   = element.find('a.right')
+    left    = element.find('a.left')
+    cropper = element.find('.cropping_area img')
+    preview = element.find('.exhibit .image img')
+    done    = element.find('.apply_resize')
+    imageWidth  = 0
+    imageHeight = 0
+    max_height  = 330
+    prev_height = 150
+    prev_width  = 200
+    selected    = {}
+    bounds = []
+
+    done.click ->
+      image = scope.model.images[scope.active_image_index]
+      scope.update_media scope.active_image_index, ->
+        images =  scope.model.images
+        images.sort (a, b) ->
+          a = new Date(a.updated)
+          b = new Date(b.updated)
+          if a < b 
+            1 
+          else
+            if a > b 
+              -1 
+            else 
+              0
+        scope.model.images = images
+        if scope.model.type is 'exhibit' 
+          $('ul.exhibits li.exhibit.active').find('.image img').attr 'src', image.thumbnailUrl
+        element.hide()
+      false
+
+    scope.update_media = (index, callback) ->
+      $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index]._id}", selected).success (data) ->
+        console.log  data
+        scope.model.images[index] = data
+        # scope.$digest()
+        callback() if callback
+        return true
+      .error ->
+        errorProcessing.addError 'Failed to update a thumbnail'
+        return false
+
+    showPreview = (coords) ->
+      selected = coords
+      rx = 200 / selected.w
+      ry = 150 / selected.h
+      preview.css
+        width: Math.round(rx * bounds[0]) + "px"
+        height: Math.round(ry * bounds[1]) + "px"
+        marginLeft: "-" + Math.round(rx * selected.x) + "px"
+        marginTop: "-" + Math.round(ry * selected.y) + "px"
+
+    getSelection = (selection) ->
+      # console.log selection
+      result = [selection.x, selection.y, selection.x2, selection.y2] #array [ x, y, x2, y2 ]
+      result
+
+    cropper.on 'load', ->
+      imageWidth = cropper.get(0).naturalWidth
+      imageHeight = cropper.get(0).naturalHeight
+
+      cropper.height max_height
+      cropper.width imageWidth * ( max_height / imageHeight )
+
+      preview.attr 'style', ""
+
+      if scope.model.images[scope.active_image_index].selection
+        selected = JSON.parse scope.model.images[scope.active_image_index].selection 
+      else
+        selected = {
+          x: 0
+          y: 0
+          w: imageWidth
+          h: imageHeight
+          x2: imageWidth
+          y2: imageHeight
+        }
+
+      options =
+        boxWidth: cropper.width()
+        boxHeight: cropper.height()
+        aspectRatio: 4 / 3
+        setSelect: getSelection(selected)
+        trueSize: [imageWidth, imageHeight]
+        onChange: showPreview
+        onSelect: showPreview
+      
+      @jcrop.destroy() if @jcrop
+
+      jcrop = null
+
+      cropper.Jcrop options, -> 
+        jcrop = @
+        bounds = jcrop.getBounds()
+
+      showPreview selected
+
+      @jcrop = jcrop
+
+    scope.$watch 'model.images', (newValue, oldValue) ->
+      if newValue?
+        if newValue.length > 0
+          for image in newValue
+            image.active = false
+          newValue[0].active = true
+          left.css({'opacity': 0})
+          scope.active_image_index = 0
+
+    scope.$watch 'active_image_index', (newValue, oldValue) ->
+      if newValue?
+        left.css({'opacity': 255})
+        right.css({'opacity': 255})
+        if newValue is scope.model.images.length - 1
+          right.css({'opacity': 0})
+        if newValue is 0
+          left.css({'opacity': 0})
+        scope.check_active_image()      
+
+    true
+
 .directive 'switchToggle', ($timeout) ->
   restrict: 'A'
   controller:  ($scope, $rootScope, $element, $attrs, $http) ->
@@ -847,7 +1190,7 @@ angular.module("Museum.directives", [])
           $http.put("#{$scope.backend_url}/quiz/#{item._id}", item).success (data) ->
             console.log data
           .error ->
-            console.log 'fail'
+            errorProcessing.addError 'Failed to save quiz state'
           true
         , 0
       else
@@ -878,3 +1221,46 @@ angular.module("Museum.directives", [])
         $("label[for=#{selector}_disabled]").text('Disabled')
         $("label[for=#{selector}_enabled]").text('Enable')
         true
+
+.directive 'errorNotification', (errorProcessing) ->
+  restrict: "E"
+  replace: true
+  transclude: true
+  template: """
+    <div class="error_notifications">
+      <div class="alert alert-danger" ng-repeat="error in errors">
+        {{error.error}}
+        <a class="close" href="#" ng-click="dismiss_error($index)" >&times;</a>
+      </div>
+    </div>
+  """
+  link: (scope, element, attrs) ->
+    scope.errors = errorProcessing.getErrors()
+
+    scope.dismiss_error = (index) ->
+      errorProcessing.deleteError(index)
+
+    scope.$on 'new_error', (event, errors) ->
+      scope.errors = errors
+
+.directive 'scrollspyInit', ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+    opener = {
+      target: $('.museum_edit_opener')
+    }
+    $("ul.exhibits").scrollspy
+      min: 50
+      onEnter: (element, position) ->
+        $(".float_menu").addClass "navbar-fixed-top"
+        $(".navigation").addClass "bottom-padding"
+
+      onLeave: (element, position) ->
+        $(".float_menu").removeClass "navbar-fixed-top"
+        $(".navigation").removeClass "bottom-padding"
+
+      onTick: (position,state,enters,leaves) ->
+        if scope.museum_edit_dropdown_opened
+          scope.show_museum_edit(opener)
+        $('.museum_navigation_menu').hide()
+        #hide all menus

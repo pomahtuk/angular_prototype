@@ -51,58 +51,68 @@
     "acceptable_extensions": {
       "audio": ["mp3", "ogg", "aac", "wav", "amr", "3ga", "m4a", "wma", "mp4", "mp2", "flac"],
       "image": ["jpg", "jpeg", "gif", "png", "tiff", "bmp"],
-      "video": ["mp4", "m4v"]
+      "video": ["mp4", "m4v", "avi", "ogv"]
     },
     "development": false
   };
 
   angular.module("Museum.controllers", []).controller('IndexController', [
-    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', 'ngProgress', function($scope, $http, $filter, $window, $modal, $routeParams, ngProgress) {
+    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', 'ngProgress', 'storySetValidation', 'errorProcessing', function($scope, $http, $filter, $window, $modal, $routeParams, ngProgress, storySetValidation, errorProcessing) {
       var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
       window.sc = $scope;
       $scope.exhibit_search = '';
       $scope.criteriaMatch = function(criteria) {
         return function(item) {
           var in_string;
-          if (item.stories[$scope.current_museum.language].name) {
-            in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
-            $scope.grid();
-            return in_string || criteria === '';
+          if (item.stories[$scope.current_museum.language] != null) {
+            if (item.stories[$scope.current_museum.language].name) {
+              in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
+              $scope.grid();
+              return in_string || criteria === '';
+            } else {
+              return true;
+            }
           } else {
             return true;
           }
         };
       };
-      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "524a0bd2c4e48d499c000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "524a0bd2c4e48d499c000001";
-      $scope.backend_url = "http://192.168.216.128:3000";
+      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "5260c63ceb6688e516000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "5260c63ceb6688e516000001";
+      $scope.backend_url = "http://192.168.158.128:3000";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
       $scope.ajax_progress = true;
       $scope.reload_exhibits = function(sort_field, sort_direction) {
-        console.log(museum_id);
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
           exhibits = [];
+          $scope.modal_translations = {};
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             item = data[_i];
-            exhibit = item.exhibit;
-            exhibit.stories = {};
-            _ref = item.stories;
-            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-              story = _ref[_j];
-              story.story.quiz = story.quiz.quiz;
-              story.story.images = story.images;
-              story.story.audio = story.audio;
-              story.story.quiz.answers = story.quiz.answers;
-              exhibit.stories[story.story.language] = story.story;
+            if (item != null) {
+              exhibit = item.exhibit;
+              exhibit.images = item.images;
+              exhibit.stories = {};
+              _ref = item.stories;
+              for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+                story = _ref[_j];
+                story.story.quiz = story.quiz.quiz;
+                story.story.audio = story.audio;
+                story.story.video = story.video;
+                story.story.quiz.answers = story.quiz.answers;
+                exhibit.stories[story.story.language] = story.story;
+                $scope.modal_translations[story.story.language] = {
+                  name: $scope.translations[story.story.language]
+                };
+              }
+              exhibits.push(exhibit);
             }
-            exhibits.push(exhibit);
           }
           ngProgress.complete();
+          $scope.active_exhibit = exhibits[0];
           $scope.exhibits = exhibits;
-          $scope.active_exhibit = $scope.exhibits[0];
           $scope.ajax_progress = false;
           if (exhibits.length === 0) {
             return $scope.active_exhibit = {
@@ -177,16 +187,19 @@
             item = data[_i];
             museum = item.exhibit;
             museum.def_lang = "ru";
-            museum.language = "ru";
+            if (!museum.language) {
+              museum.language = "ru";
+            }
             museum.package_status = "process";
             museum.stories = {};
+            museum.images = item.images;
             _ref = item.stories;
             for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
               story = _ref[_j];
               story.story.city = "Saint-Petersburg";
               story.story.quiz = story.quiz.quiz;
-              story.story.images = story.images;
               story.story.audio = story.audio;
+              story.story.video = story.video;
               story.story.quiz.answers = story.quiz.answers;
               museum.stories[story.story.language] = story.story;
             }
@@ -295,7 +308,42 @@
       $scope.translations = {
         ru: 'Russian',
         en: 'English',
-        es: 'Spanish'
+        es: 'Spanish',
+        ge: 'German',
+        fi: 'Finnish',
+        sw: 'Sweedish',
+        it: 'Italian',
+        fr: 'French',
+        kg: 'Klingon'
+      };
+      $scope.modal_translations = {
+        ru: {
+          name: 'Russian'
+        },
+        en: {
+          name: 'English'
+        },
+        es: {
+          name: 'Spanish'
+        },
+        ge: {
+          name: 'German'
+        },
+        fi: {
+          name: 'Finnish'
+        },
+        sw: {
+          name: 'Sweedish'
+        },
+        it: {
+          name: 'Italian'
+        },
+        fr: {
+          name: 'French'
+        },
+        kg: {
+          name: 'Klingon'
+        }
       };
       $scope.exhibits = [
         {
@@ -325,6 +373,66 @@
           ],
           stories: {
             ru: {
+              name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+              description: 'test description',
+              publish_state: 'all',
+              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
+              quiz: {
+                question: 'are you sure?',
+                description: 'can you tell me?',
+                state: 'published',
+                answers: [
+                  {
+                    title: 'yes',
+                    correct: false,
+                    id: 0
+                  }, {
+                    title: 'may be',
+                    correct: true,
+                    id: 1
+                  }, {
+                    title: 'who cares?',
+                    correct: false,
+                    id: 2
+                  }, {
+                    title: 'nope',
+                    correct: false,
+                    id: 3
+                  }
+                ]
+              }
+            },
+            en: {
+              name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+              description: 'test description',
+              publish_state: 'all',
+              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
+              quiz: {
+                question: 'are you sure?',
+                description: 'can you tell me?',
+                state: 'published',
+                answers: [
+                  {
+                    title: 'yes',
+                    correct: false,
+                    id: 0
+                  }, {
+                    title: 'may be',
+                    correct: true,
+                    id: 1
+                  }, {
+                    title: 'who cares?',
+                    correct: false,
+                    id: 2
+                  }, {
+                    title: 'nope',
+                    correct: false,
+                    id: 3
+                  }
+                ]
+              }
+            },
+            es: {
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
               description: 'test description',
               publish_state: 'all',
@@ -479,6 +587,7 @@
       };
       $scope.element_switch = true;
       $scope.forbid_switch = false;
+      $scope.create_new_language = false;
       dropDown = $('#drop_down').removeClass('hidden').hide();
       findActive = function() {
         return $('ul.exhibits li.exhibit.active');
@@ -648,8 +757,24 @@
       });
       $scope.new_item_creation = false;
       $scope.all_selected = false;
+      $scope.modal_options = {
+        current_language: {
+          name: $scope.translations[$scope.current_museum.language],
+          language: $scope.current_museum.language
+        },
+        languages: $scope.modal_translations,
+        exhibits: $scope.exhibits,
+        deletion_password: '123456'
+      };
       get_number = function() {
-        return parseInt($scope.exhibits[$scope.exhibits.length - 1].number, 10) + 1;
+        var res;
+        res = 0;
+        if ($scope.exhibits[$scope.exhibits.length - 1]) {
+          res = parseInt($scope.exhibits[$scope.exhibits.length - 1].number, 10) + 1;
+        } else {
+          res = 1;
+        }
+        return res;
       };
       get_lang = function() {
         return $scope.current_museum.language;
@@ -668,12 +793,99 @@
           return '';
         }
       };
+      $scope.create_dummy_story = function(id) {
+        var dummy_story, i, _i;
+        dummy_story = {
+          playback_algorithm: 'generic',
+          content_provider: content_provider_id,
+          story_type: 'story',
+          status: 'draft',
+          language: 'dummy',
+          name: '',
+          short_description: '',
+          long_description: '',
+          story_set: id
+        };
+        dummy_story.quiz = {
+          story: "",
+          question: '',
+          comment: '',
+          status: 'passcode',
+          answers: []
+        };
+        for (i = _i = 0; _i <= 3; i = ++_i) {
+          dummy_story.quiz.answers.push({
+            quiz: "",
+            content: '',
+            correct: false
+          });
+        }
+        dummy_story.quiz.answers[0].correct = true;
+        return dummy_story;
+      };
+      $scope.new_museum_language = function() {
+        var ModalMuseumInstance, dummy_story;
+        $scope.create_new_language = true;
+        dummy_story = $scope.create_dummy_story($scope.current_museum._id);
+        dummy_story.quiz.answers[0].correct = true;
+        $scope.dummy_museum = angular.copy($scope.current_museum);
+        $scope.dummy_museum.stories.dummy = dummy_story;
+        $scope.dummy_museum.stories.dummy.status = 'passcode';
+        $scope.dummy_museum.language = 'dummy';
+        $scope.modal_options = {
+          museum: $scope.dummy_museum,
+          translations: $scope.translations
+        };
+        ModalMuseumInstance = $modal.open({
+          templateUrl: "myMuseumModalContent.html",
+          controller: ModalMuseumInstanceCtrl,
+          resolve: {
+            modal_options: function() {
+              return $scope.modal_options;
+            }
+          }
+        });
+        ModalMuseumInstance.result.then((function(result_string) {
+          var exhibit, lang, story, _i, _len, _ref;
+          switch (result_string) {
+            case 'save':
+              true;
+              console.log($scope.dummy_museum);
+              lang = $scope.dummy_museum.language;
+              $scope.dummy_museum.stories[lang] = $scope.dummy_museum.stories.dummy;
+              $scope.dummy_museum.stories[lang].language = lang;
+              _ref = $scope.exhibits;
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                exhibit = _ref[_i];
+                exhibit.stories[lang] = $scope.dummy_museum.stories[lang];
+                exhibit.stories[lang].language = lang;
+                exhibit.stories[lang].name = "";
+                exhibit.stories[lang].status = 'draft';
+                exhibit.stories[lang].story_set = exhibit._id;
+                story = angular.copy(exhibit.stories[lang]);
+                $scope.post_stories(story);
+              }
+              $scope.current_museum.stories[lang] = $scope.dummy_museum.stories[lang];
+              $scope.current_museum.language = lang;
+              story = angular.copy($scope.dummy_museum.stories[lang]);
+              story.story_set = $scope.current_museum._id;
+              $scope.post_stories(story);
+              return $scope.create_new_language = false;
+            case 'discard':
+              return true;
+          }
+        }), function() {
+          return console.log("Modal dismissed at: " + new Date());
+        });
+        return true;
+      };
       $scope.create_new_item = function() {
         var e, i, lang, number, _i;
         if ($scope.new_item_creation !== true) {
           number = get_number();
           $scope.new_exhibit = {
             content_provider: content_provider_id,
+            number: number,
             type: 'exhibit',
             distance: 20,
             duration: 20,
@@ -688,15 +900,13 @@
             },
             stories: {}
           };
-          $scope.new_exhibit.number = number;
           $scope.new_exhibit.images = [];
-          console.log($scope.new_exhibit);
           for (lang in $scope.current_museum.stories) {
             $scope.new_exhibit.stories[lang] = {
               playback_algorithm: 'generic',
               content_provider: content_provider_id,
               story_type: 'story',
-              status: 'passcode',
+              status: 'draft',
               language: lang,
               name: '',
               short_description: '',
@@ -714,8 +924,7 @@
               $scope.new_exhibit.stories[lang].quiz.answers.push({
                 quiz: "",
                 content: '',
-                correct: false,
-                _id: i
+                correct: false
               });
             }
             $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true;
@@ -757,13 +966,6 @@
       $scope.delete_modal_open = function() {
         var ModalDeleteInstance;
         if (!$scope.new_item_creation) {
-          $scope.modal_options = {
-            current_language: {
-              name: $scope.translations[$scope.current_museum.language],
-              language: $scope.current_museum.language
-            },
-            languages: $scope.current_museum.stories
-          };
           ModalDeleteInstance = $modal.open({
             templateUrl: "myModalContent.html",
             controller: ModalDeleteInstanceCtrl,
@@ -774,71 +976,121 @@
             }
           });
           return ModalDeleteInstance.result.then((function(selected) {
-            var exhibit, index, item, st_index, story, _i, _len, _ref, _ref1, _results, _results1;
-            $scope.selected = selected;
-            if (Object.keys($scope.active_exhibit.stories).length === selected.length) {
-              $scope.closeDropDown();
+            return $scope.delete_exhibit($scope.active_exhibit, selected);
+          }), function() {
+            return console.log("Modal dismissed at: " + new Date());
+          });
+        } else {
+          return true;
+        }
+      };
+      $scope.delete_museum_modal_open = function() {
+        var museumDeleteInstance;
+        if (!$scope.new_item_creation) {
+          museumDeleteInstance = $modal.open({
+            templateUrl: "museumDelete.html",
+            controller: museumDeleteCtrl,
+            resolve: {
+              modal_options: function() {
+                return $scope.modal_options;
+              }
+            }
+          });
+          return museumDeleteInstance.result.then((function(selected) {
+            var exhibit, lang, museum, _i, _j, _len, _len1, _ref, _ref1;
+            lang = $scope.current_museum.language;
+            if (selected === 'lang') {
+              $scope.current_museum.language = $scope.current_museum.def_lang;
               _ref = $scope.exhibits;
-              _results = [];
-              for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-                exhibit = _ref[index];
-                if (exhibit._id === $scope.active_exhibit._id) {
-                  $scope.exhibits.splice(index, 1);
-                  $scope.grid();
-                  $http["delete"]("" + $scope.backend_url + "/story_set/" + $scope.active_exhibit._id + "/").success(function(data) {
-                    console.log(data);
-                    return $scope.active_exhibit = $scope.exhibits[0];
-                  }).error(function() {
-                    return console.log('error');
-                  });
-                  break;
-                } else {
-                  _results.push(void 0);
-                }
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                exhibit = _ref[_i];
+                $scope.delete_story(exhibit.stories, lang, function(stories, lang) {
+                  delete stories[lang];
+                  return true;
+                });
               }
-              return _results;
+              return $scope.delete_story($scope.current_museum.stories, lang, function(stories, lang) {
+                delete stories[lang];
+                return true;
+              });
             } else {
-              _ref1 = $scope.active_exhibit.stories;
-              _results1 = [];
-              for (st_index in _ref1) {
-                story = _ref1[st_index];
-                _results1.push((function() {
-                  var _j, _len1, _results2;
-                  _results2 = [];
-                  for (_j = 0, _len1 = selected.length; _j < _len1; _j++) {
-                    item = selected[_j];
-                    if (item === st_index) {
-                      story = $scope.active_exhibit.stories[st_index];
-                      story.status = 'dummy';
-                      story.name = '';
-                      story.short_description = '';
-                      story.long_description = '';
-                      story.quiz.question = '';
-                      story.quiz.comment = '';
-                      story.quiz.status = '';
-                      story.quiz.answers[0].content = '';
-                      story.quiz.answers[0].correct = true;
-                      story.quiz.answers[1].content = '';
-                      story.quiz.answers[1].correct = false;
-                      story.quiz.answers[2].content = '';
-                      story.quiz.answers[2].correct = false;
-                      story.quiz.answers[3].content = '';
-                      story.quiz.answers[3].correct = false;
-                      _results2.push($scope.update_story(story));
-                    } else {
-                      _results2.push(void 0);
-                    }
-                  }
-                  return _results2;
-                })());
+              console.log('deleting museum story or whole museum');
+              museum = $scope.current_museum;
+              _ref1 = $scope.exhibits;
+              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                exhibit = _ref1[_j];
+                $scope.delete_story_set(exhibit);
               }
-              return _results1;
+              return $scope.delete_story_set(museum);
             }
           }), function() {
             return console.log("Modal dismissed at: " + new Date());
           });
         } else {
           return true;
+        }
+      };
+      $scope.delete_exhibit = function(target_exhibit, languages) {
+        var exhibit, index, item, st_index, story, _i, _len, _ref, _ref1, _results, _results1;
+        if (Object.keys(target_exhibit.stories).length === languages.length) {
+          $scope.closeDropDown();
+          _ref = $scope.exhibits;
+          _results = [];
+          for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+            exhibit = _ref[index];
+            if (exhibit._id === target_exhibit._id) {
+              $scope.exhibits.splice(index, 1);
+              $scope.grid();
+              if (target_exhibit._id === $scope.active_exhibit._id) {
+                $scope.active_exhibit = $scope.exhibits[0];
+              }
+              $scope.delete_story_set(target_exhibit);
+              break;
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        } else {
+          console.log(target_exhibit._id);
+          _ref1 = target_exhibit.stories;
+          _results1 = [];
+          for (st_index in _ref1) {
+            story = _ref1[st_index];
+            _results1.push((function() {
+              var _j, _len1, _results2;
+              _results2 = [];
+              for (_j = 0, _len1 = languages.length; _j < _len1; _j++) {
+                item = languages[_j];
+                if (item === st_index) {
+                  story = target_exhibit.stories[st_index];
+                  story.status = 'dummy';
+                  story.name = '';
+                  story.short_description = '';
+                  story.long_description = '';
+                  story.quiz.question = '';
+                  story.quiz.comment = '';
+                  story.quiz.status = '';
+                  if (!story.quiz.answers) {
+                    story.quiz.answers = [];
+                  }
+                  story.quiz.answers[0].content = '';
+                  story.quiz.answers[0].correct = true;
+                  story.quiz.answers[1].content = '';
+                  story.quiz.answers[1].correct = false;
+                  story.quiz.answers[2].content = '';
+                  story.quiz.answers[2].correct = false;
+                  story.quiz.answers[3].content = '';
+                  story.quiz.answers[3].correct = false;
+                  _results2.push($scope.update_story(story));
+                } else {
+                  _results2.push(void 0);
+                }
+              }
+              return _results2;
+            })());
+          }
+          return _results1;
         }
       };
       $scope.dummy_modal_open = function() {
@@ -873,17 +1125,33 @@
         });
       };
       $scope.show_museum_edit = function(event) {
-        var elem;
+        var elem, museum_anim_in_progress, value_sign;
         elem = $(event.target);
-        $('.navigation .museum_edit, .page .museum_edit_guaranter').slideToggle(1000, "easeOutQuint");
-        elem.find('i').toggleClass("icon-chevron-down icon-chevron-up");
-        $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened;
+        if (!museum_anim_in_progress) {
+          museum_anim_in_progress = true;
+          elem.find('i').toggleClass("icon-chevron-down icon-chevron-up");
+          elem.hide();
+          $('.navigation .museum_edit').slideToggle(1000, "easeOutQuint");
+          value_sign = $scope.museum_edit_dropdown_opened ? "28px" : "576px";
+          $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened;
+          setTimeout(function() {
+            elem.css({
+              top: "" + value_sign
+            });
+            elem.show();
+            return museum_anim_in_progress = false;
+          }, 1000);
+        }
         return false;
       };
       $scope.museum_edit_dropdown_close = function() {
-        return setTimeout(function() {
-          return $('.actions_bar .museum_edit_opener').click();
-        }, 10);
+        var e;
+        e = {
+          target: $('.museum_edit_opener')
+        };
+        if ($scope.museum_edit_dropdown_opened) {
+          return $scope.show_museum_edit(e);
+        }
       };
       $scope.update_story = function(story) {
         return $http.put("" + $scope.backend_url + "/story/" + story._id, story).success(function(data) {
@@ -897,25 +1165,22 @@
             }
             return _results;
           }).error(function() {
-            return console.log('error');
+            return errorProcessing.addError('Failed to update a quiz for story');
           });
         }).error(function() {
-          return console.log('error');
+          return errorProcessing.addError('Failed update a story');
         });
       };
       $scope.put_answers = function(answer) {
         return $http.put("" + $scope.backend_url + "/quiz_answer/" + answer._id, answer).success(function(data) {
           return console.log('done');
         }).error(function() {
-          return console.log('error');
+          return errorProcessing.addError('Failed to save quiz answer');
         });
       };
-      $scope.museum_edit_dropdown_close = function() {
-        return setTimeout(function() {
-          return $('.actions_bar .museum_edit_opener').click();
-        }, 10);
-      };
-      $scope.post_stories = function(story) {
+      $scope.post_stories = function(original_story) {
+        var story;
+        story = angular.copy(original_story);
         return $http.post("" + $scope.backend_url + "/story/", story).success(function(data) {
           story._id = data._id;
           story.quiz.story = data._id;
@@ -931,58 +1196,144 @@
             }
             return _results;
           }).error(function() {
-            return console.log('error');
+            return errorProcessing.addError('Failed to save quiz for new story');
           });
         }).error(function() {
-          return console.log('error');
+          return errorProcessing.addError('Failed to save new story');
         });
       };
       $scope.post_answers = function(answer) {
         return $http.post("" + $scope.backend_url + "/quiz_answer/", answer).success(function(data) {
+          console.log(data);
           return answer._id = data._id;
         }).error(function() {
-          return console.log('error');
+          return errorProcessing.addError('Failed to save quiz answer');
+        });
+      };
+      $scope.mass_switch_pub = function(value) {
+        var exhibit, validation_item, _i, _len, _ref, _results;
+        _ref = $scope.exhibits;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          exhibit = _ref[_i];
+          if (exhibit.selected === true) {
+            validation_item = {};
+            validation_item.item = exhibit.stories[$scope.current_museum.language];
+            validation_item.root = exhibit;
+            validation_item.field_type = 'story';
+            switch (value) {
+              case 'passcode':
+                validation_item.item.status = 'passcode';
+                break;
+              case 'published':
+                validation_item.item.status = 'published';
+            }
+            _results.push(storySetValidation.checkValidity(validation_item));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      };
+      $scope.delete_selected_exhibits = function() {
+        var ModalDeleteInstance;
+        $scope.modal_options = {
+          current_language: {
+            name: $scope.translations[$scope.current_museum.language],
+            language: $scope.current_museum.language
+          },
+          languages: $scope.modal_translations,
+          exhibits: $scope.exhibits,
+          deletion_password: '123456'
+        };
+        ModalDeleteInstance = $modal.open({
+          templateUrl: "myModalContent.html",
+          controller: ModalDeleteInstanceCtrl,
+          resolve: {
+            modal_options: function() {
+              return $scope.modal_options;
+            }
+          }
+        });
+        return ModalDeleteInstance.result.then((function(selected, ids_to_delete) {
+          var exhibit, _i, _len, _ref, _results;
+          _ref = $scope.exhibits;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            exhibit = _ref[_i];
+            if (exhibit.selected === true) {
+              exhibit.selected = false;
+              _results.push($scope.delete_exhibit(exhibit, selected));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        }), function() {
+          return console.log("Modal dismissed at: " + new Date());
+        });
+      };
+      $scope.delete_story = function(stories, lang, callback) {
+        return $http["delete"]("" + $scope.backend_url + "/story/" + stories[lang]._id).success(function(data) {
+          console.log(data);
+          if (callback != null) {
+            return callback(stories, lang);
+          }
+        }).error(function() {
+          return errorProcessing.addError('Failed to delete story in languane: ' + $scope.translations[lang]);
+        });
+      };
+      $scope.delete_story_set = function(target_exhibit) {
+        return $http["delete"]("" + $scope.backend_url + "/story_set/" + target_exhibit._id + "/").success(function(data) {
+          return console.log(data);
+        }).error(function() {
+          return errorProcessing.addError('Failed to delete exhibit with number' + target_exhibit.number);
         });
       };
       $scope.$watch('current_museum.language', function(newValue, oldValue) {
         if (newValue) {
-          if ($scope.current_museum._id) {
-            return $http.put("" + $scope.backend_url + "/story_set/" + $scope.current_museum._id, $scope.current_museum).success(function(data) {
-              console.log(data);
-              return $scope.last_save_time = new Date();
-            }).error(function() {
-              return console.log('fail');
-            });
+          if (newValue !== 'dummy') {
+            if ($scope.current_museum._id) {
+              $scope.create_new_language = false;
+              return $http.put("" + $scope.backend_url + "/story_set/" + $scope.current_museum._id, $scope.current_museum).success(function(data) {
+                console.log(data);
+                return $scope.last_save_time = new Date();
+              }).error(function(error) {
+                return errorProcessing.addError('Failed to save museum language');
+              });
+            }
           }
         }
       });
       $scope.$on('save_new_exhibit', function() {
         console.log('saving!');
+        $scope.new_exhibit.stories[$scope.current_museum.language].status = 'passcode';
         $http.post("" + $scope.backend_url + "/story_set/", $scope.new_exhibit).success(function(data) {
-          var lang, story, _ref, _results;
+          var lang, story, _ref;
           $scope.exhibits.push($scope.new_exhibit);
           $scope.new_exhibit._id = data._id;
           $scope.last_save_time = new Date();
           _ref = $scope.new_exhibit.stories;
-          _results = [];
           for (lang in _ref) {
             story = _ref[lang];
             story.publish_state = 'passcode';
             story.story_set = data._id;
-            _results.push($scope.post_stories(story));
+            $scope.post_stories(story);
           }
-          return _results;
+          dropDown.find('.item_publish_settings').show();
+          return dropDown.find('.delete_story').removeClass('no_margin');
         }).error(function() {
-          return console.log('fail');
+          return errorProcessing.addError('Failed to save new exhibit');
         });
         return $scope.new_item_creation = false;
       });
       $scope.$on('changes_to_save', function(event, child_scope) {
         $http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
           child_scope.satus = 'done';
-          return $scope.last_save_time = new Date();
+          $scope.last_save_time = new Date();
+          return console.log(data);
         }).error(function() {
-          return console.log('fail');
+          return errorProcessing.addError('Server error - Prototype error.');
         });
         return $scope.forbid_switch = false;
       });
@@ -998,113 +1349,19 @@
             console.log(data);
             return $scope.last_save_time = new Date();
           }).error(function() {
-            return console.log('fail');
+            return errorProcessing.addError('Failed to update quiz');
           });
         }
         return $scope.forbid_switch = false;
       });
     }
-  ]).controller('DropDownController', [
-    '$scope', '$http', '$filter', '$window', '$modal', 'storage', '$rootScope', function($scope, $http, $filter, $window, $modal, storage, $rootScope) {
-      $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language].quiz', function(newValue, oldValue) {
-        if (newValue.status === 'published') {
-          console.log('pub');
-          if (!$("#story_quiz_enabled").is(':checked')) {
-            return setTimeout(function() {
-              if (!$scope.quizform.$valid) {
-                return setTimeout(function() {
-                  return $("#story_quiz_disabled").click();
-                }, 10);
-              }
-            }, 100);
-          } else {
-            return setTimeout(function() {
-              return $("#story_quiz_enabled").click();
-            }, 10);
-          }
-        } else {
-          if (!$("#story_quiz_disabled").is(':checked')) {
-            return setTimeout(function() {
-              return $("#story_quiz_disabled").click();
-            }, 10);
-          }
-        }
-      }, true);
-      $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language].quiz.question', function(newValue, oldValue) {
-        if ($scope.quizform != null) {
-          if ($scope.quizform.$valid) {
-            return $scope.mark_quiz_validity($scope.quizform.$valid);
-          } else {
-            return setTimeout(function() {
-              $("#story_quiz_disabled").click();
-              return $scope.mark_quiz_validity($scope.quizform.$valid);
-            }, 10);
-          }
-        }
-      });
-      $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language].name', function(newValue, oldValue) {
-        var form;
-        form = $('#media form');
-        if (form.length > 0) {
-          if ($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status === 'dummy') {
-            if (newValue) {
-              return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].status = 'passcode';
-            }
-          } else {
-            if (!$scope.$parent.new_item_creation) {
-              if (!newValue) {
-                $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].name = oldValue;
-                $('.empty_name_error.name').show();
-                return setTimeout(function() {
-                  return $('.empty_name_error.name').hide();
-                }, 1500);
-              }
-            }
-          }
-        }
-      });
-      $scope.$watch('$parent.active_exhibit.number', function(newValue, oldValue) {
-        var form;
-        form = $('#media form');
-        if (form.length > 0) {
-          if (!($scope.$parent.new_item_creation || $scope.$parent.item_deletion)) {
-            if (!newValue) {
-              $scope.$parent.active_exhibit.number = oldValue;
-              $('.empty_name_error.number').show();
-              return setTimeout(function() {
-                return $('.empty_name_error.number').hide();
-              }, 1500);
-            }
-          }
-        }
-      });
-      $scope.$watch(function() {
-        return angular.toJson($scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].quiz.answers);
-      }, function(newValue, oldValue) {
-        if ($scope.quizform != null) {
-          if ($scope.quizform.$valid) {
-            return $scope.mark_quiz_validity($scope.quizform.$valid);
-          } else {
-            return setTimeout(function() {
-              return $("#story_quiz_disabled").click();
-            }, 10);
-          }
-        }
-      }, true);
-      $scope.$watch('$parent.active_exhibit.stories[$parent.current_museum.language]', function(newValue, oldValue) {
-        if (newValue) {
-          if (!$scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code) {
-            return $http.get("" + $scope.$parent.backend_url + "/qr_code/" + $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language]._id).success(function(d) {
-              return $scope.$parent.active_exhibit.stories[$scope.$parent.current_museum.language].qr_code = d;
-            });
-          }
-        }
-      }, true);
-      return true;
-    }
   ]).controller('MuseumEditController', [
     '$scope', '$http', '$filter', '$window', '$modal', 'storage', function($scope, $http, $filter, $window, $modal, storage) {
-      $scope.$watch('$parent.current_museum.stories[$parent.current_museum.language].quiz', function(newValue, oldValue) {
+      setTimeout(function() {
+        $scope.$parent.museumQuizform = $scope.museumQuizform;
+        return $scope = $scope.$parent;
+      }, 100);
+      $scope.$watch('current_museum.stories[current_museum.language].quiz', function(newValue, oldValue) {
         if (newValue.state === 'limited') {
           if (!$("#museum_story_quiz_disabled").is(':checked')) {
             return setTimeout(function() {
@@ -1127,27 +1384,27 @@
           }
         }
       }, true);
-      $scope.$watch('$parent.current_museum.stories[$parent.current_museum.language].quiz.question', function(newValue, oldValue) {
+      $scope.$watch('current_museum.stories[current_museum.language].quiz.question', function(newValue, oldValue) {
         if ($scope.museumQuizform != null) {
           if ($scope.museumQuizform.$valid) {
             return $scope.mark_quiz_validity($scope.museumQuizform.$valid);
           } else {
             return setTimeout(function() {
-              $("#story_quiz_disabled").click();
+              $("#museum_story_quiz_disabled").click();
               return $scope.mark_quiz_validity($scope.museumQuizform.$valid);
             }, 10);
           }
         }
       });
       $scope.$watch(function() {
-        return angular.toJson($scope.$parent.current_museum.stories[$scope.$parent.current_museum.language].quiz.answers);
+        return angular.toJson($scope.current_museum.stories[$scope.current_museum.language].quiz.answers);
       }, function(newValue, oldValue) {
         if ($scope.museumQuizform != null) {
           if ($scope.museumQuizform.$valid) {
             return $scope.mark_quiz_validity($scope.museumQuizform.$valid);
           } else {
             return setTimeout(function() {
-              return $("#museum_#story_quiz_disabled").click();
+              return $("#museum_story_quiz_disabled").click();
             }, 10);
           }
         }
@@ -1158,10 +1415,13 @@
 
   this.ModalDeleteInstanceCtrl = function($scope, $modalInstance, modal_options) {
     $scope.modal_options = modal_options;
+    $scope.deletion_password = '';
     $scope.only_one = $scope.modal_options.languages.length === 1;
+    $scope.password_input_shown = false;
     $scope.ok = function() {
-      var language, value, _ref;
+      var exhibit, language, value, _i, _len, _ref, _ref1;
       $scope.selected = [];
+      $scope.ids_to_delete = [];
       _ref = $scope.modal_options.languages;
       for (language in _ref) {
         value = _ref[language];
@@ -1169,7 +1429,21 @@
           $scope.selected.push(language);
         }
       }
-      return $modalInstance.close($scope.selected);
+      _ref1 = modal_options.exhibits;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        exhibit = _ref1[_i];
+        if (exhibit.selected === true) {
+          $scope.ids_to_delete.push(exhibit);
+        }
+      }
+      if ($scope.ids_to_delete.length <= 1) {
+        return $modalInstance.close($scope.selected);
+      } else {
+        $scope.password_input_shown = true;
+        if ($scope.deletion_password === modal_options.deletion_password) {
+          return $modalInstance.close($scope.selected);
+        }
+      }
     };
     $scope.cancel = function() {
       return $modalInstance.dismiss();
@@ -1202,6 +1476,22 @@
     return $scope.mark_default_only();
   };
 
+  this.museumDeleteCtrl = function($scope, $modalInstance, modal_options) {
+    $scope.modal_options = modal_options;
+    $scope.deletion_password = '';
+    $scope.variant = {
+      checked: 'lang'
+    };
+    $scope.ok = function() {
+      if ($scope.deletion_password === modal_options.deletion_password) {
+        return $modalInstance.close($scope.variant.checked);
+      }
+    };
+    return $scope.cancel = function() {
+      return $modalInstance.dismiss();
+    };
+  };
+
   this.ModalDummyInstanceCtrl = function($scope, $modalInstance, modal_options) {
     $scope.exhibit = modal_options.exhibit;
     $scope.discard = function() {
@@ -1209,6 +1499,17 @@
     };
     return $scope.save_as = function() {
       return $modalInstance.close("save_as");
+    };
+  };
+
+  this.ModalMuseumInstanceCtrl = function($scope, $modalInstance, modal_options) {
+    $scope.museum = modal_options.museum;
+    $scope.translations = modal_options.translations;
+    $scope.discard = function() {
+      return $modalInstance.close('discard');
+    };
+    return $scope.save_as = function() {
+      return $modalInstance.close("save", $scope.museum);
     };
   };
 

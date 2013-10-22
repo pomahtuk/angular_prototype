@@ -9,28 +9,29 @@ html lang="en" ng-app="Museum"
     link rel="stylesheet" href="css/jplayer.blue.monday.css"
     link rel="stylesheet" href="css/toggle-switch.css"
     link rel="stylesheet" href="css/prototype.css"
+    link rel="stylesheet" href="css/jquery.Jcrop.css"
     link rel="stylesheet" href="css/jquery.fileupload-ui.css"
     link href="http://fonts.googleapis.com/css?family=Open+Sans&subset=latin,cyrillic-ext,greek-ext,greek,cyrillic,latin-ext" rel="stylesheet" type="text/css"
 
-  body.fixed_navbar ng-controller="IndexController" drag-and-drop-init=""
+  body.fixed_navbar ng-controller="IndexController" drag-and-drop-init="" scrollspy-init=""
 
-    .navigation.navbar-fixed-top
+    .navigation
 
       .museum_navigation_menu
         .museum_navbar.row
-          / .left_content
-          /   i.icon-external-link 
-          /   a.top_nav href="#"            
-          /     | Open in new Tab
-          /   i.icon-bar-chart
-          /   a.top_nav href="#"
-          /     | Statistic
-          /   i.icon-plus-sign
-          /   a.top_nav href="#"
-          /     | New museum
-          /   i.icon-plus-sign
-          /   a.top_nav href="#" 
-          /     | New Tour
+          .left_content
+            /   i.icon-external-link 
+            /   a.top_nav href="#"            
+            /     | Open in new Tab
+            /   i.icon-bar-chart
+            /   a.top_nav href="#"
+            /     | Statistic
+            i.icon-plus-sign
+            a.top_nav href="#"
+              | New museum
+            i.icon-plus-sign
+            a.top_nav href="#" 
+              | New Tour
           .navbar-right
             
             museum-search ng-model="museum_search"
@@ -67,7 +68,7 @@ html lang="en" ng-app="Museum"
             a href="#"
               span class="package_status {{museum.stories.ru.package_status}}"
                 i ng-class="{'icon-ok-sign':museum.package_status=='generated', 'icon-refresh':museum.package_status=='process'}"
-              img src="{{museum.stories.ru.images[0].thumbnailUrl}}"
+              img src="{{museum.images[0].thumbnailUrl || '/img/img-bg.png'}}"
               h4 
                 | {{museum.stories.ru.name}}, 
                 span 
@@ -80,30 +81,32 @@ html lang="en" ng-app="Museum"
           span.cms_text_logo
             | izi.cms
           h1.museum_title ng-class="{'opened':museum_edit_dropdown_opened}"
-            | {{current_museum.name}}
+            | {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
           .btn-group.language
             button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
-              | {{translations[current_museum.language]}}  
+              | {{translations[current_museum.language] || 'New language'}}  
               span.caret
             ul.dropdown-menu role="menu"
               li ng-repeat="story in current_museum.stories"
                 a href="#" ng-click="current_museum.language = story.language"
                   | {{translations[story.language]}}
-              / li.divider
-              / li
-              /   a href="{{current_museum.new_story_link}}" New language
+              li.divider
+              li
+                a href="#" ng-click="new_museum_language()" New language
         .right_content
           span.autosaved_info ng-show="last_save_time" Changes autosaved at {{ last_save_time | date:'HH:mm'}}
-          switchpubitem ng-item="current_museum" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story_set' field="status" root="current_museum"
+          switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story_set' field="status" root="current_museum"
 
       .museum_edit
         #museum_edit_dropdown ng-controller="MuseumEditController"
-          #museum_dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{current_museum.stories[current_museum.language]._id}}" ng-model="current_museum" selector="museum_fileupload" selector-dropzone="museum_dropzone"
+          #museum_dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{current_museum._id}}" model="current_museum" selector="museum_fileupload" selector-dropzone="museum_dropzone"
             .wrapper
               .text
                 | Drop media files here to attach to this object
               .progress
                 .progress-bar.progress-bar-success
+
+          lightbox-cropper model="current_museum"
 
           .images
             a.btn.btn-default.upload href="#" button-file-upload=""
@@ -111,78 +114,28 @@ html lang="en" ng-app="Museum"
             span.or_drag or drag images here
             input.fileupload id="museum_fileupload" type="file" name="files[]" multiple=""
             ul
-              li ng-repeat="image in current_museum.stories[current_museum.language].images"
-                a.img_thumbnail href="#"
-                  img src="{{image.thumbnailUrl}}" alt="" data-crop-url="{{image.url}}"
+              li ng-repeat="image in current_museum.images"
+                a.img_thumbnail href="#" open-lightbox="{{$index}}"
+                  img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
                 a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" parent="current_museum.stories[current_museum.language]" media="image" rel="nofollow" ×
                 .progress.progress-success.progress-striped.active.hide
                   .bar
 
-            #crop_modal.modal.hide.crop-wrap
-              .modal-header
-                button.close data-dismiss="modal"
-                h3
-                  | Crop image
-                  .help-tooltip
-                    i.icon-question-sign.icon.tip data-placement="bottom" title="In this window you may crop the uploaded photograph. Remember that, on a smartphone screen, 4:3 proportioned photographs look the most appealing. The cropping frame has these proportions as the default."
-              .modal-body style="min-height: 0px;"
-                .image-for-crop
-                  img src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f.jpg" style="display: block; visibility: hidden; width: 2304px; height: 1536px;"
-              .modal-footer
-                a.btn.btn-primary.save-crop
-                  | Save
-                a.btn data-dismiss="modal"
-                  | Cancel
-
           .description
             .close ng-click="museum_edit_dropdown_close()"
+            .hider ng-show="current_museum.stories[current_museum.language].status == 'published' || current_museum.stories[current_museum.language].status == 'passcode'"
+              a.delete_story.museum ng-click="delete_museum_modal_open()" href="#" 
+                i.icon-trash
 
-            / a.delete_story ng-click="delete_modal_open()" href="#" 
-            /   i.icon-trash
-
-            script type="text/ng-template" id="myMuseumModalContent.html"
-              .modal-dialog#delete_museum_story
-                .modal-content
-                  .modal-body
-                    form.form-horizontal
-                      .only_one ng-show="only_one"
-                        .form-group
-                          label.control-label for="lang_def_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
-                            input type="radio" class="hidden" name="language" value="en" id="museum_lang_def_{{modal_options.current_language.language}}" checked="checked"
-                            | Delete item completely?
-                      .multiply ng-hide="only_one"
-                        .form-group
-                          label.control-label for="lang_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
-                            input type="radio" name="language" value="en" id="museum_lang_{{modal_options.current_language.language}}" checked="checked"
-                            | Delete only {{modal_options.current_language.name}} language
-                        .form-group
-                          label.control-label for="lang_all" ng-click="show_langs = false; mark_all()"
-                            input type="radio" name="language" value="all" id="museum_lang_all"
-                            | Delete all languages
-                        .form-group
-                          label.control-label.lang_selected for="lang_selected" ng-click="show_langs = true"
-                            input type="radio" name="language" value="selected" id="museum_lang_selected"
-                            | Delete only selected languages
-                      .other_variants ng-show="show_langs"
-                        .form-group ng-repeat=" language in modal_options.languages"
-                          label.control-label for="language_{{language.language}}"
-                            input type="checkbox" ng-model="language.checked" ng-checked="language.checked" ng-change="lang_proc()" name="languages[]" value="{{language.language}}" id="museum_language_{{language.language}}"
-                            | {{language.name}}
-                  .modal-footer
-                      button type="button" class="btn btn-default"ng-click="ok()" Delete
-                      button type="button" class="btn btn-primary"ng-click="cancel()" Cancel
-            
             tabset
               tab heading="Media content"
                 #museum_media.row
                   form.form-horizontal role="form" name="mainForm"
-                    
-                    placeholderfield ng-item="current_museum" ng-id="opas_number" ng-title="OPAS №" ng-field="number" ng-help="help text for popup" type="story_set"
+
                     placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
                     audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
 
-                    placeholdertextarea ng-item="current_museum.stories[current_museum.def_lang]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="255" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
-                      
+                    placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
 
               tab heading="Quiz"
                 #museum_story_quiz.row
@@ -203,7 +156,7 @@ html lang="en" ng-app="Museum"
               tab heading="QR-code"
                 #museum_qr_code.row
                   .qr_image.col-md-4
-                    img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code}}"
+                    img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
                   .well.col-md-4.col-md-offset-2
                     a.btn.qr-code href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
                     br
@@ -211,23 +164,46 @@ html lang="en" ng-app="Museum"
               tab heading="More"
                 | hgsdfklghdfj kgkjdf hg
 
+      .museum_edit_opener ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened"
+        | Museum properties  
+        i.icon-chevron-down
+
+    .float_menu
       .actions_bar
-        .museum_edit_opener ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened"
-          | Museum properties  
-          i.icon-chevron-down
+        error-notification
         .left_content ng-mouseover="show_museum_edit_dropdown=false"
           button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" ng-class="{'disabled':new_item_creation}" New item 
-          / .btn-group
-          /   button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
-          /     | Actions  
-          /     span.caret
-          /   ul.dropdown-menu role="menu"
-          /     li
-          /       a href="#" 1
-          /     li
-          /       a href="#" 2
-          /     li
-          /       a href="#" 3
+          .btn-group
+            button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
+              | Actions  
+              span.caret
+            ul.dropdown-menu role="menu"
+              li ng-switch="" on="all_selected" ng-click="select_all_exhibits()" 
+                a href="#" ng-switch-when="false" Select all
+                a href="#" ng-switch-when="true" Deselect all
+              li.dropdown-submenu
+                a href="#" Add selected items to collection...
+                ul.dropdown-menu role="menu"
+                  li
+                    a href="#" Collection 1
+                  li
+                    a href="#" Collection 2
+                  li
+                    a href="#" Collection 3
+              li.dropdown-submenu
+                a href="#" Set visibility selected items...
+                ul.dropdown-menu role="menu"
+                  li
+                    a href="#" ng-click="mass_switch_pub('published')"
+                      i class="icon-globe"  
+                      |   Everyone
+                  li
+                    a href="#" ng-click="mass_switch_pub('passcode')"
+                      i class="icon-lock"  
+                      |   Only users who have passcode
+              li
+                a href="#" ng-click="delete_selected_exhibits()" Delete selected items
+
           / .btn-group.spacer
           /   button.btn.btn-default.undo type="button" 
           /     i.icon-undo
@@ -236,7 +212,7 @@ html lang="en" ng-app="Museum"
 
           a.spacer href="#" ng-click="select_all_exhibits()" ng-show="select_all_enabled" ng-switch="" on="all_selected"
             span ng-switch-when="false" Select all
-            span ng-switch-when="true"  Unselect all
+            span ng-switch-when="true"  Deselect all
 
         .right_content ng-mouseover="show_museum_edit_dropdown=false"
           / span.limits.spacer
@@ -291,19 +267,90 @@ html lang="en" ng-app="Museum"
                   button.btn.btn-default type="button" ng-click="discard()" Discard item
                   button.btn.btn-default type="button" ng-click="save_as()" Save as "item_{{exhibit.number}}"
 
-        .museum_edit_guaranter
+        script type="text/ng-template" id="myMuseumModalContent.html"
+          .modal-dialog#new_museum
+            .modal-content
+              .modal-header
+                h3.modal-title New language
+              .modal-body.description
+                form.form-horizontal
+                  new-lang-switch museum="museum"
+                  placeholderfield ng-item="museum.stories.dummy" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="museum.stories.dummy.name" type='story'
 
-        .museums_list_guaranter
+              .modal-footer
+                  button.btn.btn-warning ng-class="{'disabled': museum.stories.dummy.name.length == 0 && museum.language != 'new_lang' }" type="button" ng-click="save_as()" Create
+                  button.btn.btn-default type="button" ng-click="discard()" Cancel
+
+        script type="text/ng-template" id="myModalContent.html"
+          .modal-dialog#delete_story
+            .modal-content
+              .modal-body
+                form.form-horizontal
+                  .only_one ng-show="only_one"
+                    .form-group
+                      label.control-label for="lang_def_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
+                        input type="radio" class="hidden" name="language" value="en" id="lang_def_{{modal_options.current_language.language}}" checked="checked"
+                        | Delete item completely?
+                  .multiply ng-hide="only_one"
+                    .form-group
+                      label.control-label for="lang_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
+                        input type="radio" name="language" value="en" id="lang_{{modal_options.current_language.language}}" checked="checked"
+                        | Delete only {{modal_options.current_language.name}} language
+                    .form-group
+                      label.control-label for="lang_all" ng-click="show_langs = false; mark_all()"
+                        input type="radio" name="language" value="all" id="lang_all"
+                        | Delete all languages
+                    .form-group
+                      label.control-label.lang_selected for="lang_selected" ng-click="show_langs = true"
+                        input type="radio" name="language" value="selected" id="lang_selected"
+                        | Delete only selected languages
+                  .other_variants ng-show="show_langs"
+                    .form-group ng-repeat=" (language, value) in modal_options.languages"
+                      label.control-label for="language_{{value.name}}"
+                        input type="checkbox" ng-model="value.checked" ng-checked="value.checked" ng-change="lang_proc()" name="languages[]" value="{{language}}" id="language_{{value.name}}"
+                        | {{value.name}}
+                  .password ng-show="password_input_shown"
+                    label.control-label for="modal_delete_password" Please, enter your password to confirm deletion
+                    input type="password" ng-model="$parent.deletion_password" name="modal_delete_password" id="modal_delete_password" ng-change="console.log('11111111111')"
+              .modal-footer
+                  button type="button" class="btn btn-default" ng-click="ok()" Delete
+                  button type="button" class="btn btn-default" ng-click="cancel()" Cancel
+        
+        script type="text/ng-template" id="museumDelete.html"
+          .modal-dialog#delete_museum_story
+            .modal-content
+              .modal-body
+                form.form-horizontal
+                  .multiply ng-hide="only_one"
+                    .form-group
+                      label.control-label for="only_default" 
+                        input type="radio" name="variant" value="lang" id="only_default" ng-model="variant.checked" ng-checked="variant.checked" 
+                        | Delete museum in {{modal_options.current_language.name}} language (including exhibits an collections)
+                    .form-group
+                      label.control-label for="museum_lang_all"
+                        input type="radio" name="variant" value="all" id="museum_lang_all" ng-model="variant.checked" ng-checked="variant.checked" 
+                        | Delete whole museum  (including exhibits an collections)
+                  .password
+                    label.control-label for="modal_delete_password" Please, enter your password to confirm deletion
+                    input type="password" ng-model="$parent.deletion_password" name="modal_delete_password" id="modal_delete_password"
+              .modal-footer
+                  button type="button" class="btn btn-default" ng-click="ok()" Delete
+                  button type="button" class="btn btn-default" ng-click="cancel()" Cancel
 
         ul.exhibits
 
-          li#drop_down ng-controller="DropDownController" 
-            #dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{active_exhibit.stories[current_museum.language]._id}}" ng-model="$parent.active_exhibit.stories[current_museum.language]" selector="fileupload" selector-dropzone="dropzone"
+          li#drop_down drop-down-edit="" ng-class="{'invalid': active_exhibit.invalid}"
+            #dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{active_exhibit._id}}" model="active_exhibit" selector="fileupload" selector-dropzone="dropzone"
               .wrapper
                 .text
                   | Drop media files here to attach to this object
                 #progress.progress
+                  .progress-text
+                    | Загружено ... из ..., скорость: 256kb/s
                   .progress-bar.progress-bar-success
+            
+            lightbox-cropper  model="active_exhibit"
+
             .prev-ex
             .images
               a.btn.btn-default.upload href="#" button-file-upload=""
@@ -311,77 +358,31 @@ html lang="en" ng-app="Museum"
               span.or_drag or drag images here
               input.fileupload id="fileupload" type="file" name="files[]" multiple=""
               ul
-                li ng-repeat="image in active_exhibit.stories[current_museum.language].images"
-                  a.img_thumbnail href="#"
-                    img src="{{image.thumbnailUrl}}" alt="" data-crop-url="{{image.url}}"
-                  a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.active_exhibit.stories[current_museum.language]" rel="nofollow" ×
+                span.label.label-danger.images_label ng-show="active_exhibit.images.length == 0" Fill to publish
+                li ng-repeat="image in active_exhibit.images"
+                  a.img_thumbnail href="#" open-lightbox="{{$index}}"
+                    img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
+                  a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.active_exhibit" rel="nofollow" ×
                   .progress.progress-success.progress-striped.active.hide
                     .bar
 
-              #crop_modal.modal.hide.crop-wrap
-                .modal-header
-                  button.close data-dismiss="modal"
-                  h3
-                    | Crop image
-                    .help-tooltip
-                      i.icon-question-sign.icon.tip data-placement="bottom" title="In this window you may crop the uploaded photograph. Remember that, on a smartphone screen, 4:3 proportioned photographs look the most appealing. The cropping frame has these proportions as the default."
-                .modal-body style="min-height: 0px;"
-                  .image-for-crop
-                    img src="https://s3-eu-west-1.amazonaws.com/original-media.dev.izi.travel/6f628c51-1ba0-48ef-8213-0c84253753e3/2f12a234-be93-4f6d-8ff9-37ead034136f.jpg" style="display: block; visibility: hidden; width: 2304px; height: 1536px;"
-                .modal-footer
-                  a.btn.btn-primary.save-crop
-                    | Save
-                  a.btn data-dismiss="modal"
-                    | Cancel
-
             .description
               .close
-              .hider ng-hide="active_exhibit.stories[current_museum.language].publish_state == 'dummy'"
-                switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="active_exhibit"
+              .hider ng-hide="active_exhibit.stories[current_museum.language].status == 'dummy'"
+                switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="active_exhibit" 
 
               a.delete_story ng-click="delete_modal_open()" href="#" 
                 i.icon-trash
-              script type="text/ng-template" id="myModalContent.html"
-                .modal-dialog#delete_story
-                  .modal-content
-                    .modal-body
-                      form.form-horizontal
-                        .only_one ng-show="only_one"
-                          .form-group
-                            label.control-label for="lang_def_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
-                              input type="radio" class="hidden" name="language" value="en" id="lang_def_{{modal_options.current_language.language}}" checked="checked"
-                              | Delete item completely?
-                        .multiply ng-hide="only_one"
-                          .form-group
-                            label.control-label for="lang_{{modal_options.current_language.language}}" ng-click="show_langs = false; mark_default_only()" 
-                              input type="radio" name="language" value="en" id="lang_{{modal_options.current_language.language}}" checked="checked"
-                              | Delete only {{modal_options.current_language.name}} language
-                          .form-group
-                            label.control-label for="lang_all" ng-click="show_langs = false; mark_all()"
-                              input type="radio" name="language" value="all" id="lang_all"
-                              | Delete all languages
-                          .form-group
-                            label.control-label.lang_selected for="lang_selected" ng-click="show_langs = true"
-                              input type="radio" name="language" value="selected" id="lang_selected"
-                              | Delete only selected languages
-                        .other_variants ng-show="show_langs"
-                          .form-group ng-repeat=" (language, value) in modal_options.languages"
-                            label.control-label for="language_{{value.language}}"
-                              input type="checkbox" ng-model="value.checked" ng-checked="value.checked" ng-change="lang_proc()" name="languages[]" value="{{value.language}}" id="language_{{value.language}}"
-                              | {{value.name}}
-                    .modal-footer
-                        button type="button" class="btn btn-default" ng-click="ok()" Delete
-                        button type="button" class="btn btn-default" ng-click="cancel()" Cancel
-              
+
               tabset
                 tab heading="Media content"
                   #media.row
                     form.form-horizontal role="form" name="mainForm"
-                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS №" ng-field="number" ng-help="help text for popup" type="story_set"
+                      placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS №" ng-field="number" ng-help="help text for popup" type="story_set" placeholder="active_exhibit.number"
                       placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
                       audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
 
-                      placeholdertextarea ng-item="active_exhibit.stories[current_museum.def_lang]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="255" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
+                      placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
                       
                 tab heading="Quiz"
                   #story_quiz.row
@@ -402,7 +403,7 @@ html lang="en" ng-app="Museum"
                 tab heading="QR-code"
                   #qr_code.row
                     .qr_image.col-md-4
-                      img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code}}"
+                      img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
                     .well.col-md-4.col-md-offset-2
                       a.btn.qr-code href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
                       br
@@ -413,24 +414,28 @@ html lang="en" ng-app="Museum"
             .next-ex
 
           li.exhibit post-render="" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search)" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
-            div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected}"
+            div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
               .image
-                img src="{{exhibit.stories[current_museum.language].images[0].thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                img src="{{exhibit.images[0].thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
               .description ng-click="open_dropdown($event, exhibit)"
                 h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
                   | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
-                .media_types
+                .media_types ng-class="{'invalid': exhibit.invalid}"
+                  i class="icon-picture empty" ng-show="exhibit.images.length == 0"
+                  i class="icon-list-ol empty" ng-show="exhibit.number.length == 0"
                   i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
+                  i class="icon-music empty" ng-hide="exhibit.stories[current_museum.language].audio"
                   i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
-                  i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video.length > 0"
+                  i class="icon-align-left empty" ng-hide="exhibit.stories[current_museum.language].long_description"
+                  i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video"
                   i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
-              .visibility ng-switch="" on="exhibit.stories[current_museum.language].status"
+              .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
                 i class="icon-globe placeholder" ng-switch-when="published"
                 i class="icon-lock placeholder" ng-switch-when="passcode"
                 .on_hover
-                  switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field="status"
+                  switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
 
           li.exhibit.dummy data-big-image='/img/img-bg.png' ng-show="new_item_creation"
             div class="opener draft"
@@ -462,6 +467,9 @@ html lang="en" ng-app="Museum"
     script src="lib/jquery-ui.js"
     script src="lib/async.js"
     script src="lib/ngProgress.js"
+    script src="lib/jquery.Jcrop.min.js"
+    script src="lib/jquery.color.js"
+    script src="lib/jquery-scrollspy.js"
     / script src="lib/qrcode.js"
     / app part
     script src="js/app.js"
