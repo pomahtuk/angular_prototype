@@ -238,12 +238,12 @@
               return scope.status_process();
             }, 0, false);
           }
-          if (elem.val() !== '') {
+          if (elem.val().length > 0) {
             triggered.hide();
             return trigger.show();
           } else {
             elem.addClass('ng-invalid');
-            if (scope.field === 'name') {
+            if (scope.field === 'name' && scope.item.status !== 'dummy') {
               return $timeout(function() {
                 elem.val(scope.oldValue);
                 scope.item[scope.field] = scope.oldValue;
@@ -1224,7 +1224,7 @@
       restrict: "E",
       replace: true,
       transclude: true,
-      template: "<div class=\"error_notifications\">\n  <div class=\"alert alert-danger\" ng-repeat=\"error in errors\">\n    {{error.error}}\n    <a class=\"close\" href=\"#\" ng-click=\"dismiss_error($index)\" >&times;</a>\n  </div>\n</div>",
+      template: "<div class=\"error_notifications\" ng-hide=\"errors.length == 0\">\n  <div class=\"alert alert-danger\" ng-repeat=\"error in errors\">\n    {{error.error}}\n    <a class=\"close\" href=\"#\" ng-click=\"dismiss_error($index)\" >&times;</a>\n  </div>\n</div>",
       link: function(scope, element, attrs) {
         scope.errors = errorProcessing.getErrors();
         scope.dismiss_error = function(index) {
@@ -1245,19 +1245,50 @@
         };
         return $("ul.exhibits").scrollspy({
           min: 50,
+          max: 99999,
           onEnter: function(element, position) {
             $(".float_menu").addClass("navbar-fixed-top");
-            return $(".navigation").addClass("bottom-padding");
+            $(".navigation").addClass("bottom-padding");
+            return $(".to_top").show();
           },
           onLeave: function(element, position) {
             $(".float_menu").removeClass("navbar-fixed-top");
-            return $(".navigation").removeClass("bottom-padding");
+            $(".navigation").removeClass("bottom-padding");
+            if (!$(".to_top").hasClass('has_position')) {
+              $(".to_top").hide();
+            }
+            return console.log('leave');
           },
           onTick: function(position, state, enters, leaves) {
             if (scope.museum_edit_dropdown_opened) {
               scope.show_museum_edit(opener);
             }
             return $('.museum_navigation_menu').hide();
+          }
+        });
+      }
+    };
+  }).directive('toTop', function(errorProcessing) {
+    return {
+      restrict: "E",
+      replace: true,
+      transclude: true,
+      template: "<div class=\"to_top\">\n  <div class=\"to_top_panel\">\n    <div class=\"to_top_button\" title=\"Наверх\">\n      <span class=\"arrow\"><i class=\"icon-long-arrow-up\"></i></span>\n    </div>\n  </div>\n</div>",
+      link: function(scope, element, attrs) {
+        element = $(element);
+        return element.click(function() {
+          var pos;
+          if (element.hasClass('has_position')) {
+            element.removeClass('has_position');
+            pos = element.data('scrollPosition');
+            element.find('.arrow i').removeClass("icon-long-arrow-down").addClass("icon-long-arrow-up");
+            return $.scrollTo(pos, 0);
+          } else {
+            element.addClass('has_position');
+            pos = $(document).scrollTop();
+            element.data('scrollPosition', pos);
+            element.find('.arrow i').addClass("icon-long-arrow-down").removeClass("icon-long-arrow-up");
+            return $.scrollTo(0, 0);
           }
         });
       }

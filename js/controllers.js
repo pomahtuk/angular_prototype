@@ -952,9 +952,19 @@
           return $scope.all_selected = true;
         }
       };
-      $scope.select_all_exhibits = function() {
+      $scope.select_all_exhibits = function(option) {
         var exhibit, sign, _i, _len, _ref;
-        sign = !$scope.all_selected;
+        if (option != null) {
+          switch (option) {
+            case 'select':
+              sign = true;
+              break;
+            case 'cancel':
+              sign = false;
+          }
+        } else {
+          sign = !$scope.all_selected;
+        }
         _ref = $scope.exhibits;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           exhibit = _ref[_i];
@@ -1032,7 +1042,7 @@
       };
       $scope.delete_exhibit = function(target_exhibit, languages) {
         var exhibit, index, item, st_index, story, _i, _len, _ref, _ref1, _results, _results1;
-        if (Object.keys(target_exhibit.stories).length === languages.length) {
+        if (languages.length >= Object.keys(target_exhibit.stories).length) {
           $scope.closeDropDown();
           _ref = $scope.exhibits;
           _results = [];
@@ -1063,6 +1073,7 @@
               for (_j = 0, _len1 = languages.length; _j < _len1; _j++) {
                 item = languages[_j];
                 if (item === st_index) {
+                  target_exhibit.selected = false;
                   story = target_exhibit.stories[st_index];
                   story.status = 'dummy';
                   story.name = '';
@@ -1216,7 +1227,7 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           exhibit = _ref[_i];
-          if (exhibit.selected === true) {
+          if (exhibit.selected === true && exhibit.stories[$scope.current_museum.language].status !== 'dummy') {
             validation_item = {};
             validation_item.item = exhibit.stories[$scope.current_museum.language];
             validation_item.root = exhibit;
@@ -1294,6 +1305,10 @@
         if (newValue) {
           if (newValue !== 'dummy') {
             if ($scope.current_museum._id) {
+              $scope.modal_options.current_language = {
+                name: $scope.translations[$scope.current_museum.language],
+                language: $scope.current_museum.language
+              };
               $scope.create_new_language = false;
               return $http.put("" + $scope.backend_url + "/story_set/" + $scope.current_museum._id, $scope.current_museum).success(function(data) {
                 console.log(data);

@@ -180,7 +180,7 @@ html lang="en" ng-app="Museum"
             ul.dropdown-menu role="menu"
               li ng-switch="" on="all_selected" ng-click="select_all_exhibits()" 
                 a href="#" ng-switch-when="false" Select all
-                a href="#" ng-switch-when="true" Deselect all
+                a href="#" ng-switch-when="true" Cancel selection
               li.dropdown-submenu
                 a href="#" Add selected items to collection...
                 ul.dropdown-menu role="menu"
@@ -210,9 +210,10 @@ html lang="en" ng-app="Museum"
           /   button.btn.btn-default.redo type="button" 
           /     i.icon-repeat
 
-          a.spacer href="#" ng-click="select_all_exhibits()" ng-show="select_all_enabled" ng-switch="" on="all_selected"
-            span ng-switch-when="false" Select all
-            span ng-switch-when="true"  Deselect all
+          a.spacer href="#" ng-click="select_all_exhibits('select')" ng-show="select_all_enabled"
+            span Select all
+          a.spacer href="#" ng-click="select_all_exhibits('cancel')" ng-show="select_all_enabled"
+            span Cancel selection
 
         .right_content ng-mouseover="show_museum_edit_dropdown=false"
           / span.limits.spacer
@@ -448,6 +449,8 @@ html lang="en" ng-app="Museum"
 
           li ng-repeat="story in stories"
             | {{story}}
+
+    to-top
 
     script src="lib/angular/angular.min.js"
     script src="lib/angular/angular-cookies.js"

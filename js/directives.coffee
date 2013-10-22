@@ -284,12 +284,12 @@ angular.module("Museum.directives", [])
           scope.$digest()
           scope.status_process()
         , 0, false
-      if elem.val() isnt ''
+      if elem.val().length > 0
         triggered.hide()
         trigger.show()
       else
         elem.addClass 'ng-invalid'
-        if scope.field is 'name'
+        if scope.field is 'name' && scope.item.status isnt 'dummy'
           $timeout ->
             elem.val scope.oldValue
             scope.item[scope.field] = scope.oldValue
@@ -1227,7 +1227,7 @@ angular.module("Museum.directives", [])
   replace: true
   transclude: true
   template: """
-    <div class="error_notifications">
+    <div class="error_notifications" ng-hide="errors.length == 0">
       <div class="alert alert-danger" ng-repeat="error in errors">
         {{error.error}}
         <a class="close" href="#" ng-click="dismiss_error($index)" >&times;</a>
@@ -1251,16 +1251,49 @@ angular.module("Museum.directives", [])
     }
     $("ul.exhibits").scrollspy
       min: 50
+      max: 99999
       onEnter: (element, position) ->
         $(".float_menu").addClass "navbar-fixed-top"
         $(".navigation").addClass "bottom-padding"
+        $(".to_top").show()
 
       onLeave: (element, position) ->
         $(".float_menu").removeClass "navbar-fixed-top"
         $(".navigation").removeClass "bottom-padding"
+        $(".to_top").hide() unless $(".to_top").hasClass 'has_position'
+        console.log 'leave'
 
       onTick: (position,state,enters,leaves) ->
         if scope.museum_edit_dropdown_opened
           scope.show_museum_edit(opener)
         $('.museum_navigation_menu').hide()
         #hide all menus
+
+.directive 'toTop', (errorProcessing) ->
+  restrict: "E"
+  replace: true
+  transclude: true
+  template: """
+    <div class="to_top">
+      <div class="to_top_panel">
+        <div class="to_top_button" title="Наверх">
+          <span class="arrow"><i class="icon-long-arrow-up"></i></span>
+        </div>
+      </div>
+    </div>
+  """
+  link: (scope, element, attrs) ->
+    element = $ element
+
+    element.click ->
+      if element.hasClass 'has_position'
+        element.removeClass 'has_position'
+        pos = element.data('scrollPosition')
+        element.find('.arrow i').removeClass("icon-long-arrow-down").addClass("icon-long-arrow-up")
+        $.scrollTo pos, 0
+      else
+        element.addClass 'has_position'
+        pos = $(document).scrollTop()
+        element.data('scrollPosition', pos)
+        element.find('.arrow i').addClass("icon-long-arrow-down").removeClass("icon-long-arrow-up")
+        $.scrollTo 0, 0

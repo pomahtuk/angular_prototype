@@ -161,7 +161,7 @@
             <button class="btn btn-default dropdown-toggle spacer" data-toggle="dropdown" type="button">Actions  <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
               <li ng-click="select_all_exhibits()" ng-switch="" on="all_selected">
-                <a href="#" ng-switch-when="false">Select all</a><a href="#" ng-switch-when="true">Deselect all</a>
+                <a href="#" ng-switch-when="false">Select all</a><a href="#" ng-switch-when="true">Cancel selection</a>
               </li>
               <li class="dropdown-submenu">
                 <a href="#">Add selected items to collection...</a>
@@ -193,7 +193,7 @@
               </li>
             </ul>
           </div>
-          <a class="spacer" href="#" ng-click="select_all_exhibits()" ng-show="select_all_enabled" ng-switch="" on="all_selected"><span ng-switch-when="false">Select all</span><span ng-switch-when="true"> Deselect all</span></a>
+          <a class="spacer" href="#" ng-click="select_all_exhibits(&#39;select&#39;)" ng-show="select_all_enabled"><span>Select all</span></a><a class="spacer" href="#" ng-click="select_all_exhibits(&#39;cancel&#39;)" ng-show="select_all_enabled"><span>Cancel selection</span></a>
         </div>
         <div class="right_content" ng-mouseover="show_museum_edit_dropdown=false">
           <input class="form-control search spacer" ng-model="exhibit_search" placeholder="Search" resizer="" type="text"><button class="btn btn-default filter_opener" ng-class="{&#39;active&#39;: filters_opened}" toggle-filters="" type="button">Filters and sort</button>
@@ -436,6 +436,7 @@
         </ul>
       </div>
     </div>
+    <to-top></to-top>
     <script src="lib/angular/angular.min.js"></script>
     <script src="lib/angular/angular-cookies.js"></script>
     <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>

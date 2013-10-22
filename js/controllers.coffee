@@ -57,14 +57,14 @@ angular.module("Museum.controllers", [])
     $routeParams.museum_id
   else
     "5260c63ceb6688e516000002"
-    # "5260e108d8831a0e67000002"
+    # "5266921cb7a2b93a7f000002"
 
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
     "5260c63ceb6688e516000001"
-    # "5260e108d8831a0e67000001"
+    # "5266921cb7a2b93a7f000001"
 
   $scope.backend_url = "http://192.168.158.128:3000"
   # $scope.backend_url = "http://prototype.izi.travel"
@@ -942,8 +942,15 @@ angular.module("Museum.controllers", [])
     if count is $scope.exhibits.length
        $scope.all_selected = true
 
-  $scope.select_all_exhibits = ->
-    sign = !$scope.all_selected
+  $scope.select_all_exhibits = (option) ->
+    if option?
+      switch option
+        when 'select'
+          sign = true
+        when 'cancel'
+          sign = false
+    else
+      sign = !$scope.all_selected
     for exhibit in $scope.exhibits
       exhibit.selected = sign
     $scope.all_selected = !$scope.all_selected
@@ -1001,7 +1008,8 @@ angular.module("Museum.controllers", [])
       true
 
   $scope.delete_exhibit = (target_exhibit, languages) ->
-    if Object.keys(target_exhibit.stories).length is languages.length
+    # console.log Object.keys(target_exhibit.stories).length, languages
+    if languages.length >= Object.keys(target_exhibit.stories).length
       $scope.closeDropDown()
       for exhibit, index in $scope.exhibits
         if exhibit._id is target_exhibit._id
@@ -1017,6 +1025,7 @@ angular.module("Museum.controllers", [])
         for item in languages
           # console.log item, st_index
           if item is st_index
+            target_exhibit.selected = false
             story = target_exhibit.stories[st_index]
             story.status = 'dummy'
             story.name = ''
@@ -1130,7 +1139,7 @@ angular.module("Museum.controllers", [])
 
   $scope.mass_switch_pub = (value) ->
     for exhibit in $scope.exhibits
-      if exhibit.selected is true
+      if exhibit.selected is true && exhibit.stories[$scope.current_museum.language].status isnt 'dummy'
         validation_item = {}
         validation_item.item = exhibit.stories[$scope.current_museum.language]
         validation_item.root = exhibit
@@ -1185,6 +1194,10 @@ angular.module("Museum.controllers", [])
     if newValue
       if newValue isnt 'dummy'
         if $scope.current_museum._id
+          $scope.modal_options.current_language = 
+            name: $scope.translations[$scope.current_museum.language]
+            language: $scope.current_museum.language
+
           $scope.create_new_language = false
           $http.put("#{$scope.backend_url}/story_set/#{$scope.current_museum._id}", $scope.current_museum).success (data) ->
             console.log data
