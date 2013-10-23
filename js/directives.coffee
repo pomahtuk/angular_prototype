@@ -91,44 +91,20 @@ angular.module("Museum.directives", [])
     root: '=root'
   template: """
     <div class="btn-group pull-right item_publish_settings" ng-hide="item.status == 'draft'">
-      <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" type="button" ng-switch on="item[field]">
+      <button class="btn btn-success" ng-class="{'active': item.status == 'published' }" ng-click="item.status = 'published'; status_process()" type="button" ng-switch on="item[field]">
         <div class="extra" ng-switch on="item[field]">
-          <i class="icon-globe" ng-switch-when="published" ></i>
-          <i class="icon-lock" ng-switch-when="passcode" ></i>
+          <i class="icon-globe"></i>
         </div>
         <span ng-switch-when="passcode">Publish</span>
         <span ng-switch-when="published">Published</span>
-        <span class="caret"></span>
       </button>
-      <ul class="dropdown-menu status-select-dropdown" role="menu">
-        Who can see it in mobile application
-        <li class="divider"></li>
-        <li ng-click="item[field] = 'published'; status_process()">
-        <span class="check"><i ng-show="item[field] == 'published'" class="icon-ok"></i></span>
-          <i class="icon-globe"></i> Everyone
-        </li>
-        <li ng-click="item[field] = 'passcode'; status_process()">
-          <span class="check"><i ng-show="item[field] == 'passcode'" class="icon-ok"></i></span>
-          <i class="icon-lock"></i> Only users who have passcode
-          <div class="limited-pass-hint hidden">
-            <div class="limited-pass">
-              {{provider.passcode}}
-            </div>
-            <a href="{{provider.passcode_edit_link}}" target="_blank">Edit</a>
-          </div>
-        </li>
-        <li class="divider"></li>
-        <li class="other_list">
-          <span class="other_lang" ng-click="hidden_list=!hidden_list" stop-event="click">Other languages</a>
-          <ul class="other" ng-hide="hidden_list">
-            <li ng-repeat="(name, story) in root.stories" ng-switch on="story.status">
-              <span class="col-lg-4">{{trans[name]}} </span>
-              <i class="icon-globe" ng-switch-when="published" ></i>
-              <i class="icon-lock" ng-switch-when="passcode" ></i>
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <button class="btn btn-success" ng-class="{'active': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
+        <div class="extra" ng-switch on="item[field]">
+          <i class="icon-lock"></i>
+        </div>
+        <span ng-switch-when="passcode">Private</span>
+        <span ng-switch-when="published">Make private</span>
+      </button>
     </div>
   """ 
   controller: ($scope, $rootScope, $element, $attrs, storySetValidation) ->
@@ -238,10 +214,10 @@ angular.module("Museum.directives", [])
       </div>
       {{active_exhibit}}
       <span class="empty_name_error {{field}}">can't be empty</span>
-      <div class="col-xs-6 trigger">
+      <div class="col-xs-7 trigger">
         <span class="placeholder" ng-click="update_old()">{{item[field]}}</span>
       </div>
-      <div class="col-xs-6 triggered">
+      <div class="col-xs-7 triggered">
         <input type="hidden" id="original_{{id}}" ng-model="item[field]" required>
         <input type="text" class="form-control" id="{{id}}" value="{{item[field]}}" placeholder="{{placeholder}}">
         <div class="error_text {{field}}" >can't be blank</div>
@@ -360,12 +336,12 @@ angular.module("Museum.directives", [])
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
-      <div class="col-lg-6 trigger">
-        <span class="placeholder large" ng-click="update_old()">{{item[field]}}</span>
+      <div class="col-xs-7 trigger">
+        <div class="placeholder large" ng-click="update_old()">{{item[field]}}</div>
       </div>
-      <div class="col-lg-6 triggered">
+      <div class="col-xs-7 triggered">
         <input type="hidden" id="original_{{id}}" ng-model="item[field]" required">
-        <textarea class="form-control" id="{{id}}" placeholder="{{placeholder}}">{{item[field]}}</textarea>
+        <div class="content_editable" contenteditable="true" id="{{id}}" placeholder="{{placeholder}}">{{item[field]}}</div>
       </div>
       <span class="sumbols_left">
         {{length_text}}
@@ -390,23 +366,24 @@ angular.module("Museum.directives", [])
     trigger = element.find('.trigger')
     triggered = element.find('.triggered')
     sumbols_left = element.find('.sumbols_left')
-    control = triggered.children('.form-control')
+    control = triggered.children('.content_editable')
 
-    element.find('span.placeholder').click ->
+    element.find('div.placeholder').click ->
       trigger.hide()
       triggered.show()
-      control.val scope.item[scope.field]
+      control.text scope.item[scope.field]
       control.focus()
+      scope.length_text = "осталось символов: #{scope.max_length - control.text().length - 1}"
       sumbols_left.show()
 
     control.blur ->
       elem = $ @
       $timeout ->
-        scope.item[scope.field] = elem.val()
+        scope.item[scope.field] = elem.text()
         scope.$digest()
         scope.status_process()
       , 0, false
-      if elem.val() isnt ''
+      if elem.text() isnt ''
         triggered.hide()
         trigger.show()
         sumbols_left.hide()
@@ -414,16 +391,16 @@ angular.module("Museum.directives", [])
 
     control.keyup (e) ->
       elem = $ @
-      value = elem.val()
+      value = elem.text()
       if value.length >= scope.max_length
-        elem.val value.substr(0, scope.max_length-1)
+        elem.text value.substr(0, scope.max_length-1)
       scope.length_text = "осталось символов: #{scope.max_length - value.length - 1}"
       scope.$digest()
 
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
         scope.length_text = "осталось символов: 255"
-        control.val ''
+        control.text ''
         trigger.hide()
         triggered.show()
       else
@@ -576,7 +553,7 @@ angular.module("Museum.directives", [])
       <div class="help">
         <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
       </div>
-      <div class="col-xs-6 trigger" ng-hide="edit_mode">
+      <div class="col-xs-7 trigger" ng-hide="edit_mode">
         <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
         </div>
         <div class="jp-audio" id="jp_container_{{id}}">
@@ -591,34 +568,36 @@ angular.module("Museum.directives", [])
                 </li>
               </ul>
             </div>
-            <div class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="visibility_filter">{{item[field].name}}<span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li role="presentation">
-                  <a href="#" class="replace_media" data-confirm="Are you sure you wish to replace this audio?" data-method="delete" data-link="{{$parent.$parent.backend_url}}/media/{{item[field]._id}}">Replace</a>
-                </li>
-                <li role="presentation">
-                  <a href="{{item[field].url}}" target="_blank">Download</a>
-                </li>
-                <li role="presentation">
-                  <a class="remove" href="#" data-confirm="Are you sure you wish to delete this audio?" data-method="delete" data-link="{{$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="item[field]" parent="item">Delete</a>
-                </li>
-              </ul>
-            </div>
-            <div class="jp-progress">
-              <div class="jp-seek-bar">
-                <div class="jp-play-bar">
+            <div class="jp-timeline">
+              <div class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="visibility_filter">{{item[field].name}}<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li role="presentation">
+                    <a href="#" class="replace_media" data-confirm="Are you sure you wish to replace this audio?" data-method="delete" data-link="{{$parent.$parent.backend_url}}/media/{{item[field]._id}}">Replace</a>
+                  </li>
+                  <li role="presentation">
+                    <a href="{{item[field].url}}" target="_blank">Download</a>
+                  </li>
+                  <li role="presentation">
+                    <a class="remove" href="#" data-confirm="Are you sure you wish to delete this audio?" data-method="delete" data-link="{{$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="item[field]" parent="item">Delete</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="jp-progress">
+                <div class="jp-seek-bar">
+                  <div class="jp-play-bar">
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="jp-time-holder">
-              <div class="jp-current-time">
+              <div class="jp-time-holder">
+                <div class="jp-current-time">
+                </div>
+                <div class="jp-duration">
+                </div>
               </div>
-              <div class="jp-duration">
+              <div class="jp-no-solution">
+                <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank"></a>
               </div>
-            </div>
-            <div class="jp-no-solution">
-              <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank"></a>
             </div>
           </div>
         </div>
@@ -661,7 +640,7 @@ angular.module("Museum.directives", [])
           wmode: "window"
           preload: "auto"
           smoothPlayBar: true
-          keyEnabled: true
+          # keyEnabled: true
           supplied: "mp3, ogg"
         $("#jquery_jplayer_#{scope.id}").jPlayer "setMedia",
           mp3: newValue.url
@@ -1261,13 +1240,10 @@ angular.module("Museum.directives", [])
         $(".float_menu").removeClass "navbar-fixed-top"
         $(".navigation").removeClass "bottom-padding"
         $(".to_top").hide() unless $(".to_top").hasClass 'has_position'
-        console.log 'leave'
 
       onTick: (position,state,enters,leaves) ->
         if scope.museum_edit_dropdown_opened
           scope.show_museum_edit(opener)
-        $('.museum_navigation_menu').hide()
-        #hide all menus
 
 .directive 'toTop', (errorProcessing) ->
   restrict: "E"

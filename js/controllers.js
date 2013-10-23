@@ -84,6 +84,7 @@
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
       $scope.ajax_progress = true;
+      $scope.story_subtab = 'video';
       $scope.reload_exhibits = function(sort_field, sort_direction) {
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
@@ -1136,22 +1137,13 @@
         });
       };
       $scope.show_museum_edit = function(event) {
-        var elem, museum_anim_in_progress, value_sign;
+        var elem, museum_anim_in_progress;
         elem = $(event.target);
         if (!museum_anim_in_progress) {
           museum_anim_in_progress = true;
           elem.find('i').toggleClass("icon-chevron-down icon-chevron-up");
-          elem.hide();
           $('.navigation .museum_edit').slideToggle(1000, "easeOutQuint");
-          value_sign = $scope.museum_edit_dropdown_opened ? "28px" : "576px";
           $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened;
-          setTimeout(function() {
-            elem.css({
-              top: "" + value_sign
-            });
-            elem.show();
-            return museum_anim_in_progress = false;
-          }, 1000);
         }
         return false;
       };

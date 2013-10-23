@@ -72,7 +72,8 @@ angular.module("Museum.controllers", [])
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
   $scope.sort_text      = 'Sort 0-9'
-  $scope.ajax_progress = true
+  $scope.ajax_progress  = true
+  $scope.story_subtab   = 'video'
 
   $scope.reload_exhibits = (sort_field, sort_direction) ->
     # $http.get("#{$scope.backend_url}/provider/524c2a72856ee97345000001/museums/524c2a72856ee97345000002/exhibits").success (data) ->
@@ -1076,18 +1077,8 @@ angular.module("Museum.controllers", [])
     unless museum_anim_in_progress
       museum_anim_in_progress = true
       elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
-      elem.hide()
       $('.navigation .museum_edit').slideToggle(1000, "easeOutQuint")
-      value_sign = if $scope.museum_edit_dropdown_opened
-          "28px"
-        else
-          "576px"
       $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened
-      setTimeout ->
-        elem.css({top: "#{value_sign}"})
-        elem.show()
-        museum_anim_in_progress = false
-      , 1000
     false
 
   $scope.museum_edit_dropdown_close = () ->

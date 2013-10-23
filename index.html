@@ -12,7 +12,6 @@
     <link href="css/prototype.css" rel="stylesheet">
     <link href="css/jquery.Jcrop.css" rel="stylesheet">
     <link href="css/jquery.fileupload-ui.css" rel="stylesheet">
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans&amp;subset=latin,cyrillic-ext,greek-ext,greek,cyrillic,latin-ext" rel="stylesheet" type="text/css">
   </head>
   <body class="fixed_navbar" drag-and-drop-init="" ng-controller="IndexController" scrollspy-init="">
     <div class="navigation">
@@ -157,6 +156,18 @@
         <error-notification></error-notification>
         <div class="left_content" ng-mouseover="show_museum_edit_dropdown=false">
           <button class="btn btn-warning spacer" id="create_new_item" ng-class="{&#39;disabled&#39;:new_item_creation}" ng-click="create_new_item()" type="button">New item </button>
+          <div class="btn-group spacer lang_switch">
+            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{{translations[current_museum.language] || 'New language'}}  <span class="caret"></span></button>
+            <ul class="dropdown-menu" role="menu">
+              <li ng-repeat="story in current_museum.stories">
+                <a href="#" ng-click="current_museum.language = story.language">{{translations[story.language]}}</a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="#" ng-click="new_museum_language()">New language</a>
+              </li>
+            </ul>
+          </div>
           <div class="btn-group">
             <button class="btn btn-default dropdown-toggle spacer" data-toggle="dropdown" type="button">Actions  <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
@@ -335,63 +346,97 @@
                 </div>
               </div>
             </div>
-            <lightbox-cropper model="active_exhibit"></lightbox-cropper>
-            <div class="prev-ex"></div>
-            <div class="images">
-              <a button-file-upload="" class="btn btn-default upload" href="#">Upload images</a><span class="or_drag">or drag images here</span><input class="fileupload" id="fileupload" multiple="" name="files[]" type="file">
-              <ul>
-                <span class="label label-danger images_label" ng-show="active_exhibit.images.length == 0">Fill to publish</span>
-                <li ng-repeat="image in active_exhibit.images">
-                  <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
-                  <div class="progress progress-success progress-striped active hide">
-                    <div class="bar"></div>
-                  </div>
-                </li>
-              </ul>
-            </div>
+            <input class="fileupload" id="fileupload" multiple="" name="files[]" type="file"><lightbox-cropper model="active_exhibit"></lightbox-cropper>
             <div class="description">
-              <div class="close"></div>
-              <div class="hider" ng-hide="active_exhibit.stories[current_museum.language].status == &#39;dummy&#39;">
-                <switchpubitem field="status" ng-item="active_exhibit.stories[current_museum.language]" ng-museum="current_museum" ng-provider="provider" root="active_exhibit" translations="translations" type="story"></switchpubitem>
+              <div class="controls">
+                <a class="delete_story" href="#" ng-click="delete_modal_open()"><i class="icon-trash"></i></a>
+                <div class="hider" ng-hide="active_exhibit.stories[current_museum.language].status == &#39;dummy&#39;">
+                  <switchpubitem field="status" ng-item="active_exhibit.stories[current_museum.language]" ng-museum="current_museum" ng-provider="provider" root="active_exhibit" translations="translations" type="story"></switchpubitem>
+                </div>
+                <div class="close"></div>
               </div>
-              <a class="delete_story" href="#" ng-click="delete_modal_open()"><i class="icon-trash"></i></a><tabset><tab heading="Media content">
-                  <div class="row" id="media">
-                    <form class="form-horizontal" name="mainForm" role="form">
-                      <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS №" placeholder="active_exhibit.number" type="story_set"></placeholderfield><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio" parent="active_exhibit.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="1000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
-                    </form>
-                  </div>
-                </tab><tab heading="Quiz">
-                  <div class="row" id="story_quiz">
-                    <form class="form-horizontal" name="quizform" role="form">
-                      <div class="switch-toggle ios" quiz-switch="story_quiz" switch-toggle="">
-                        <input id="story_quiz_enabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="published"><label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">Enable</label><input id="story_quiz_disabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="limited"><label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">Disable</label><a></a>
-                      </div>
-                      <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Question" type="quiz"></placeholderfield>
-                      <div class="error">
-                        <div class="controls"></div>
-                      </div>
-                      <div class="answers">
-                        <quizanswer field="content" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers" type="quiz_answer"></quizanswer>
-                      </div>
-                      <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Description" type="quiz"></placeholdertextarea>
-                    </form>
-                  </div>
-                </tab><tab heading="QR-code">
-                  <div class="row" id="qr_code">
-                    <div class="qr_image col-md-4">
-                      <img alt="Qr_code" id="qr" src="{{active_exhibit.stories[current_museum.language].qr_code || &#39;/img/qr_code.png&#39;}}">
+              <tabset><tab heading="Main">
+                  <form class="form-horizontal" name="mainForm" role="form">
+                    <audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio" parent="active_exhibit.stories[current_museum.language]" type="media"></audioplayer><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><placeholdertextarea maxlength="1000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
+                  </form>
+                </tab><tab heading="Images"><label class="col-xs-1 control-label">Images</label>
+                  <ul class="images col-xs-11">
+                    <span class="label label-danger images_label" ng-show="active_exhibit.images.length == 0">Fill to publish</span>
+                    <li ng-repeat="image in active_exhibit.images">
+                      <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                    </li>
+                    <li>
+                      <a button-file-upload="" class="btn btn-default upload" href="#">Upload images</a>
+                    </li>
+                  </ul>
+                </tab><tab heading="More">
+                  <ul class="nav nav-stacked nav-list col-xs-2">
+                    <li ng-class="{&#39;active&#39;: story_subtab == &#39;video&#39; }">
+                      <a href="#" ng-click="story_subtab = &#39;video&#39;">Video</a>
+                    </li>
+                    <li ng-class="{&#39;active&#39;: story_subtab == &#39;qr-code&#39; }">
+                      <a href="#" ng-click="story_subtab = &#39;qr-code&#39;">QR-code</a>
+                    </li>
+                    <li ng-class="{&#39;active&#39;: story_subtab == &#39;quiz&#39; }">
+                      <a href="#" ng-click="story_subtab = &#39;quiz&#39;">Quiz</a>
+                    </li>
+                    <li ng-class="{&#39;active&#39;: story_subtab == &#39;collections&#39; }">
+                      <a href="#" ng-click="story_subtab = &#39;collections&#39;">Used in collections</a>
+                    </li>
+                    <li ng-class="{&#39;active&#39;: story_subtab == &#39;tours&#39; }">
+                      <a href="#" ng-click="story_subtab = &#39;tours&#39;">Linked in tours</a>
+                    </li>
+                    <li ng-class="{&#39;active&#39;: story_subtab == &#39;settings&#39; }">
+                      <a href="#" ng-click="story_subtab = &#39;settings&#39;">Advanced settings</a>
+                    </li>
+                  </ul>
+                  <div class="tab-content col-xs-10">
+                    <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;video&#39; }">
+                      sample video content
                     </div>
-                    <div class="well col-md-4 col-md-offset-2">
-                      <a class="btn qr-code" href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank">Print QR-code</a><br>
-                        <p>
-                          You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
-                        </p>
-                      </br>
+                    <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;qr-code&#39; }">
+                      <row>
+                        <div class="qr_image col-xs-5">
+                          <img alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || &#39;/img/qr_code.png&#39;}}">
+                        </div>
+                        <div class="well col-xs-5">
+                          <a class="btn qr-code" href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank">Print QR-code</a><br>
+                            <p>
+                              You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                            </p>
+                          </br>
+                        </div>
+                      </row>
+                    </div>
+                    <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;quiz&#39; }">
+                      <div class="row">
+                        <form class="form-horizontal" name="quizform" role="form">
+                          <div class="switch-toggle ios" quiz-switch="story_quiz" switch-toggle="">
+                            <input id="story_quiz_enabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="published"><label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">Enable</label><input id="story_quiz_disabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="limited"><label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">Disable</label><a></a>
+                          </div>
+                          <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Question" type="quiz"></placeholderfield>
+                          <div class="error">
+                            <div class="controls"></div>
+                          </div>
+                          <div class="answers">
+                            <quizanswer field="content" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers" type="quiz_answer"></quizanswer>
+                          </div>
+                          <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Description" type="quiz"></placeholdertextarea>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;collections&#39; }">
+                      2222
+                    </div>
+                    <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;tours&#39; }">
+                      33333
+                    </div>
+                    <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;settings&#39; }">
+                      44444
                     </div>
                   </div>
-                </tab><tab heading="More">hgsdfklghdfj kgkjdf hg</tab></tabset>
+                </tab></tabset>
             </div>
-            <div class="next-ex"></div>
           </li>
           <li class="exhibit" ng-class="{active: exhibit.active}" ng-hide="ajax_progress" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search)" post-render="">
             <div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{&#39;border&#39;: exhibit.selected, &#39;draft&#39;:exhibit.stories[current_museum.language].name.length == 0}">
