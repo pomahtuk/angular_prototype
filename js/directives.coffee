@@ -553,7 +553,7 @@ angular.module("Museum.directives", [])
       <div class="help">
         <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
       </div>
-      <div class="col-xs-7 trigger" ng-hide="edit_mode">
+      <div class="col-xs-9 trigger" ng-hide="edit_mode">
         <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
         </div>
         <div class="jp-audio" id="jp_container_{{id}}">
