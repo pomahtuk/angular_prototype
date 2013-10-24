@@ -91,14 +91,14 @@ angular.module("Museum.directives", [])
     root: '=root'
   template: """
     <div class="btn-group pull-right item_publish_settings" ng-hide="item.status == 'draft'">
-      <button class="btn btn-success" ng-class="{'active': item.status == 'published' }" ng-click="item.status = 'published'; status_process()" type="button" ng-switch on="item[field]">
+      <button class="btn btn-default" ng-class="{'active btn-success': item.status == 'published'}" ng-click="item.status = 'published'; status_process()" type="button" ng-switch on="item[field]">
         <div class="extra" ng-switch on="item[field]">
           <i class="icon-globe"></i>
         </div>
         <span ng-switch-when="passcode">Publish</span>
         <span ng-switch-when="published">Published</span>
       </button>
-      <button class="btn btn-success" ng-class="{'active': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
+      <button class="btn btn-default" ng-class="{'active btn-primary': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
         <div class="extra" ng-switch on="item[field]">
           <i class="icon-lock"></i>
         </div>
@@ -553,7 +553,7 @@ angular.module("Museum.directives", [])
       <div class="help">
         <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
       </div>
-      <div class="col-xs-9 trigger" ng-hide="edit_mode">
+      <div class="col-xs-9 trigger" ng-show="edit_mode == 'value'">
         <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
         </div>
         <div class="jp-audio" id="jp_container_{{id}}">
@@ -602,9 +602,14 @@ angular.module("Museum.directives", [])
           </div>
         </div>
       </div>
-      <div class="triggered" ng-show="edit_mode">
-        <a href="#" class="btn btn-default" button-file-upload="">Upload a file</a>
-        <span class="or_drag">or drag an audio here</span>
+      <div class="triggered" ng-show="edit_mode == 'empty'">
+        <img class="upload_audio" src="/img/audio_drag.png" />
+        <span>drag audio here or </span>
+        <a href="#" class="btn btn-default" button-file-upload="">Click to upload</a>
+      </div>
+      <div class="col-xs-9 processing" ng-show="edit_mode == 'processing'">
+        <img class="upload_audio" src="/img/medium_loader.GIF" style="float: left;"/> 
+        <span>&nbsp;&nbsp;processing audio</span>
       </div>
       <status-indicator ng-binding="item" ng-field="field"></statusIndicator>
     </div>
@@ -630,9 +635,11 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
-        scope.edit_mode = true
+        scope.edit_mode = 'empty'
+      else if newValue is 'processing'
+        scope.edit_mode = 'processing'
       else
-        scope.edit_mode = false
+        scope.edit_mode = 'value'
         # console.log newValue
         $("#jquery_jplayer_#{scope.id}").jPlayer
           cssSelectorAncestor: "#jp_container_#{scope.id}"
@@ -752,6 +759,8 @@ angular.module("Museum.directives", [])
               parent: parent
             }
             data.submit()
+            if type is 'audio'
+              scope.model.stories[scope.$parent.current_museum.language].audio = 'processing'
           else
             console.log 'error: file size'
             hide_drop_area()
@@ -972,10 +981,12 @@ angular.module("Museum.directives", [])
 .directive 'openLightbox', ->
   restrict: 'A'
   link: (scope, element, attrs) ->
-    element = $ element
-    lightbox = element.parents('#drop_down, #museum_edit_dropdown').find('.lightbox_area')
+    element  = $ element
+    parent   = element.parents('#drop_down, #museum_edit_dropdown')
+    lightbox = parent.find('.lightbox_area')
     element.click ->
       lightbox.show()
+      parent.height(lightbox.height() + 60) if lightbox.height() + 60 > parent.height()
       lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
     true
 
@@ -1041,6 +1052,7 @@ angular.module("Museum.directives", [])
     cropper = element.find('.cropping_area img')
     preview = element.find('.exhibit .image img')
     done    = element.find('.apply_resize')
+    parent  = element.parents('#drop_down, #museum_edit_dropdown')
     imageWidth  = 0
     imageHeight = 0
     max_height  = 330
@@ -1066,7 +1078,8 @@ angular.module("Museum.directives", [])
         scope.model.images = images
         if scope.model.type is 'exhibit' 
           $('ul.exhibits li.exhibit.active').find('.image img').attr 'src', image.thumbnailUrl
-        element.hide()
+        parent.attr('style', '')
+      element.hide()
       false
 
     scope.update_media = (index, callback) ->

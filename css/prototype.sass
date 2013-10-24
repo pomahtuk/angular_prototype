@@ -172,7 +172,7 @@ html, body
 
 body
   color: #222
-  font-family: 'Helvetica Neue', 'Open Sans', Helvetica, Arial, sans-serif
+  font-family: Arial, sans-serif
   font-size: 13px
   line-height: 1.5em
 
@@ -766,7 +766,7 @@ ul.exhibits
   &.hidden
     display: none
 
-  >.dropdown_area, .lightbox_area
+  >.dropdown_area
     position: absolute
     top: 0px
     left: 0px
@@ -809,80 +809,6 @@ ul.exhibits
         -moz-user-select: none
         -ms-user-select: none
         user-select: none
-
-  .lightbox_area
-    +box-sizing(border-box)
-    // display: block
-    padding: 30px 90px
-    z-index: 999
-
-    .explain_text
-      color: #fff
-      margin-bottom: 20px
-      font-size: 14px
-
-    .apply_resize
-      position: absolute
-      top: 30px
-      right: 25px
-
-    .content
-      height: 360px
-      margin-bottom: 20px
-
-      .preview
-        width: 220px
-        float: left
-        min-height: 300px
-        line-height: 34px
-        margin-top: -10px
-        color: #fff
-
-        .exhibit
-          margin: 0
-
-          .image
-            width: 200px
-            height: 150px
-            overflow: hidden
-
-      .cropping_area
-        float: left
-        width: calc(100% - 220px)
-        overflow: hidden
-        img
-          display: block
-          margin: 0 auto
-          max-height: 350px
-
-        .jcrop-holder
-          margin: 0 auto
-
-    .slider
-      +inline-block
-      margin: 0 auto
-      width: 100%
-      font-size: 0px
-      text-align: center
-
-      .left, .right
-        margin: 0px 10px
-        color: #fff
-        font-size: 36px
-        font-weight: 100
-
-        &:hover
-          color: $exhibitTextColorHover
-
-      img.thumb
-        +inline-block
-        width: 105px
-        height: 80px
-        margin: 0px 10px
-        cursor: pointer
-
-        &.active
-          border: 2px solid $exhibitTextColorHover
 
   >.prev-ex, >.next-ex
     background: url('../img/popin-left-arrow.png') no-repeat
@@ -1033,7 +959,7 @@ ul.exhibits
     .label.label-danger
       display: block
       position: absolute
-      left: 13px
+      right: 13px
       top: 25px
 
       &.images_label
@@ -1437,7 +1363,6 @@ a
         display: block
         // max-height: 200px
         border: 1px solid transparent
-        background: url(/img/texarea_placeholder_bg.png) bottom repeat-x
 
     .triggered
       z-index: 1
@@ -1447,8 +1372,11 @@ a
       & > select
         cursor: pointer
 
+      & > .upload_audio
+        margin-left: 22px
+
       & > a
-        margin-left: 15px
+        margin-left: 5px
 
       .content_editable
         +border-radius(4px)
@@ -1456,9 +1384,8 @@ a
         border: 1px solid #cccccc
         font-size: 14px
         line-height: 1.44
-        // background: #fff
+        background: #fff
         min-height: 140px
-        background: url(../img/texarea_bg.png) bottom repeat-x #fff
 
         &:focus
           +box-shadow(none)
@@ -1485,6 +1412,10 @@ a
 
     &.textfield .triggered
       display: none
+
+    .processing
+      line-height: 30px
+      margin-left: 13px
 
     .help
       width: 15px
@@ -1531,7 +1462,7 @@ a
       .placeholder.large
         +border-radius(4px)
         border: 1px solid darken($border_color, 20%)
-        background: url(../img/texarea_bg.png) bottom repeat-x #fff
+        background: #fff
 
       .statuses
         background: #e5e5e5
@@ -1547,6 +1478,12 @@ a
 
     .statuses
       display: none
+
+
+
+
+
+
 
 .to_top
   +opacity(0.5)
@@ -1601,3 +1538,107 @@ a
       text-align: center
       font-size: 18px
       font-weight: bold
+
+
+
+
+
+
+.page-wrapper
+  position: relative
+
+.page-preloader
+  position: absolute
+  width: 100%
+  top: 0px
+  left: 0px
+  height: 300px
+  background: white
+  background: url('../img/big_loader.GIF') no-repeat center bottom
+
+
+
+
+
+
+.lightbox_area
+  position: absolute
+  top: 0px
+  left: 0px
+  // height: 100%
+  width: 100%
+  background: rgba(0,0,0, .90)
+  z-index: 998
+  display: none
+  +box-sizing(border-box)
+  // display: block
+  padding: 30px 90px
+  z-index: 999
+
+  .explain_text
+    color: #fff
+    margin-bottom: 20px
+    font-size: 14px
+
+  .apply_resize
+    position: absolute
+    top: 30px
+    right: 25px
+
+  .content
+    height: 360px
+    margin-bottom: 10px
+
+    .preview
+      width: 220px
+      float: left
+      min-height: 300px
+      line-height: 34px
+      margin-top: -10px
+      color: #fff
+
+      .exhibit
+        margin: 0
+
+        .image
+          width: 200px
+          height: 150px
+          overflow: hidden
+
+    .cropping_area
+      float: left
+      width: calc(100% - 220px)
+      overflow: hidden
+      img
+        display: block
+        margin: 0 auto
+        max-height: 350px
+
+      .jcrop-holder
+        margin: 0 auto
+
+  .slider
+    +inline-block
+    margin: 0 auto
+    width: 100%
+    font-size: 0px
+    text-align: center
+
+    .left, .right
+      margin: 0px 10px
+      color: #fff
+      font-size: 36px
+      font-weight: 100
+
+      &:hover
+        color: $exhibitTextColorHover
+
+    img.thumb
+      +inline-block
+      width: 105px
+      height: 80px
+      margin: 10px
+      cursor: pointer
+
+      &.active
+        border: 2px solid $exhibitTextColorHover

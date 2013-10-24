@@ -121,7 +121,7 @@
         field_type: '@type',
         root: '=root'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-success\" ng-class=\"{'active': item.status == 'published' }\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n  </button>\n  <button class=\"btn btn-success\" ng-class=\"{'active': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Private</span>\n    <span ng-switch-when=\"published\">Make private</span>\n  </button>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n  </button>\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Private</span>\n    <span ng-switch-when=\"published\">Make private</span>\n  </button>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs, storySetValidation) {
         return $scope.status_process = function() {
           return storySetValidation.checkValidity($scope);
@@ -521,7 +521,7 @@
         field: '@ngField',
         parent: '=parent'
       },
-      template: "<div class=\"form-group audio\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">\n    Audio\n    <span class=\"label label-danger\" ng-show=\"edit_mode\">Fill to publish</span>\n  </label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-9 trigger\" ng-hide=\"edit_mode\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-timeline\">\n          <div class=\"dropdown\">\n            <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n            <ul class=\"dropdown-menu\" role=\"menu\">\n              <li role=\"presentation\">\n                <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n              </li>\n              <li role=\"presentation\">\n                <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n              </li>\n              <li role=\"presentation\">\n                <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n              </li>\n            </ul>\n          </div>\n          <div class=\"jp-progress\">\n            <div class=\"jp-seek-bar\">\n              <div class=\"jp-play-bar\">\n              </div>\n            </div>\n          </div>\n          <div class=\"jp-time-holder\">\n            <div class=\"jp-current-time\">\n            </div>\n            <div class=\"jp-duration\">\n            </div>\n          </div>\n          <div class=\"jp-no-solution\">\n            <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode\">\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Upload a file</a>\n    <span class=\"or_drag\">or drag an audio here</span>\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group audio\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">\n    Audio\n    <span class=\"label label-danger\" ng-show=\"edit_mode\">Fill to publish</span>\n  </label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-9 trigger\" ng-show=\"edit_mode == 'value'\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-timeline\">\n          <div class=\"dropdown\">\n            <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n            <ul class=\"dropdown-menu\" role=\"menu\">\n              <li role=\"presentation\">\n                <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n              </li>\n              <li role=\"presentation\">\n                <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n              </li>\n              <li role=\"presentation\">\n                <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n              </li>\n            </ul>\n          </div>\n          <div class=\"jp-progress\">\n            <div class=\"jp-seek-bar\">\n              <div class=\"jp-play-bar\">\n              </div>\n            </div>\n          </div>\n          <div class=\"jp-time-holder\">\n            <div class=\"jp-current-time\">\n            </div>\n            <div class=\"jp-duration\">\n            </div>\n          </div>\n          <div class=\"jp-no-solution\">\n            <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode == 'empty'\">\n    <img class=\"upload_audio\" src=\"/img/audio_drag.png\" />\n    <span>drag audio here or </span>\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Click to upload</a>\n  </div>\n  <div class=\"col-xs-9 processing\" ng-show=\"edit_mode == 'processing'\">\n    <img class=\"upload_audio\" src=\"/img/medium_loader.GIF\" style=\"float: left;\"/> \n    <span>&nbsp;&nbsp;processing audio</span>\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
         element = $(element);
@@ -539,9 +539,11 @@
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
-            return scope.edit_mode = true;
+            return scope.edit_mode = 'empty';
+          } else if (newValue === 'processing') {
+            return scope.edit_mode = 'processing';
           } else {
-            scope.edit_mode = false;
+            scope.edit_mode = 'value';
             $("#jquery_jplayer_" + scope.id).jPlayer({
               cssSelectorAncestor: "#jp_container_" + scope.id,
               swfPath: "/js",
@@ -673,7 +675,10 @@
                   type: type,
                   parent: parent
                 };
-                return data.submit();
+                data.submit();
+                if (type === 'audio') {
+                  return scope.model.stories[scope.$parent.current_museum.language].audio = 'processing';
+                }
               } else {
                 console.log('error: file size');
                 return hide_drop_area();
@@ -974,11 +979,15 @@
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var lightbox;
+        var lightbox, parent;
         element = $(element);
-        lightbox = element.parents('#drop_down, #museum_edit_dropdown').find('.lightbox_area');
+        parent = element.parents('#drop_down, #museum_edit_dropdown');
+        lightbox = parent.find('.lightbox_area');
         element.click(function() {
           lightbox.show();
+          if (lightbox.height() + 60 > parent.height()) {
+            parent.height(lightbox.height() + 60);
+          }
           return lightbox.find(".slider img.thumb.item_" + attrs.openLightbox).click();
         });
         return true;
@@ -1012,13 +1021,14 @@
         };
       },
       link: function(scope, element, attrs) {
-        var bounds, cropper, done, getSelection, imageHeight, imageWidth, left, max_height, prev_height, prev_width, preview, right, selected, showPreview;
+        var bounds, cropper, done, getSelection, imageHeight, imageWidth, left, max_height, parent, prev_height, prev_width, preview, right, selected, showPreview;
         element = $(element);
         right = element.find('a.right');
         left = element.find('a.left');
         cropper = element.find('.cropping_area img');
         preview = element.find('.exhibit .image img');
         done = element.find('.apply_resize');
+        parent = element.parents('#drop_down, #museum_edit_dropdown');
         imageWidth = 0;
         imageHeight = 0;
         max_height = 330;
@@ -1049,8 +1059,9 @@
             if (scope.model.type === 'exhibit') {
               $('ul.exhibits li.exhibit.active').find('.image img').attr('src', image.thumbnailUrl);
             }
-            return element.hide();
+            return parent.attr('style', '');
           });
+          element.hide();
           return false;
         });
         scope.update_media = function(index, callback) {

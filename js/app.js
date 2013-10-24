@@ -18,7 +18,8 @@
         template: " ",
         controller: "IndexController"
       });
-      return $locationProvider.html5Mode(true);
+      $locationProvider.html5Mode(true);
+      return $locationProvider.hashPrefix('!');
     }
   ]);
 

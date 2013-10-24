@@ -35,9 +35,11 @@ tileGrid = (collection, tileWidth, tileSpace, tileListMargin) ->
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', 'ngProgress', 'storySetValidation', 'errorProcessing', ($scope, $http, $filter, $window, $modal, $routeParams, ngProgress, storySetValidation, errorProcessing) ->
+.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', ($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing) ->
   
   window.sc = $scope
+
+  console.log $routeParams, $location
 
   $scope.exhibit_search = ''
 
@@ -53,8 +55,12 @@ angular.module("Museum.controllers", [])
       else
         true
 
-  museum_id = if $routeParams.museum_id?
-    $routeParams.museum_id
+  $scope.museum_change_progress = true
+
+  ngProgress.color('#fd6e3b')
+
+  museum_id = if $location.$$path?
+    $location.$$path.split('/')[1]
   else
     "5260c63ceb6688e516000002"
     # "5266921cb7a2b93a7f000002"
@@ -66,25 +72,20 @@ angular.module("Museum.controllers", [])
     "5260c63ceb6688e516000001"
     # "5266921cb7a2b93a7f000001"
 
-  $scope.backend_url = "http://192.168.158.128:3000"
-  # $scope.backend_url = "http://prototype.izi.travel"
+  $scope.backend_url = "http://192.168.158.128:3000/api"
+  # $scope.backend_url = "http://prototype.izi.travel/api"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
   $scope.sort_text      = 'Sort 0-9'
   $scope.ajax_progress  = true
   $scope.story_subtab   = 'video'
-  $scope.museum_subtab   = 'video'
+  $scope.museum_subtab  = 'video'
 
-  $scope.reload_exhibits = (sort_field, sort_direction) ->
-    # $http.get("#{$scope.backend_url}/provider/524c2a72856ee97345000001/museums/524c2a72856ee97345000002/exhibits").success (data) ->
-    # ngProgress.color('#fd6e3b')
-    # ngProgress.start()
-    # console.log museum_id
+  $scope.reload_exhibits = (sort_field = $scope.sort_field, sort_direction = $scope.sort_direction) ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
       exhibits = []
       $scope.modal_translations = {}
-      # console.log data
       for item in data
         if item?
           exhibit = item.exhibit
@@ -99,7 +100,7 @@ angular.module("Museum.controllers", [])
             $scope.modal_translations[story.story.language] = {name: $scope.translations[story.story.language]}
           exhibits.push exhibit
       ngProgress.complete()
-      # console.log exhibits
+      console.log 'anim completed'
       $scope.active_exhibit =  exhibits[0]
       $scope.exhibits = exhibits
       $scope.ajax_progress  = false
@@ -167,9 +168,12 @@ angular.module("Museum.controllers", [])
           }
         }
 
-  $scope.reload_museums = (sort_field, sort_direction) ->
-    ngProgress.color('#fd6e3b')
+      $scope.museum_change_progress = false
+
+  $scope.reload_museums = ->
+    # ngProgress.complete()
     ngProgress.start()
+    console.log 'anim started'
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums").success (data) ->
       $scope.museums = []
       found = false
@@ -188,7 +192,9 @@ angular.module("Museum.controllers", [])
           story.story.quiz.answers = story.quiz.answers
           museum.stories[story.story.language] = story.story
         $scope.museums.push museum
+        museum.active = false
         if museum._id is museum_id
+          museum.active = true
           $scope.current_museum = museum
           found = true
       unless found
@@ -196,9 +202,9 @@ angular.module("Museum.controllers", [])
         $scope.current_museum.def_lang = "ru"
         $scope.current_museum.language = "ru"
         museum_id = $scope.current_museum._id
-      $scope.reload_exhibits $scope.sort_field, $scope.sort_direction
+      $scope.reload_exhibits()
 
-  $scope.reload_museum = () ->
+  $scope.reload_museum = ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}").success (data) ->
       museum = data.exhibit
       museum.def_lang = "ru"
@@ -609,6 +615,7 @@ angular.module("Museum.controllers", [])
         $scope.dummy_modal_open()
 
   $scope.closeDropDown = ->
+    console.log 'closing'
     active = findActive()
     if active.hasClass 'dummy'
       $scope.dummy_focusout_process(active)
@@ -967,8 +974,8 @@ angular.module("Museum.controllers", [])
           modal_options: ->
             $scope.modal_options
       )
-      ModalDeleteInstance.result.then ((selected) ->
-        $scope.delete_exhibit $scope.active_exhibit, selected
+      ModalDeleteInstance.result.then ((result) ->
+        $scope.delete_exhibit $scope.active_exhibit, result.selected
       ), ->
         console.log "Modal dismissed at: " + new Date()
     else
@@ -1107,7 +1114,8 @@ angular.module("Museum.controllers", [])
 
   $scope.post_stories = (original_story) ->
 
-    story = angular.copy original_story
+    # story = angular.copy original_story
+    story = original_story
 
     $http.post("#{$scope.backend_url}/story/", story).success (data) ->
       story._id = data._id
@@ -1124,7 +1132,7 @@ angular.module("Museum.controllers", [])
 
   $scope.post_answers = (answer) ->
     $http.post("#{$scope.backend_url}/quiz_answer/", answer).success (data) ->
-      console.log data
+      # console.log data
       answer._id = data._id
     .error ->
       errorProcessing.addError 'Failed to save quiz answer'
@@ -1161,11 +1169,12 @@ angular.module("Museum.controllers", [])
           $scope.modal_options
     )
 
-    ModalDeleteInstance.result.then ((selected, ids_to_delete) ->
-      for exhibit in $scope.exhibits
+    ModalDeleteInstance.result.then ((result) ->
+      console.log result.ids_to_delete
+      for exhibit in result.ids_to_delete
         if exhibit.selected is true
           exhibit.selected = false
-          $scope.delete_exhibit exhibit, selected
+          $scope.delete_exhibit exhibit, result.selected
     ), ->
       console.log "Modal dismissed at: " + new Date()
 
@@ -1209,10 +1218,10 @@ angular.module("Museum.controllers", [])
         story.story_set = data._id
         $scope.post_stories story
       dropDown.find('.item_publish_settings').show()
-      dropDown.find('.delete_story').removeClass 'no_margin'
     .error ->
       errorProcessing.addError 'Failed to save new exhibit'
     $scope.new_item_creation = false
+    $scope.$digest()
 
   $scope.$on 'changes_to_save', (event, child_scope) ->
     $http.put("#{$scope.backend_url}/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
@@ -1237,6 +1246,32 @@ angular.module("Museum.controllers", [])
       .error ->
         errorProcessing.addError 'Failed to update quiz'
     $scope.forbid_switch  = false
+
+  $scope.$watch -> 
+    $location.path()
+  , (newValue, oldValue) ->
+    if newValue? && newValue isnt oldValue
+      ngProgress.complete()
+      ngProgress.start()
+      console.log 'anim started'
+      $scope.museum_change_progress = true
+      museum_id = newValue.split('/')[1]
+      for museum in $scope.museums
+        if museum._id is museum_id
+          museum.active = true
+          $scope.current_museum = museum
+        else
+          museum.active = false
+      $scope.reload_exhibits()
+
+  $scope.$watch 'museum_change_progress', (newValue, oldValue) ->
+    if newValue?
+      if newValue
+        $('.page-wrapper .page').fadeOut(300)
+        $('.page-preloader').fadeIn(300)
+      else
+        $('.page-wrapper .page').fadeIn(300)
+        $('.page-preloader').fadeOut(300)
 
 ])
 
@@ -1314,12 +1349,17 @@ angular.module("Museum.controllers", [])
       if exhibit.selected is true
         $scope.ids_to_delete.push exhibit
 
+    result = 
+      ids_to_delete: $scope.ids_to_delete
+      selected: $scope.selected
+
+
     if $scope.ids_to_delete.length <= 1
-      $modalInstance.close $scope.selected
+      $modalInstance.close result
     else
       $scope.password_input_shown = true
       if $scope.deletion_password is modal_options.deletion_password
-        $modalInstance.close $scope.selected
+        $modalInstance.close result
 
   $scope.cancel = ->
     $modalInstance.dismiss()

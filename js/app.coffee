@@ -15,6 +15,7 @@ configureHttp = (httpp) ->
     template: " "
     controller: "IndexController"
   $locationProvider.html5Mode true
+  $locationProvider.hashPrefix '!'
 ]
 
 # @app.config (RestangularProvider) ->

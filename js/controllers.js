@@ -57,9 +57,10 @@
   };
 
   angular.module("Museum.controllers", []).controller('IndexController', [
-    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', 'ngProgress', 'storySetValidation', 'errorProcessing', function($scope, $http, $filter, $window, $modal, $routeParams, ngProgress, storySetValidation, errorProcessing) {
+    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', function($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing) {
       var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
       window.sc = $scope;
+      console.log($routeParams, $location);
       $scope.exhibit_search = '';
       $scope.criteriaMatch = function(criteria) {
         return function(item) {
@@ -77,9 +78,11 @@
           }
         };
       };
-      museum_id = $routeParams.museum_id != null ? $routeParams.museum_id : "5260c63ceb6688e516000002";
+      $scope.museum_change_progress = true;
+      ngProgress.color('#fd6e3b');
+      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "5260c63ceb6688e516000002";
       content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "5260c63ceb6688e516000001";
-      $scope.backend_url = "http://192.168.158.128:3000";
+      $scope.backend_url = "http://192.168.158.128:3000/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -87,6 +90,12 @@
       $scope.story_subtab = 'video';
       $scope.museum_subtab = 'video';
       $scope.reload_exhibits = function(sort_field, sort_direction) {
+        if (sort_field == null) {
+          sort_field = $scope.sort_field;
+        }
+        if (sort_direction == null) {
+          sort_direction = $scope.sort_direction;
+        }
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
           exhibits = [];
@@ -113,11 +122,12 @@
             }
           }
           ngProgress.complete();
+          console.log('anim completed');
           $scope.active_exhibit = exhibits[0];
           $scope.exhibits = exhibits;
           $scope.ajax_progress = false;
           if (exhibits.length === 0) {
-            return $scope.active_exhibit = {
+            $scope.active_exhibit = {
               index: 0,
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
               number: '1',
@@ -176,11 +186,12 @@
               }
             };
           }
+          return $scope.museum_change_progress = false;
         });
       };
-      $scope.reload_museums = function(sort_field, sort_direction) {
-        ngProgress.color('#fd6e3b');
+      $scope.reload_museums = function() {
         ngProgress.start();
+        console.log('anim started');
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
           var found, item, museum, story, _i, _j, _len, _len1, _ref;
           $scope.museums = [];
@@ -206,7 +217,9 @@
               museum.stories[story.story.language] = story.story;
             }
             $scope.museums.push(museum);
+            museum.active = false;
             if (museum._id === museum_id) {
+              museum.active = true;
               $scope.current_museum = museum;
               found = true;
             }
@@ -217,7 +230,7 @@
             $scope.current_museum.language = "ru";
             museum_id = $scope.current_museum._id;
           }
-          return $scope.reload_exhibits($scope.sort_field, $scope.sort_direction);
+          return $scope.reload_exhibits();
         });
       };
       $scope.reload_museum = function() {
@@ -615,6 +628,7 @@
       };
       $scope.closeDropDown = function() {
         var active;
+        console.log('closing');
         active = findActive();
         if (active.hasClass('dummy')) {
           $scope.dummy_focusout_process(active);
@@ -987,8 +1001,8 @@
               }
             }
           });
-          return ModalDeleteInstance.result.then((function(selected) {
-            return $scope.delete_exhibit($scope.active_exhibit, selected);
+          return ModalDeleteInstance.result.then((function(result) {
+            return $scope.delete_exhibit($scope.active_exhibit, result.selected);
           }), function() {
             return console.log("Modal dismissed at: " + new Date());
           });
@@ -1184,7 +1198,7 @@
       };
       $scope.post_stories = function(original_story) {
         var story;
-        story = angular.copy(original_story);
+        story = original_story;
         return $http.post("" + $scope.backend_url + "/story/", story).success(function(data) {
           story._id = data._id;
           story.quiz.story = data._id;
@@ -1208,7 +1222,6 @@
       };
       $scope.post_answers = function(answer) {
         return $http.post("" + $scope.backend_url + "/quiz_answer/", answer).success(function(data) {
-          console.log(data);
           return answer._id = data._id;
         }).error(function() {
           return errorProcessing.addError('Failed to save quiz answer');
@@ -1259,15 +1272,16 @@
             }
           }
         });
-        return ModalDeleteInstance.result.then((function(selected, ids_to_delete) {
+        return ModalDeleteInstance.result.then((function(result) {
           var exhibit, _i, _len, _ref, _results;
-          _ref = $scope.exhibits;
+          console.log(result.ids_to_delete);
+          _ref = result.ids_to_delete;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             exhibit = _ref[_i];
             if (exhibit.selected === true) {
               exhibit.selected = false;
-              _results.push($scope.delete_exhibit(exhibit, selected));
+              _results.push($scope.delete_exhibit(exhibit, result.selected));
             } else {
               _results.push(void 0);
             }
@@ -1328,12 +1342,12 @@
             story.story_set = data._id;
             $scope.post_stories(story);
           }
-          dropDown.find('.item_publish_settings').show();
-          return dropDown.find('.delete_story').removeClass('no_margin');
+          return dropDown.find('.item_publish_settings').show();
         }).error(function() {
           return errorProcessing.addError('Failed to save new exhibit');
         });
-        return $scope.new_item_creation = false;
+        $scope.new_item_creation = false;
+        return $scope.$digest();
       });
       $scope.$on('changes_to_save', function(event, child_scope) {
         $http.put("" + $scope.backend_url + "/" + child_scope.field_type + "/" + child_scope.item._id, child_scope.item).success(function(data) {
@@ -1345,7 +1359,7 @@
         });
         return $scope.forbid_switch = false;
       });
-      return $scope.$on('quiz_changes_to_save', function(event, child_scope, correct_item) {
+      $scope.$on('quiz_changes_to_save', function(event, child_scope, correct_item) {
         var sign, sub_item, _i, _len, _ref;
         _ref = child_scope.collection;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1361,6 +1375,40 @@
           });
         }
         return $scope.forbid_switch = false;
+      });
+      $scope.$watch(function() {
+        return $location.path();
+      }, function(newValue, oldValue) {
+        var museum, _i, _len, _ref;
+        if ((newValue != null) && newValue !== oldValue) {
+          ngProgress.complete();
+          ngProgress.start();
+          console.log('anim started');
+          $scope.museum_change_progress = true;
+          museum_id = newValue.split('/')[1];
+          _ref = $scope.museums;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            museum = _ref[_i];
+            if (museum._id === museum_id) {
+              museum.active = true;
+              $scope.current_museum = museum;
+            } else {
+              museum.active = false;
+            }
+          }
+          return $scope.reload_exhibits();
+        }
+      });
+      return $scope.$watch('museum_change_progress', function(newValue, oldValue) {
+        if (newValue != null) {
+          if (newValue) {
+            $('.page-wrapper .page').fadeOut(300);
+            return $('.page-preloader').fadeIn(300);
+          } else {
+            $('.page-wrapper .page').fadeIn(300);
+            return $('.page-preloader').fadeOut(300);
+          }
+        }
       });
     }
   ]).controller('MuseumEditController', [
@@ -1427,7 +1475,7 @@
     $scope.only_one = $scope.modal_options.languages.length === 1;
     $scope.password_input_shown = false;
     $scope.ok = function() {
-      var exhibit, language, value, _i, _len, _ref, _ref1;
+      var exhibit, language, result, value, _i, _len, _ref, _ref1;
       $scope.selected = [];
       $scope.ids_to_delete = [];
       _ref = $scope.modal_options.languages;
@@ -1444,12 +1492,16 @@
           $scope.ids_to_delete.push(exhibit);
         }
       }
+      result = {
+        ids_to_delete: $scope.ids_to_delete,
+        selected: $scope.selected
+      };
       if ($scope.ids_to_delete.length <= 1) {
-        return $modalInstance.close($scope.selected);
+        return $modalInstance.close(result);
       } else {
         $scope.password_input_shown = true;
         if ($scope.deletion_password === modal_options.deletion_password) {
-          return $modalInstance.close($scope.selected);
+          return $modalInstance.close(result);
         }
       }
     };
