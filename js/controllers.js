@@ -85,6 +85,7 @@
       $scope.sort_text = 'Sort 0-9';
       $scope.ajax_progress = true;
       $scope.story_subtab = 'video';
+      $scope.museum_subtab = 'video';
       $scope.reload_exhibits = function(sort_field, sort_direction) {
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;

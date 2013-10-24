@@ -754,7 +754,7 @@
           e.preventDefault();
           elem = $(this);
           parent = elem.parents('#drop_down, #museum_edit_dropdown');
-          return parent.find('.images :file').click();
+          return parent.find(':file').click();
         });
       }
     };

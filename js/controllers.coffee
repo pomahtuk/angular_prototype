@@ -74,6 +74,7 @@ angular.module("Museum.controllers", [])
   $scope.sort_text      = 'Sort 0-9'
   $scope.ajax_progress  = true
   $scope.story_subtab   = 'video'
+  $scope.museum_subtab   = 'video'
 
   $scope.reload_exhibits = (sort_field, sort_direction) ->
     # $http.get("#{$scope.backend_url}/provider/524c2a72856ee97345000001/museums/524c2a72856ee97345000002/exhibits").success (data) ->

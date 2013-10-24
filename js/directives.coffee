@@ -810,7 +810,7 @@ angular.module("Museum.directives", [])
       e.preventDefault()
       elem = $ @
       parent = elem.parents('#drop_down, #museum_edit_dropdown')
-      parent.find('.images :file').click()
+      parent.find(':file').click()
 
 .directive 'deleteMedia', ->
   restrict : 'A'
