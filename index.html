@@ -91,59 +91,99 @@
               </div>
             </div>
           </div>
-          <lightbox-cropper model="current_museum"></lightbox-cropper>
-          <div class="images">
-            <a button-file-upload="" class="btn btn-default upload" href="#">Upload images </a><span class="or_drag">or drag images here</span><input class="fileupload" id="museum_fileupload" multiple="" name="files[]" type="file">
-            <ul>
-              <li ng-repeat="image in current_museum.images">
-                <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="current_museum.stories[current_museum.language]" rel="nofollow" stop-event="">×</a>
-                <div class="progress progress-success progress-striped active hide">
-                  <div class="bar"></div>
-                </div>
-              </li>
-            </ul>
-          </div>
+          <input class="fileupload" id="museum_fileupload" multiple="" name="files[]" type="file"><lightbox-cropper model="current_museum"></lightbox-cropper>
           <div class="description">
-            <div class="close" ng-click="museum_edit_dropdown_close()"></div>
-            <div class="hider" ng-show="current_museum.stories[current_museum.language].status == &#39;published&#39; || current_museum.stories[current_museum.language].status == &#39;passcode&#39;">
-              <a class="delete_story museum" href="#" ng-click="delete_museum_modal_open()"><i class="icon-trash"></i></a>
+            <div class="controls">
+              <a class="delete_story" href="#" ng-click="delete_museum_modal_open()"><i class="icon-trash"></i></a>
+              <div class="close" ng-click="museum_edit_dropdown_close()"></div>
             </div>
-            <tabset><tab heading="Media content">
-                <div class="row" id="museum_media">
-                  <form class="form-horizontal" name="mainForm" role="form">
-                    <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name" placeholder="current_museum.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="Audio" parent="current_museum.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="1000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="current_museum.stories[current_museum.language]" ng-title="Description" placeholder="current_museum.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
-                  </form>
-                </div>
-              </tab><tab heading="Quiz">
-                <div class="row" id="museum_story_quiz">
-                  <form class="form-horizontal" name="museumQuizform" role="form">
-                    <div class="switch-toggle ios" quiz-switch="museum_story_quiz" switch-toggle="">
-                      <input id="museum_story_quiz_enabled" name="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="published"><label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">Enable</label><input id="museum_story_quiz_disabled" name="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="limited"><label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">Disable</label><a></a>
+            <tabset><tab heading="Main">
+                <form class="form-horizontal" name="mainForm" role="form">
+                  <audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="Audio" parent="current_museum.stories[current_museum.language]" type="media"></audioplayer><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name" placeholder="current_museum.stories[current_museum.def_lang].name" type="story"></placeholderfield><placeholdertextarea maxlength="1000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="current_museum.stories[current_museum.language]" ng-title="Description" placeholder="current_museum.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
+                </form>
+              </tab><tab heading="Images"><label class="col-xs-1 control-label">Images</label>
+                <ul class="images col-xs-11">
+                  <span class="label label-danger images_label" ng-show="current_museum.images.length == 0">Fill to publish</span>
+                  <li ng-repeat="image in current_museum.images">
+                    <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.current_museum" rel="nofollow" stop-event="">×</a>
+                  </li>
+                  <li class="upload_item">
+                    <div class="drag_here">
+                      <div class="img"></div>
+                      <span>Drag images here</span>
                     </div>
-                    <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="museum_story_quiz_attributes_question" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Question" type="quiz"></placeholderfield>
-                    <div class="error">
-                      <div class="controls"></div>
+                    <div class="or_upload">
+                      <span>or</span><a button-file-upload="" class="btn btn-default upload" href="#">Click to upload</a>
                     </div>
-                    <div class="answers">
-                      <quizanswer field="content" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer"></quizanswer>
-                    </div>
-                    <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Description" type="quiz"></placeholdertextarea>
-                  </form>
-                </div>
-              </tab><tab heading="QR-code">
-                <div class="row" id="museum_qr_code">
-                  <div class="qr_image col-md-4">
-                    <img alt="Qr_code" id="qr" src="{{active_exhibit.stories[current_museum.language].qr_code || &#39;/img/qr_code.png&#39;}}">
+                  </li>
+                </ul>
+              </tab><tab heading="More">
+                <ul class="nav nav-stacked nav-list col-xs-2">
+                  <li ng-class="{&#39;active&#39;: museum_subtab == &#39;video&#39; }">
+                    <a href="#" ng-click="museum_subtab = &#39;video&#39;">Video</a>
+                  </li>
+                  <li ng-class="{&#39;active&#39;: museum_subtab == &#39;qr-code&#39; }">
+                    <a href="#" ng-click="museum_subtab = &#39;qr-code&#39;">QR-code</a>
+                  </li>
+                  <li ng-class="{&#39;active&#39;: museum_subtab == &#39;quiz&#39; }">
+                    <a href="#" ng-click="museum_subtab = &#39;quiz&#39;">Quiz</a>
+                  </li>
+                  <li ng-class="{&#39;active&#39;: museum_subtab == &#39;collections&#39; }">
+                    <a href="#" ng-click="museum_subtab = &#39;collections&#39;">Used in collections</a>
+                  </li>
+                  <li ng-class="{&#39;active&#39;: museum_subtab == &#39;tours&#39; }">
+                    <a href="#" ng-click="museum_subtab = &#39;tours&#39;">Linked in tours</a>
+                  </li>
+                  <li ng-class="{&#39;active&#39;: museum_subtab == &#39;settings&#39; }">
+                    <a href="#" ng-click="museum_subtab = &#39;settings&#39;">Advanced settings</a>
+                  </li>
+                </ul>
+                <div class="tab-content col-xs-10">
+                  <div class="tab-pane" ng-class="{&#39;active&#39;: museum_subtab == &#39;video&#39; }">
+                    sample video content
                   </div>
-                  <div class="well col-md-4 col-md-offset-2">
-                    <a class="btn qr-code" href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank">Print QR-code</a><br>
-                      <p>
-                        You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
-                      </p>
-                    </br>
+                  <div class="tab-pane" ng-class="{&#39;active&#39;: museum_subtab == &#39;qr-code&#39; }">
+                    <row>
+                      <div class="qr_image col-xs-5">
+                        <img alt="Qr_code" src="{{current_museum.stories[current_museum.language].qr_code || &#39;/img/qr_code.png&#39;}}">
+                      </div>
+                      <div class="well col-xs-5">
+                        <a class="btn qr-code" href="{{current_museum.stories[current_museum.language].qr_code}}" target="_blank">Print QR-code</a><br>
+                          <p>
+                            You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                          </p>
+                        </br>
+                      </div>
+                    </row>
+                  </div>
+                  <div class="tab-pane" ng-class="{&#39;active&#39;: museum_subtab == &#39;quiz&#39; }">
+                    <div class="row">
+                      <form class="form-horizontal" name="museumQuizform" role="form">
+                        <div class="switch-toggle ios" quiz-switch="museum_story_quiz" switch-toggle="">
+                          <input id="museum_story_quiz_enabled" name="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="published"><label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">Enable</label><input id="museum_story_quiz_disabled" name="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="limited"><label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">Disable</label><a></a>
+                        </div>
+                        <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="museum_story_quiz_attributes_question" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Question" type="quiz"></placeholderfield>
+                        <div class="error">
+                          <div class="controls"></div>
+                        </div>
+                        <div class="answers">
+                          <quizanswer field="content" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer"></quizanswer>
+                        </div>
+                        <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Description" type="quiz"></placeholdertextarea>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="tab-pane" ng-class="{&#39;active&#39;: museum_subtab == &#39;collections&#39; }">
+                    2222
+                  </div>
+                  <div class="tab-pane" ng-class="{&#39;active&#39;: museum_subtab == &#39;tours&#39; }">
+                    33333
+                  </div>
+                  <div class="tab-pane" ng-class="{&#39;active&#39;: museum_subtab == &#39;settings&#39; }">
+                    44444
                   </div>
                 </div>
-              </tab><tab heading="More">hgsdfklghdfj kgkjdf hg</tab></tabset>
+              </tab></tabset>
           </div>
         </div>
       </div>
@@ -365,8 +405,14 @@
                     <li ng-repeat="image in active_exhibit.images">
                       <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                     </li>
-                    <li>
-                      <a button-file-upload="" class="btn btn-default upload" href="#">Upload images</a>
+                    <li class="upload_item">
+                      <div class="drag_here">
+                        <div class="img"></div>
+                        <span>Drag images here</span>
+                      </div>
+                      <div class="or_upload">
+                        <span>or</span><a button-file-upload="" class="btn btn-default upload" href="#">Click to upload</a>
+                      </div>
                     </li>
                   </ul>
                 </tab><tab heading="More">

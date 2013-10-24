@@ -903,9 +903,27 @@ ul.exhibits
   .images
     position: relative
 
-    .upload
-      z-index: 99
-      overflow: hidden
+    .upload_item
+      width: 306px
+      .drag_here
+        margin-left: -3px
+        float: left
+        .img
+          width: 148px
+          height: 90px
+          background: url('../img/img_drag.png') no-repeat center
+        span
+          display: block
+          text-align: center
+          width: 148px
+      .or_upload
+        span
+          line-height: 112px
+          padding: 0px 5px
+        .upload
+          float: right
+          margin: 40px 5px
+          // margin-top: 40px
 
   #fileupload, #museum_fileupload
     display: none
@@ -1028,10 +1046,6 @@ ul.exhibits
 
 #museum_edit_dropdown
   margin-bottom: 0px
-  .images
-    padding:  40px 20px
-  .description
-    padding: 30px 30px 0 55px
 
 .muted
   color: #666
@@ -1443,7 +1457,7 @@ a
         font-size: 14px
         line-height: 1.44
         // background: #fff
-        min-height: 130px
+        min-height: 140px
         background: url(../img/texarea_bg.png) bottom repeat-x #fff
 
         &:focus

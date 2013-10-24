@@ -106,64 +106,150 @@ html lang="en" ng-app="Museum"
               .progress
                 .progress-bar.progress-bar-success
 
+          input.fileupload id="museum_fileupload" type="file" name="files[]" multiple=""
+
           lightbox-cropper model="current_museum"
 
-          .images
-            a.btn.btn-default.upload href="#" button-file-upload=""
-              | Upload images 
-            span.or_drag or drag images here
-            input.fileupload id="museum_fileupload" type="file" name="files[]" multiple=""
-            ul
-              li ng-repeat="image in current_museum.images"
-                a.img_thumbnail href="#" open-lightbox="{{$index}}"
-                  img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
-                a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" parent="current_museum.stories[current_museum.language]" media="image" rel="nofollow" ×
-                .progress.progress-success.progress-striped.active.hide
-                  .bar
+          / .images
+          /   a.btn.btn-default.upload href="#" button-file-upload=""
+          /     | Upload images 
+          /   span.or_drag or drag images here
+            
+          /   ul
+          /     li ng-repeat="image in current_museum.images"
+          /       a.img_thumbnail href="#" open-lightbox="{{$index}}"
+          /         img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
+          /       a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" parent="current_museum.stories[current_museum.language]" media="image" rel="nofollow" ×
+          /       .progress.progress-success.progress-striped.active.hide
+          /         .bar
 
+          / .description
+          /   .close ng-click="museum_edit_dropdown_close()"
+          /   .hider ng-show="current_museum.stories[current_museum.language].status == 'published' || current_museum.stories[current_museum.language].status == 'passcode'"
+          /     a.delete_story.museum ng-click="delete_museum_modal_open()" href="#" 
+          /       i.icon-trash
+
+            / tabset
+            /   tab heading="Media content"
+            /     #museum_media.row
+            /       form.form-horizontal role="form" name="mainForm"
+
+            /         placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
+            /         audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
+
+            /         placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
+
+            /   tab heading="Quiz"
+            /     #museum_story_quiz.row
+            /       form.form-horizontal role="form" name="museumQuizform"
+            /         .switch-toggle.ios switch-toggle="" quiz-switch="museum_story_quiz"
+            /           input id="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="published" type="radio" name="museum_story_quiz_enabled" 
+            /           label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Enable
+            /           input id="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="limited" type="radio" name="museum_story_quiz_disabled"
+            /           label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Disable
+            /           a
+            /         placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup" type="quiz"
+            /         .error
+            /           .controls
+            /         .answers
+            /           quizanswer ng-item="answer" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer" field="content"
+            /         placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3" type="quiz"
+
+            /   tab heading="QR-code"
+            /     #museum_qr_code.row
+            /       .qr_image.col-md-4
+            /         img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
+            /       .well.col-md-4.col-md-offset-2
+            /         a.btn.qr-code href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
+            /         br
+            /           p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+              
+            /   tab heading="More"
+            /     | hgsdfklghdfj kgkjdf hg
+        
           .description
-            .close ng-click="museum_edit_dropdown_close()"
-            .hider ng-show="current_museum.stories[current_museum.language].status == 'published' || current_museum.stories[current_museum.language].status == 'passcode'"
-              a.delete_story.museum ng-click="delete_museum_modal_open()" href="#" 
+            .controls
+              a.delete_story ng-click="delete_museum_modal_open()" href="#" 
                 i.icon-trash
+              / .hider ng-hide="current_museum.stories[current_museum.language].status == 'dummy'"
+              /   switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum" 
+              .close ng-click="museum_edit_dropdown_close()"
 
             tabset
-              tab heading="Media content"
-                #museum_media.row
-                  form.form-horizontal role="form" name="mainForm"
 
-                    placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
-                    audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
+              tab heading="Main"
+                form.form-horizontal role="form" name="mainForm"
+                  audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
+                  placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
+                  placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
 
-                    placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
+              tab heading="Images"
+                label.col-xs-1.control-label Images
+                ul.images.col-xs-11
+                  span.label.label-danger.images_label ng-show="current_museum.images.length == 0" Fill to publish
+                  li ng-repeat="image in current_museum.images"
+                    a.img_thumbnail href="#" open-lightbox="{{$index}}"
+                      img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
+                    a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.current_museum" rel="nofollow" ×
 
-              tab heading="Quiz"
-                #museum_story_quiz.row
-                  form.form-horizontal role="form" name="museumQuizform"
-                    .switch-toggle.ios switch-toggle="" quiz-switch="museum_story_quiz"
-                      input id="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="published" type="radio" name="museum_story_quiz_enabled" 
-                      label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Enable
-                      input id="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="limited" type="radio" name="museum_story_quiz_disabled"
-                      label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Disable
-                      a
-                    placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup" type="quiz"
-                    .error
-                      .controls
-                    .answers
-                      quizanswer ng-item="answer" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer" field="content"
-                    placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3" type="quiz"
+                  li.upload_item
+                    .drag_here
+                      .img
+                      span Drag images here
+                    .or_upload
+                      span or
+                      a.btn.btn-default.upload href="#" button-file-upload=""
+                        | Click to upload
 
-              tab heading="QR-code"
-                #museum_qr_code.row
-                  .qr_image.col-md-4
-                    img#qr alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
-                  .well.col-md-4.col-md-offset-2
-                    a.btn.qr-code href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
-                    br
-                      p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
               tab heading="More"
-                | hgsdfklghdfj kgkjdf hg
-        
+
+                ul.nav.nav-stacked.nav-list.col-xs-2
+                  li ng-class="{'active': museum_subtab == 'video' }"
+                    a href="#" ng-click="museum_subtab = 'video'" Video
+                  li ng-class="{'active': museum_subtab == 'qr-code' }"
+                    a href="#" ng-click="museum_subtab = 'qr-code'" QR-code
+                  li ng-class="{'active': museum_subtab == 'quiz' }"
+                    a href="#" ng-click="museum_subtab = 'quiz'" Quiz
+                  li ng-class="{'active': museum_subtab == 'collections' }"
+                    a href="#" ng-click="museum_subtab = 'collections'" Used in collections
+                  li ng-class="{'active': museum_subtab == 'tours' }"
+                    a href="#" ng-click="museum_subtab = 'tours'" Linked in tours
+                  li ng-class="{'active': museum_subtab == 'settings' }"
+                    a href="#" ng-click="museum_subtab = 'settings'" Advanced settings
+
+                .tab-content.col-xs-10
+                  .tab-pane ng-class="{'active': museum_subtab == 'video' }"
+                    | sample video content
+                  .tab-pane  ng-class="{'active': museum_subtab == 'qr-code' }" 
+                    row
+                      .qr_image.col-xs-5
+                        img alt="Qr_code" src="{{current_museum.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
+                      .well.col-xs-5
+                        a.btn.qr-code href="{{current_museum.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
+                        br
+                          p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                  .tab-pane ng-class="{'active': museum_subtab == 'quiz' }" 
+                    .row
+                      form.form-horizontal role="form" name="museumQuizform"
+                        .switch-toggle.ios switch-toggle="" quiz-switch="museum_story_quiz"
+                          input id="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="published" type="radio" name="museum_story_quiz_enabled" 
+                          label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Enable
+                          input id="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="limited" type="radio" name="museum_story_quiz_disabled"
+                          label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Disable
+                          a
+                        placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup" type="quiz"
+                        .error
+                          .controls
+                        .answers
+                          quizanswer ng-item="answer" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer" field="content"
+                        placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3" type="quiz"
+                  .tab-pane ng-class="{'active': museum_subtab == 'collections' }" 
+                    |2222
+                  .tab-pane ng-class="{'active': museum_subtab == 'tours' }" 
+                    |33333
+                  .tab-pane ng-class="{'active': museum_subtab == 'settings' }" 
+                    |44444
+
       .museum_edit_opener ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened"
         | Museum properties  
         i.icon-chevron-down
@@ -391,9 +477,14 @@ html lang="en" ng-app="Museum"
                         img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
                       a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.active_exhibit" rel="nofollow" ×
 
-                    li
-                      a.btn.btn-default.upload href="#" button-file-upload=""
-                        | Upload images
+                    li.upload_item
+                      .drag_here
+                        .img
+                        span Drag images here
+                      .or_upload
+                        span or
+                        a.btn.btn-default.upload href="#" button-file-upload=""
+                          | Click to upload
 
 
                 tab heading="More"
