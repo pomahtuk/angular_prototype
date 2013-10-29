@@ -1102,6 +1102,7 @@ angular.module("Museum.directives", [])
       false
 
     scope.update_media = (index, callback) ->
+      console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index]._id}", selected).success (data) ->
         console.log  data
         scope.model.images[index] = data
