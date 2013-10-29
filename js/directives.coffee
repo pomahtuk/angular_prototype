@@ -1095,7 +1095,9 @@ angular.module("Museum.directives", [])
         scope.model.images = images
         if scope.model.type is 'exhibit' 
           $('ul.exhibits li.exhibit.active').find('.image img').attr 'src', image.thumbnailUrl
-        parent.attr('style', '')
+      # this line resizes parent back
+      parent.attr('style', '')
+      #####
       element.hide()
       false
 

@@ -1087,10 +1087,10 @@
             });
             scope.model.images = images;
             if (scope.model.type === 'exhibit') {
-              $('ul.exhibits li.exhibit.active').find('.image img').attr('src', image.thumbnailUrl);
+              return $('ul.exhibits li.exhibit.active').find('.image img').attr('src', image.thumbnailUrl);
             }
-            return parent.attr('style', '');
           });
+          parent.attr('style', '');
           element.hide();
           return false;
         });
