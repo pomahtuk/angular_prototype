@@ -1687,12 +1687,55 @@ a
       &:hover
         color: $exhibitTextColorHover
 
-    img.thumb
+    .thumb
       +inline-block
-      width: 105px
-      height: 80px
-      margin: 10px
+      width: 109px
+      height: 84px
+      margin: 8px
       cursor: pointer
+      position: relative
 
-      &.active
+      .cover
+        +border-radius(20px)
+        +inline-block
+        display: block
+        position: absolute
+        bottom: 10px
+        left: 10px
+        background: #47a447
+        overflow: hidden
+        padding: 0px 5px
+        max-width: 20px
+        height: 20px
+        transition: all 0.2s
+        -webkit-transition: all 0.2s
+        visibility: hidden
+
+        span
+          +inline-block
+          width: 80px
+          float: left
+          color: #fff
+          line-height: 20px
+          margin-left: -2px
+
+        &.active
+          visibility: visible
+          max-width: 92px
+          
+          span
+            width: 66px
+
+        &:hover
+          max-width: 92px
+
+      &:hover .cover
+        visibility: visible
+
+      img
+        width: 105px
+        height: 80px
+        border: 2px solid transparent
+
+      &.active img
         border: 2px solid $exhibitTextColorHover

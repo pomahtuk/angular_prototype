@@ -1041,7 +1041,13 @@ angular.module("Museum.directives", [])
         <a class="left" href="#" ng-click="set_index(active_image_index - 1)">
           <i class="icon-angle-left"></i>
         </a>
-        <img class="thumb item_{{$index}}" ng-click="set_index($index)" ng-class="{'active':image.active}" src="{{image.thumbnailUrl}}" ng-repeat="image in model.images">
+        <div class="thumb item_{{$index}}" ng-class="{'active':image.active}" ng-repeat="image in model.images">
+          <img ng-click="set_index($index)" src="{{image.thumbnailUrl}}" >
+          <a class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch on="image.cover">
+            <span ng-switch-when="true"><i class="icon-ok"></i> Cover</span>
+            <span ng-switch-default><i class="icon-ok"></i> Set cover</span>
+          </a>
+        </div>
         <a class="right" href="#" ng-click="set_index(active_image_index + 1)">
           <i class="icon-angle-right"></i>
         </a>
@@ -1054,6 +1060,18 @@ angular.module("Museum.directives", [])
       $scope.update_media $scope.active_image_index, ->
         $scope.active_image_index = index
         console.log $scope.active_image_index, index
+
+    $scope.make_cover = (index) ->
+      target_image = $scope.model.images[index]
+      for image in $scope.model.images
+        if image._id isnt target_image._id
+          image.cover = false
+        else
+          image.cover = true
+        $http.put("#{$scope.$parent.backend_url}/media/#{image._id}", image).success (data) ->
+          console.log 'ok'
+        .error ->
+          errorProcessing.addError 'Failed to set cover'
 
     $scope.check_active_image = ->
       for image, index in $scope.model.images
@@ -1083,18 +1101,21 @@ angular.module("Museum.directives", [])
       scope.update_media scope.active_image_index, ->
         images =  scope.model.images
         images.sort (a, b) ->
-          a = new Date(a.updated)
-          b = new Date(b.updated)
-          if a < b 
-            1 
+          a = new Date(a.order)
+          b = new Date(b.order)
+          if a.cover is true
+            return 1000
           else
-            if a > b 
-              -1 
-            else 
-              0
+            if a < b 
+              return 1 
+            else
+              if a > b 
+                return -1 
+              else 
+                return 0
         scope.model.images = images
-        if scope.model.type is 'exhibit' 
-          $('ul.exhibits li.exhibit.active').find('.image img').attr 'src', image.thumbnailUrl
+        # if scope.model.type is 'exhibit' 
+        #   $('ul.exhibits li.exhibit.active').find('.image img').attr 'src', image.thumbnailUrl
       # this line resizes parent back
       parent.attr('style', '')
       #####
@@ -1102,7 +1123,7 @@ angular.module("Museum.directives", [])
       false
 
     scope.update_media = (index, callback) ->
-      console.log selected
+      # console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index]._id}", selected).success (data) ->
         console.log  data
         scope.model.images[index] = data

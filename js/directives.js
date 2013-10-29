@@ -1031,13 +1031,33 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    Select the preview area. Images won't crop. You can always return to this later on.\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">Done</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      PREVIEW\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <img class=\"thumb item_{{$index}}\" ng-click=\"set_index($index)\" ng-class=\"{'active':image.active}\" src=\"{{image.thumbnailUrl}}\" ng-repeat=\"image in model.images\">\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    Select the preview area. Images won't crop. You can always return to this later on.\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">Done</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      PREVIEW\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <div class=\"thumb item_{{$index}}\" ng-class=\"{'active':image.active}\" ng-repeat=\"image in model.images\">\n      <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" >\n      <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n        <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> Cover</span>\n        <span ng-switch-default><i class=\"icon-ok\"></i> Set cover</span>\n      </a>\n    </div>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
             $scope.active_image_index = index;
             return console.log($scope.active_image_index, index);
           });
+        };
+        $scope.make_cover = function(index) {
+          var image, target_image, _i, _len, _ref, _results;
+          target_image = $scope.model.images[index];
+          _ref = $scope.model.images;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            image = _ref[_i];
+            if (image._id !== target_image._id) {
+              image.cover = false;
+            } else {
+              image.cover = true;
+            }
+            _results.push($http.put("" + $scope.$parent.backend_url + "/media/" + image._id, image).success(function(data) {
+              return console.log('ok');
+            }).error(function() {
+              return errorProcessing.addError('Failed to set cover');
+            }));
+          }
+          return _results;
         };
         return $scope.check_active_image = function() {
           var image, index, _i, _len, _ref, _results;
@@ -1073,29 +1093,29 @@
             var images;
             images = scope.model.images;
             images.sort(function(a, b) {
-              a = new Date(a.updated);
-              b = new Date(b.updated);
-              if (a < b) {
-                return 1;
+              a = new Date(a.order);
+              b = new Date(b.order);
+              if (a.cover === true) {
+                return 1000;
               } else {
-                if (a > b) {
-                  return -1;
+                if (a < b) {
+                  return 1;
                 } else {
-                  return 0;
+                  if (a > b) {
+                    return -1;
+                  } else {
+                    return 0;
+                  }
                 }
               }
             });
-            scope.model.images = images;
-            if (scope.model.type === 'exhibit') {
-              return $('ul.exhibits li.exhibit.active').find('.image img').attr('src', image.thumbnailUrl);
-            }
+            return scope.model.images = images;
           });
           parent.attr('style', '');
           element.hide();
           return false;
         });
         scope.update_media = function(index, callback) {
-          console.log(selected);
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index]._id, selected).success(function(data) {
             console.log(data);
             scope.model.images[index] = data;
