@@ -165,7 +165,7 @@ body
   top: 0
 
   &.bottom-padding
-    padding-bottom: 88px
+    padding-bottom: 45px
 
 html, body
   width: 100%
@@ -182,7 +182,7 @@ body
   padding: 30px 30px
   z-index: 1001
   position: relative
-  max-height: 420px
+  max-height: 440px
   overflow: auto
   overflow-y: hidden
   display: none
@@ -190,18 +190,11 @@ body
   .museum_navbar
     margin-bottom: 15px
 
-    .left_content i, .right_content i
+    i
       margin-right: 10px
 
-    .right_content
-      margin-top: -10px
-      width: 40% !important
-
-    .left_content
-      min-width: 600px !important
-
     .navbar-right
-      margin-top: -10px
+      margin-top: -25px
 
     a
       color: inherit
@@ -359,8 +352,8 @@ body
 
 .museum_edit_opener
   +box-shadow(#666, 0px 1px)
-  +border-top-radius(3px)
-  margin-top: -24px
+  +border-bottom-radius(3px)
+  margin-bottom: -24px
   position: absolute
   height: 24px
   z-index: 1000
@@ -385,8 +378,6 @@ body
  
 .left_content
   padding-left: 40px
-  float: left
-  width: 50%
 
   .cms_text_logo
     display: block
@@ -441,12 +432,18 @@ body
     margin-top: 10px
 
 .right_content
-  padding-right: 40px
+  +inline-block
+  position: absolute
+  top: 0px
+  right: 40px
   text-align: right
-  float: right
-  width: 50%
+
+  .hider
+    +inline-block
+    // margin-top: -15px
 
   .autosaved_info
+    float: left
     color: $unmain_color
     line-height: 50px
     margin-right: 10px
@@ -503,6 +500,9 @@ body
     width: 150px
     margin-right: 10px
     max-width: 500px
+
+  .right_content
+    top: 5px
 
   .error_notifications
     position: absolute
@@ -638,7 +638,7 @@ ul.exhibits
           left: 3px
 
       .visibility
-        bottom: 10px
+        bottom: 12px
         right: 14px
         position: absolute
 
@@ -651,6 +651,7 @@ ul.exhibits
           display: none
 
           .btn
+            +box-sizing(border-box)
             padding: 6px 8px
 
           .dropdown-toggle
@@ -682,24 +683,6 @@ ul.exhibits
           i.placeholder, .on_hover .extra_right i
             color: #d9534f
 
-      .media_types
-        position: absolute
-        left: 15px
-        bottom: 12px
-
-        i
-          margin-right: 15px
-          font-size: 14px
-          color: $unmain_text_color
-
-          &.empty
-            display: none
-
-        &.invalid
-          i.empty
-            display: inline
-            color: #d9534f
-
       &.border
         +box-sizing(border-box)
         +box-shadow($exhibitTextColorHover 0 0 1px 2px)
@@ -710,7 +693,7 @@ ul.exhibits
 
     &.active
       background: url('../img/orange-pop-in-arrow.png') no-repeat center bottom
-      padding-bottom: 45px
+      padding-bottom: 30px
 
     &:hover,
     &.active
@@ -754,17 +737,40 @@ ul.exhibits
   #dropzone, #museum_dropzone
     display: block !important
 
+.media_types
+  position: absolute
+  left: 15px
+  bottom: 12px
+
+  i
+    margin-right: 15px
+    font-size: 14px
+    color: $unmain_text_color
+
+    &.empty
+      display: none
+
+  &.invalid
+    i.empty
+      display: inline
+      color: #d9534f
+
 #drop_down, #museum_edit_dropdown
-  background: #f8f8f8
+  // background: #f8f8f8
+  background: #fff
   border-top: 1px solid $slideDownOuterBorderColor
   border-bottom: 1px solid $slideDownOuterBorderColor
   // height: $slideDownHeight - 2 // minus border
-  margin: 0 0 45px
+  margin: 0 0 30px
   position: relative
   width: 100%
 
   &.hidden
     display: none
+
+  .museum_invalid_media
+    top: 15px
+    text-align: right
 
   >.dropdown_area
     position: absolute
@@ -884,6 +890,10 @@ ul.exhibits
         +inline-block
         width: 65px
         float: none
+        +opacity(0.6)
+
+        &:hover
+          +opacity(1)
 
       .delete_story
         +inline-block
@@ -1297,7 +1307,7 @@ a
       width: 100px
       margin-top: 5px
       margin-left: 10px
-      background: #f8f8f8
+      // background: #f8f8f8
       z-index: 2
       position: relative
 
@@ -1355,7 +1365,7 @@ a
       .large
         +box-sizing(border-box)
         width: 100%
-        height: 140px
+        height: 180px
         padding: 6px 12px
         font-size: 14px
         line-height: 1.44
@@ -1366,6 +1376,7 @@ a
 
     .triggered
       z-index: 1
+      position: relative
       & > input, & > .content_editable, & > select
         min-width: 300px
 
@@ -1385,12 +1396,41 @@ a
         font-size: 14px
         line-height: 1.44
         background: #fff
-        min-height: 140px
+        min-height: 180px
 
         &:focus
           +box-shadow(none)
           outline: none
           border-color: #fd6e3b
+
+      .additional_controls
+        +inline-block
+        position: absolute
+        top: 0px
+        right: -17px
+        font-size: 0px
+
+        a
+          +box-shadow(border-box)
+          +inline-block
+          width: 34px
+          height: 34px
+          text-align: center
+          line-height: 34px
+          font-size: 18px
+          background:  #fb6e02
+          color: #909090
+          border: 1px solid #d65d00
+          z-index: 1
+          color: #fff
+
+          &:last-child
+            margin-left: -1px
+
+          &:hover
+            background: #eea236
+            z-index: 2
+
 
     &.checkbox_added
       margin-left: 0px
@@ -1445,6 +1485,9 @@ a
     &:not(.last):hover
       background: #e5e5e5
 
+      .trigger, .triggered
+        cursor: pointer
+
       .help
         visibility: visible
         cursor: pointer
@@ -1464,8 +1507,8 @@ a
         border: 1px solid darken($border_color, 20%)
         background: #fff
 
-      .statuses
-        background: #e5e5e5
+      // .statuses
+      //   background: #e5e5e5
 
 #new_museum
   width: 600px
@@ -1590,24 +1633,33 @@ a
     margin-bottom: 10px
 
     .preview
-      width: 220px
+      width: 240px
       float: left
       min-height: 300px
       line-height: 34px
       margin-top: -10px
       color: #fff
 
-      .exhibit
-        margin: 0
+      .mobile
+        position: relative
+        width: 225px
+        height: 480px
+        background: url('../img/iphone preview.png')
 
         .image
-          width: 200px
-          height: 150px
+          position: absolute
+          top: 131px
+          left: 24px
           overflow: hidden
+          width: 177px
+          height: 133px
+          img
+            width: 177px
+            height: 133px
 
     .cropping_area
       float: left
-      width: calc(100% - 220px)
+      width: calc(100% - 240px)
       overflow: hidden
       img
         display: block
@@ -1619,8 +1671,10 @@ a
 
   .slider
     +inline-block
+    float: left
+    width: calc(100% - 240px)
     margin: 0 auto
-    width: 100%
+    // width: 100%
     font-size: 0px
     text-align: center
 

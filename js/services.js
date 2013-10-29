@@ -15,7 +15,7 @@
   }).service("storySetValidation", function($rootScope, $timeout) {
     return {
       checkValidity: function(scope) {
-        if ((scope.item.long_description != null) && scope.item.audio && (scope.root.number != null) && scope.root.images.length >= 1) {
+        if (scope.item.long_description.length !== 0 && scope.item.audio && (scope.root.number != null) && scope.root.images.length >= 1) {
           this.markValid(scope);
           return $rootScope.$broadcast('changes_to_save', scope);
         } else {
@@ -24,6 +24,7 @@
       },
       markInvalid: function(scope) {
         console.log('invalid');
+        console.log(scope.item);
         if (scope.item.status === 'published') {
           scope.root.invalid = true;
           return $timeout(function() {

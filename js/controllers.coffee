@@ -62,18 +62,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $location.$$path?
     $location.$$path.split('/')[1]
   else
-    "5260c63ceb6688e516000002"
-    # "5266921cb7a2b93a7f000002"
-
+    # "526a0a26a15cfbe815000002"
+    "526e1baa0439f8b01a000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    "5260c63ceb6688e516000001"
-    # "5266921cb7a2b93a7f000001"
+    # "526a0a26a15cfbe815000001"
+    "526e1baa0439f8b01a000001"
 
-  $scope.backend_url = "http://192.168.158.128:3000/api"
-  # $scope.backend_url = "http://prototype.izi.travel/api"
+  # $scope.backend_url = "http://192.168.158.128:3000/api"
+  $scope.backend_url = "http://prototype.izi.travel/api"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -180,7 +179,7 @@ angular.module("Museum.controllers", [])
       for item in data
         museum = item.exhibit
         museum.def_lang = "ru"
-        museum.language = "ru" unless museum.language
+        museum.language = "ru" unless museum.language?
         museum.package_status = "process"
         museum.stories = {}
         museum.images = item.images
@@ -200,7 +199,7 @@ angular.module("Museum.controllers", [])
       unless found
         $scope.current_museum = $scope.museums[0]
         $scope.current_museum.def_lang = "ru"
-        $scope.current_museum.language = "ru"
+        $scope.current_museum.language = "ru"  unless museum.language?
         museum_id = $scope.current_museum._id
       $scope.reload_exhibits()
 
@@ -598,6 +597,8 @@ angular.module("Museum.controllers", [])
   $scope.forbid_switch  = false
   $scope.create_new_language = false
 
+  $scope.dropdown = {}
+
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
   findActive = -> $('ul.exhibits li.exhibit.active')
@@ -668,15 +669,18 @@ angular.module("Museum.controllers", [])
   $scope.open_dropdown = (event, elem) ->
     clicked = $(event.target).parents('li')
 
+    $scope.element_switch = true
+
     if $scope.forbid_switch is true
       event.stopPropagation()
       return false
 
-    if clicked.hasClass('active')
+    if clicked.hasClass('active') and not $scope.new_item_creation
       $scope.closeDropDown()
       return false
 
     if $scope.new_item_creation
+      $scope.dropdown.new_item_creation = true
       if findActive().length > 0
         $scope.closeDropDown()
 
@@ -685,10 +689,9 @@ angular.module("Museum.controllers", [])
         exhibit.active = false
 
     elem.active = true
-    $scope.element_switch = true
     setTimeout ->
       $scope.element_switch = false
-    , 200
+    , 500
     $scope.active_exhibit = elem
 
     previous = findActive()
@@ -857,26 +860,28 @@ angular.module("Museum.controllers", [])
           $scope.dummy_museum.stories[lang] = $scope.dummy_museum.stories.dummy
           $scope.dummy_museum.stories[lang].language = lang
 
-          for exhibit in $scope.exhibits
-            exhibit.stories[lang] = $scope.dummy_museum.stories[lang]
-            exhibit.stories[lang].language = lang
-            exhibit.stories[lang].name = ""
-            exhibit.stories[lang].status = 'draft'
-            exhibit.stories[lang].story_set = exhibit._id
-
-            story = angular.copy exhibit.stories[lang]
-
-            $scope.post_stories story
-
-          $scope.current_museum.stories[lang] = $scope.dummy_museum.stories[lang]
-          $scope.current_museum.language = lang
-
-          story = angular.copy $scope.dummy_museum.stories[lang]
+          story = $scope.dummy_museum.stories[lang]
           story.story_set = $scope.current_museum._id
 
-          $scope.post_stories story
+          $scope.post_stories story, 'uncommon', (saved_story) ->
 
-          $scope.create_new_language = false
+            saved_story.quiz = story.quiz
+
+            for exhibit in $scope.exhibits
+              exhibit.stories[lang] = angular.copy story
+              exhibit.stories[lang].language = lang
+              exhibit.stories[lang].name = ""
+              exhibit.stories[lang].status = 'draft'
+              exhibit.stories[lang].story_set = exhibit._id
+
+              sub_story = angular.copy exhibit.stories[lang]
+
+              $scope.post_stories sub_story, 'uncommon'
+
+            $scope.current_museum.stories[lang] = saved_story
+            $scope.current_museum.language = lang
+
+            $scope.create_new_language = false
 
         when 'discard'
           true
@@ -936,6 +941,7 @@ angular.module("Museum.controllers", [])
       $scope.new_item_creation = true
       e = {}
       e.target = $('li.exhibit.dummy > .opener.draft')
+      console.log $('li.exhibit.dummy')
       $scope.open_dropdown(e, $scope.new_exhibit)
 
       #hack to tile grid when adding an item to new line
@@ -967,6 +973,14 @@ angular.module("Museum.controllers", [])
 
   $scope.delete_modal_open = ->
     unless $scope.new_item_creation
+      $scope.modal_options = {
+        current_language: 
+          name: $scope.translations[$scope.current_museum.language]
+          language: $scope.current_museum.language
+        languages: $scope.modal_translations
+        exhibits: $scope.exhibits
+        deletion_password: '123456'
+      }
       ModalDeleteInstance = $modal.open(
         templateUrl: "myModalContent.html"
         controller: ModalDeleteInstanceCtrl
@@ -983,6 +997,14 @@ angular.module("Museum.controllers", [])
 
   $scope.delete_museum_modal_open = ->
     unless $scope.new_item_creation
+      $scope.modal_options = {
+        current_language: 
+          name: $scope.translations[$scope.current_museum.language]
+          language: $scope.current_museum.language
+        languages: $scope.modal_translations
+        exhibits: $scope.exhibits
+        deletion_password: '123456'
+      }
       museumDeleteInstance = $modal.open(
         templateUrl: "museumDelete.html"
         controller: museumDeleteCtrl
@@ -1036,7 +1058,7 @@ angular.module("Museum.controllers", [])
           if item is st_index
             target_exhibit.selected = false
             story = target_exhibit.stories[st_index]
-            story.status = 'dummy'
+            story.status = 'draft'
             story.name = ''
             story.short_description = ''
             story.long_description = ''
@@ -1112,14 +1134,18 @@ angular.module("Museum.controllers", [])
     .error ->
       errorProcessing.addError 'Failed to save quiz answer'
 
-  $scope.post_stories = (original_story) ->
+  $scope.post_stories = (original_story, type = 'common', callback) ->
 
     # story = angular.copy original_story
-    story = original_story
+    story = if type is 'common' 
+      original_story
+    else
+      angular.copy original_story
 
     $http.post("#{$scope.backend_url}/story/", story).success (data) ->
       story._id = data._id
       story.quiz.story = data._id
+      callback(data) if callback?      
       $http.post("#{$scope.backend_url}/quiz/", story.quiz).success (data) ->
         story.quiz._id = data.id
         for answer in story.quiz.answers
@@ -1192,19 +1218,23 @@ angular.module("Museum.controllers", [])
       errorProcessing.addError 'Failed to delete exhibit with number' + target_exhibit.number
 
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
+    console.log newValue
     if newValue
       if newValue isnt 'dummy'
+        console.log 'not dummy'
         if $scope.current_museum._id
-          $scope.modal_options.current_language = 
-            name: $scope.translations[$scope.current_museum.language]
-            language: $scope.current_museum.language
-
-          $scope.create_new_language = false
           $http.put("#{$scope.backend_url}/story_set/#{$scope.current_museum._id}", $scope.current_museum).success (data) ->
             console.log data
             $scope.last_save_time = new Date()
           .error (error) ->
             errorProcessing.addError 'Failed to save museum language'
+      else
+        console.log 'dummy'
+        $scope.modal_options.current_language = 
+          name: $scope.translations[$scope.current_museum.language]
+          language: $scope.current_museum.language
+
+        $scope.create_new_language = false
 
   $scope.$on 'save_new_exhibit', ->
     console.log 'saving!'
@@ -1224,13 +1254,14 @@ angular.module("Museum.controllers", [])
     $scope.$digest()
 
   $scope.$on 'changes_to_save', (event, child_scope) ->
-    $http.put("#{$scope.backend_url}/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
-      child_scope.satus = 'done'
-      $scope.last_save_time = new Date()
-      console.log data
-    .error ->
-      errorProcessing.addError 'Server error - Prototype error.'
-    $scope.forbid_switch  = false
+    if child_scope.item._id
+      $http.put("#{$scope.backend_url}/#{child_scope.field_type}/#{child_scope.item._id}", child_scope.item).success (data) ->
+        child_scope.satus = 'done'
+        $scope.last_save_time = new Date()
+        console.log data
+      .error ->
+        errorProcessing.addError 'Server error - Prototype error.'
+      $scope.forbid_switch  = false
 
   $scope.$on 'quiz_changes_to_save', (event, child_scope, correct_item) ->
     for sub_item in child_scope.collection
@@ -1247,10 +1278,23 @@ angular.module("Museum.controllers", [])
         errorProcessing.addError 'Failed to update quiz'
     $scope.forbid_switch  = false
 
+  $scope.$watch 'current_museum.invalid', (newValue, oldValue) ->
+    console.log newValue?, newValue
+    if newValue? and newValue
+      setTimeout ->
+        $('.museum_edit_opener').click() unless $scope.museum_edit_dropdown_opened
+      , 10
+
+    true
+
   $scope.$watch -> 
     $location.path()
   , (newValue, oldValue) ->
     if newValue? && newValue isnt oldValue
+      $scope.closeDropDown()
+      ####
+      $('.museum_navigation_menu').slideUp(300)
+      ####
       ngProgress.complete()
       ngProgress.start()
       console.log 'anim started'
@@ -1391,7 +1435,6 @@ angular.module("Museum.controllers", [])
 
   $scope.cancel = ->
     $modalInstance.dismiss()
-
 
 @ModalDummyInstanceCtrl = ($scope, $modalInstance, modal_options) ->
   $scope.exhibit = modal_options.exhibit

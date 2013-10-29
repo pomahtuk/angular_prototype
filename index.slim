@@ -95,10 +95,11 @@ html lang="en" ng-app="Museum"
                 a href="#" ng-click="new_museum_language()" New language
         .right_content
           span.autosaved_info ng-show="last_save_time" Changes autosaved at {{ last_save_time | date:'HH:mm'}}
-          switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story_set' field="status" root="current_museum"
+          .hider ng-hide="museum_edit_dropdown_opened"
+            switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
 
       .museum_edit
-        #museum_edit_dropdown ng-controller="MuseumEditController"
+        #museum_edit_dropdown ng-controller="MuseumEditController" ng-class="{'invalid': current_museum.invalid}"
           #museum_dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{current_museum._id}}" model="current_museum" selector="museum_fileupload" selector-dropzone="museum_dropzone"
             .wrapper
               .text
@@ -114,20 +115,29 @@ html lang="en" ng-app="Museum"
             .controls
               a.delete_story ng-click="delete_museum_modal_open()" href="#" 
                 i.icon-trash
+              .hider ng-hide="current_museum.stories[current_museum.language].status == 'draft'"
+                switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
               .close ng-click="museum_edit_dropdown_close()"
+
+            .media_types.museum_invalid_media.col-xs-2 ng-class="{'invalid': current_museum.invalid}"
+              i class="icon-picture empty" ng-show="current_museum.images.length == 0"
+              i class="icon-list-ol empty" ng-show="current_museum.number.length == 0"
+              i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"
+              i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"
 
             tabset
 
               tab heading="Main"
                 form.form-horizontal role="form" name="mainForm"
-                  audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
                   placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
-                  placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
+                  audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
+                  placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
 
               tab heading="Images"
-                label.col-xs-1.control-label Images
+                label.col-xs-1.control-label 
+                  | Images
+                  span.label.label-danger ng-show="current_museum.images.length == 0" Fill to publish
                 ul.images.col-xs-11
-                  span.label.label-danger.images_label ng-show="current_museum.images.length == 0" Fill to publish
                   li ng-repeat="image in current_museum.images"
                     a.img_thumbnail href="#" open-lightbox="{{$index}}"
                       img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
@@ -400,17 +410,17 @@ html lang="en" ng-app="Museum"
               .controls
                 a.delete_story ng-click="delete_modal_open()" href="#" 
                   i.icon-trash
-                .hider ng-hide="active_exhibit.stories[current_museum.language].status == 'dummy'"
+                .hider ng-hide="active_exhibit.stories[current_museum.language].status == 'draft'"
                   switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="active_exhibit" 
                 .close
 
               tabset
 
-                tab heading="Main"
+                tab heading="Main" active="dropdown.new_item_creation"
                   form.form-horizontal role="form" name="mainForm"
-                    audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
                     placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
-                    placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
+                    audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
+                    placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
 
                 tab heading="Images"
                   label.col-xs-1.control-label 
@@ -478,34 +488,9 @@ html lang="en" ng-app="Museum"
                       |2222
                     .tab-pane ng-class="{'active': story_subtab == 'tours' }" 
                       |33333
-                    .tab-pane ng-class="{'active': story_subtab == 'settings' }" 
-                      |44444
-
-
-                / tab heading="Media content"
-                /   #media.row
-                /     form.form-horizontal role="form" name="mainForm"
-                /       placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS №" ng-field="number" ng-help="help text for popup" type="story_set" placeholder="active_exhibit.number"
-                /       placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
-                /       audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
-
-                /       placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="1000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
-                      
-                / tab heading="Quiz"
-                /   #story_quiz.row
-                /     form.form-horizontal role="form" name="quizform"
-                /       .switch-toggle.ios switch-toggle="" quiz-switch="story_quiz"
-                /         input id="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" value="published" type="radio" name="story_quiz_enabled" 
-                /         label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)" Enable
-                /         input id="story_quiz_disabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" value="limited" type="radio" name="story_quiz_enabled"
-                /         label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)" Disable
-                /         a
-                /       placeholderfield ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup" type="quiz"
-                /       .error
-                /         .controls
-                /       .answers
-                /         quizanswer ng-item="answer" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers" type="quiz_answer" field="content"
-                /       placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3" type="quiz"
+                    .tab-pane ng-class="{'active': story_subtab == 'settings' }"
+                      form.form-horizontal role="form" 
+                        placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS №" ng-field="number" ng-help="help text for popup" type="story_set" placeholder="active_exhibit.number"
 
             / .next-ex
 
