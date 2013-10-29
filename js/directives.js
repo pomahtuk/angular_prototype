@@ -1023,7 +1023,7 @@
         return true;
       }
     };
-  }).directive('lightboxCropper', function($http) {
+  }).directive('lightboxCropper', function($http, errorProcessing) {
     return {
       restrict: "E",
       replace: true,
@@ -1031,7 +1031,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    Select the preview area. Images won't crop. You can always return to this later on.\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">Done</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      PREVIEW\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_imge_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <img class=\"thumb item_{{$index}}\" ng-click=\"set_index($index)\" ng-class=\"{'active':image.active}\" src=\"{{image.thumbnailUrl}}\" ng-repeat=\"image in model.images\">\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    Select the preview area. Images won't crop. You can always return to this later on.\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">Done</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      PREVIEW\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <img class=\"thumb item_{{$index}}\" ng-click=\"set_index($index)\" ng-class=\"{'active':image.active}\" src=\"{{image.thumbnailUrl}}\" ng-repeat=\"image in model.images\">\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1181,6 +1181,9 @@
         });
         scope.$watch('active_image_index', function(newValue, oldValue) {
           if (newValue != null) {
+            if (newValue === -1) {
+              newValue = 0;
+            }
             left.css({
               'opacity': 255
             });

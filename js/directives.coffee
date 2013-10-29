@@ -1012,7 +1012,7 @@ angular.module("Museum.directives", [])
       lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
     true
 
-.directive 'lightboxCropper', ($http) ->
+.directive 'lightboxCropper', ($http, errorProcessing) ->
   restrict: "E"
   replace: true
   transclude: true
@@ -1038,7 +1038,7 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="slider">
-        <a class="left" href="#" ng-click="set_index(active_imge_index - 1)">
+        <a class="left" href="#" ng-click="set_index(active_image_index - 1)">
           <i class="icon-angle-left"></i>
         </a>
         <img class="thumb item_{{$index}}" ng-click="set_index($index)" ng-class="{'active':image.active}" src="{{image.thumbnailUrl}}" ng-repeat="image in model.images">
@@ -1178,6 +1178,8 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'active_image_index', (newValue, oldValue) ->
       if newValue?
+        if newValue is -1
+          newValue = 0
         left.css({'opacity': 255})
         right.css({'opacity': 255})
         if newValue is scope.model.images.length - 1
