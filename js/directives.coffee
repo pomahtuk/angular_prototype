@@ -1105,7 +1105,7 @@ angular.module("Museum.directives", [])
     $scope.make_cover = (index) ->
       $scope.model.cover = $scope.model.images[index]
       for image in $scope.model.images
-        if image._id isnt target_image._id
+        if image._id isnt $scope.model.cover._id
           image.cover = false
         else
           image.cover = true

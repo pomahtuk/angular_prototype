@@ -1073,7 +1073,7 @@
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             image = _ref[_i];
-            if (image._id !== target_image._id) {
+            if (image._id !== $scope.model.cover._id) {
               image.cover = false;
             } else {
               image.cover = true;
