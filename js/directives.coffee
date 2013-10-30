@@ -903,6 +903,7 @@ angular.module("Museum.directives", [])
                       scope.model.cover = {}
                     scope.model.images.splice index, 1
                     scope.$digest()
+              console.log scope.model.images.length, scope.model.status
               if scope.model.images.length is 0 && scope.model.status is 'published'
                 storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
             else if scope.media.type is 'audio'

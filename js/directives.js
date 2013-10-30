@@ -837,6 +837,7 @@
                       }
                     }
                   }
+                  console.log(scope.model.images.length, scope.model.status);
                   if (scope.model.images.length === 0 && scope.model.status === 'published') {
                     storySetValidation.checkValidity({
                       item: scope.model.stories[scope.$parent.$parent.current_museum.language],
