@@ -13,7 +13,7 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
 
 .service "storySetValidation", ($rootScope, $timeout) ->
   checkValidity: (scope) ->
-    console.log scope
+    scope.item.images = [] unless scope.item.images?
     if scope.item.long_description.length isnt 0 && scope.item.audio && scope.root.number? && scope.root.images.length >= 1
       @markValid scope
       $rootScope.$broadcast 'changes_to_save', scope
