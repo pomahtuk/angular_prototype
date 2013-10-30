@@ -88,7 +88,13 @@ angular.module("Museum.controllers", [])
       for item in data
         if item?
           exhibit = item.exhibit
-          exhibit.images = item.images
+          # exhibit.images = item.images
+          exhibit.images = []
+          exhibit.cover  = {}
+          for image in item.images
+            exhibit.images.push image
+            if image.cover is true
+              exhibit.cover = image
           exhibit.stories = {}
           for story in item.stories
             story.story.quiz = story.quiz.quiz
@@ -182,7 +188,12 @@ angular.module("Museum.controllers", [])
         museum.language = "ru" unless museum.language?
         museum.package_status = "process"
         museum.stories = {}
-        museum.images = item.images
+        museum.images = []
+        museum.cover = {}
+        for image in item.images
+          museum.images.push image
+          if image.cover is true
+            museum.cover = image
         for story in item.stories
           story.story.city = "Saint-Petersburg"
           story.story.quiz = story.quiz.quiz
@@ -338,7 +349,7 @@ angular.module("Museum.controllers", [])
       image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
       thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
       publish_state: 'all'
-      description: ''
+      long_description: ''
       qr_code: {
         url: '/img/qr_code.png'
         print_link: 'http://localhost:8000/img/qr_code.png'
@@ -360,7 +371,7 @@ angular.module("Museum.controllers", [])
       stories: {
         ru: {
           name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-          description: 'test description'
+          long_description: 'test description'
           publish_state: 'all'
           audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
           quiz: {
@@ -393,7 +404,7 @@ angular.module("Museum.controllers", [])
         }
         en: {
           name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-          description: 'test description'
+          long_description: 'test description'
           publish_state: 'all'
           audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
           quiz: {
@@ -426,7 +437,7 @@ angular.module("Museum.controllers", [])
         }
         es: {
           name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-          description: 'test description'
+          long_description: 'test description'
           publish_state: 'all'
           audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
           quiz: {
@@ -496,6 +507,7 @@ angular.module("Museum.controllers", [])
         name: 'English'
         language: 'en'
         publish_state: 'all'
+        long_description:''
         quiz: {
           question: 'are you sure?'
           description: 'can you tell me?'
@@ -528,6 +540,7 @@ angular.module("Museum.controllers", [])
         name: 'Spanish'
         language: 'es'
         publish_state: 'all'
+        long_description:''
         quiz: {
           question: 'are you sure?'
           description: 'can you tell me?'
@@ -561,6 +574,7 @@ angular.module("Museum.controllers", [])
         language: 'ru'
         publish_state: 'all'
         audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+        long_description:''
         quiz: {
           question: 'are you sure?'
           description: 'can you tell me?'
@@ -1170,11 +1184,7 @@ angular.module("Museum.controllers", [])
         validation_item.item = exhibit.stories[$scope.current_museum.language]
         validation_item.root = exhibit
         validation_item.field_type = 'story'
-        switch value
-          when 'passcode'
-            validation_item.item.status = 'passcode'
-          when 'published'
-            validation_item.item.status = 'published'
+        validation_item.item.status = value
         storySetValidation.checkValidity validation_item
     # $scope.$digest()
 

@@ -48,7 +48,7 @@
         </div>
         <ul class="museum_list row">
           <li class="museum" ng-repeat="museum in museums | filter:museum_search | filter:{type:museum_type_filter}">
-            <a href="/{{museum._id}}" ng-class="{&#39;active&#39;: museum.active}"><span class="package_status {{museum.stories.ru.package_status}}"><i ng-class="{&#39;icon-ok-sign&#39;:museum.package_status==&#39;generated&#39;, &#39;icon-refresh&#39;:museum.package_status==&#39;process&#39;}"></i></span><img src="{{museum.images[0].thumbnailUrl || &#39;/img/img-bg.png&#39;}}">
+            <a href="/{{museum._id}}" ng-class="{&#39;active&#39;: museum.active}"><span class="package_status {{museum.stories.ru.package_status}}"><i ng-class="{&#39;icon-ok-sign&#39;:museum.package_status==&#39;generated&#39;, &#39;icon-refresh&#39;:museum.package_status==&#39;process&#39;}"></i></span><img src="{{museum.cover.thumbnailUrl || &#39;/img/img-bg.png&#39;}}">
               <h4>
                 {{museum.stories.ru.name}}, <span>{{museum.stories.ru.city}}</span>
               </h4>
@@ -244,6 +244,9 @@
                   </li>
                   <li>
                     <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  Private</a>
+                  </li>
+                  <li>
+                    <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  Invisible</a>
                   </li>
                 </ul>
               </li>
@@ -500,7 +503,7 @@
                 <input ng-change="check_selected()" ng-model="exhibit.selected" type="checkbox">
               </div>
               <div class="image">
-                <img ng-click="open_dropdown($event, exhibit)" src="{{exhibit.images[0].thumbnailUrl || &#39;/img/img-bg.png&#39;}}">
+                <img ng-click="open_dropdown($event, exhibit)" src="{{exhibit.cover.thumbnailUrl || &#39;/img/img-bg.png&#39;}}">
               </div>
               <div class="description" ng-click="open_dropdown($event, exhibit)">
                 <h4 ng-class="{&#39;dummy_header&#39;:exhibit.stories[current_museum.language].name.length == 0}">

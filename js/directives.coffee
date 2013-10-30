@@ -92,19 +92,49 @@ angular.module("Museum.directives", [])
   template: """
     <div class="btn-group pull-right item_publish_settings" ng-hide="item.status == 'draft'">
       <button class="btn btn-default" ng-class="{'active btn-success': item.status == 'published'}" ng-click="item.status = 'published'; status_process()" type="button" ng-switch on="item[field]">
-        <div class="extra" ng-switch on="item[field]">
+        <div class="extra">
           <i class="icon-globe"></i>
         </div>
-        <span ng-switch-when="passcode">Publish</span>
+        <span ng-switch-default>Publish</span>
         <span ng-switch-when="published">Published</span>
       </button>
-      <button class="btn btn-default" ng-class="{'active btn-primary': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
-        <div class="extra" ng-switch on="item[field]">
+
+
+      <button class="btn btn-default" ng-hide="item.status == 'opas_invisible'" ng-class="{'active btn-primary': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
+        <div class="extra">
           <i class="icon-lock"></i>
         </div>
         <span ng-switch-when="passcode">Private</span>
         <span ng-switch-when="published">Make private</span>
       </button>
+
+
+      <button class="btn btn-default" ng-show="item.status == 'opas_invisible'" ng-class="{'active btn-danger': item.status == 'opas_invisible' }" ng-click="item.status = 'invisible'; status_process()" type="button">
+        <div class="extra">
+          <i class="icon-eye-close"></i>
+        </div>
+        <span>Invisible</span>
+        <!--<span>Make private</span>-->
+      </button>
+
+
+      <button class="btn btn-default dropdown-toggle">
+        <span>
+          <i class="icon-caret-down"></i>
+        </span>
+      </button>
+      <ul class="dropdown-menu">
+        <li ng-hide="item.status == 'opas_invisible'">
+          <a href="#" ng-click="item.status = 'opas_invisible'; status_process()">
+            <i class="icon-eye-close"></i> Make invisible
+          </a>
+        </li>
+        <li ng-hide="item.status == 'passcode'">
+          <a href="#" ng-click="item.status = 'opas_invisible'; status_process()">
+            <i class="icon-lock"></i> Make private
+          </a>
+        </li>
+      </ul>
     </div>
   """ 
   controller: ($scope, $rootScope, $element, $attrs, storySetValidation) ->
@@ -132,6 +162,7 @@ angular.module("Museum.directives", [])
         <div ng-switch on="item[field]">
           <i class="icon-globe" ng-switch-when="published" ng-click="item[field] = 'passcode'; status_process()" ></i>
           <i class="icon-lock" ng-switch-when="passcode" ng-click="item[field] = 'published'; status_process()" ></i>
+          <i class="icon-eye-close" ng-switch-when="opas_invisible" ng-click="item[field] = 'published'; status_process()" ></i>
         </div>
       </button>
     </div>
@@ -318,7 +349,7 @@ angular.module("Museum.directives", [])
 
     true
 
-.directive "placeholdertextarea", ($timeout) ->
+.directive "placeholdertextarea", ($timeout, storySetValidation) ->
   restrict: "E"
   replace: true
   require: "?ngModel"
@@ -422,6 +453,8 @@ angular.module("Museum.directives", [])
         triggered.show()
         # sumbols_left.show()
         additional.hide()
+        if scope.field is 'long_description'
+          storySetValidation.checkValidity {item: scope.item, root: scope.$parent.active_exhibit, field_type: 'story'}
       else
         additional.show()
         scope.length_text = "осталось символов: #{scope.max_length - newValue.length}"
@@ -792,6 +825,8 @@ angular.module("Museum.directives", [])
         for file in result
           if file.type is 'image'
             scope.model.images = [] unless scope.model.images?
+            if file.cover is true
+              scope.$apply scope.model.cover = file
             scope.$apply scope.model.images.push file
           else if file.type is 'audio'
             scope.$apply scope.model.stories[scope.$parent.current_museum.language].audio = file
@@ -843,7 +878,7 @@ angular.module("Museum.directives", [])
       parent = elem.parents('#drop_down, #museum_edit_dropdown')
       parent.find(':file').click()
 
-.directive 'deleteMedia', ->
+.directive 'deleteMedia', (storySetValidation) ->
   restrict : 'A'
   scope:
     model: '=parent'
@@ -864,11 +899,17 @@ angular.module("Museum.directives", [])
               for image, index in scope.model.images
                 if image?
                   if image._id is data
-                    scope.$apply scope.model.images.splice index, 1
+                    if image.cover is true
+                      scope.model.cover = {}
+                    scope.model.images.splice index, 1
                     scope.$digest()
+              if scope.model.images.length is 0 && scope.model.status is 'published'
+                storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
             else if scope.media.type is 'audio'
               scope.model.audio = undefined
               scope.$digest()
+              if scope.model.status is 'published'
+                storySetValidation.checkValidity {item: scope.model, root: scope.$parent.$parent.active_exhibit, field_type: 'story'}
             scope.$parent.last_save_time = new Date()
 
 .directive 'dragAndDropInit', ->
@@ -1062,16 +1103,20 @@ angular.module("Museum.directives", [])
         console.log $scope.active_image_index, index
 
     $scope.make_cover = (index) ->
-      target_image = $scope.model.images[index]
+      $scope.model.cover = $scope.model.images[index]
       for image in $scope.model.images
         if image._id isnt target_image._id
           image.cover = false
         else
           image.cover = true
+          setTimeout (->
+            console.log @
+            @.order = 0).bind(image)()
+          , 500
         $http.put("#{$scope.$parent.backend_url}/media/#{image._id}", image).success (data) ->
           console.log 'ok'
         .error ->
-          errorProcessing.addError 'Failed to set cover'
+          errorProcessing.addError 'Failed to set cover' 
 
     $scope.check_active_image = ->
       for image, index in $scope.model.images
@@ -1097,25 +1142,7 @@ angular.module("Museum.directives", [])
     bounds = []
 
     done.click ->
-      image = scope.model.images[scope.active_image_index]
-      scope.update_media scope.active_image_index, ->
-        images =  scope.model.images
-        images.sort (a, b) ->
-          a = new Date(a.order)
-          b = new Date(b.order)
-          if a.cover is true
-            return 1000
-          else
-            if a < b 
-              return 1 
-            else
-              if a > b 
-                return -1 
-              else 
-                return 0
-        scope.model.images = images
-        # if scope.model.type is 'exhibit' 
-        #   $('ul.exhibits li.exhibit.active').find('.image img').attr 'src', image.thumbnailUrl
+      scope.update_media scope.active_image_index
       # this line resizes parent back
       parent.attr('style', '')
       #####

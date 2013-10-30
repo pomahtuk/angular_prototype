@@ -68,7 +68,7 @@ html lang="en" ng-app="Museum"
             a href="/{{museum._id}}"  ng-class="{'active': museum.active}"
               span class="package_status {{museum.stories.ru.package_status}}"
                 i ng-class="{'icon-ok-sign':museum.package_status=='generated', 'icon-refresh':museum.package_status=='process'}"
-              img src="{{museum.images[0].thumbnailUrl || '/img/img-bg.png'}}"
+              img src="{{museum.cover.thumbnailUrl || '/img/img-bg.png'}}"
               h4 
                 | {{museum.stories.ru.name}}, 
                 span 
@@ -249,6 +249,10 @@ html lang="en" ng-app="Museum"
                     a href="#" ng-click="mass_switch_pub('passcode')"
                       i class="icon-lock"  
                       |   Private
+                  li
+                    a href="#" ng-click="mass_switch_pub('opas_invisible')"
+                      i class="icon-eye-close"  
+                      |   Invisible
               li
                 a href="#" ng-click="delete_selected_exhibits()" Delete selected items
 
@@ -499,7 +503,7 @@ html lang="en" ng-app="Museum"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
               .image
-                img src="{{exhibit.images[0].thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                img src="{{exhibit.cover.thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
               .description ng-click="open_dropdown($event, exhibit)"
                 h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
                   | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}

@@ -121,7 +121,7 @@
         field_type: '@type',
         root: '=root'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n  </button>\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\" ng-switch on=\"item[field]\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Private</span>\n    <span ng-switch-when=\"published\">Make private</span>\n  </button>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Private</span>\n    <span ng-switch-when=\"published\">Make private</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>Invisible</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> Make invisible\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-lock\"></i> Make private\n      </a>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs, storySetValidation) {
         return $scope.status_process = function() {
           return storySetValidation.checkValidity($scope);
@@ -145,7 +145,7 @@
         field_type: '@type',
         root: '=root'
       },
-      template: "<div class=\"btn-group pull-right\">\n  <button class=\"btn btn-default\" type=\"button\">\n    <div ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ng-click=\"item[field] = 'passcode'; status_process()\" ></i>\n      <i class=\"icon-lock\" ng-switch-when=\"passcode\" ng-click=\"item[field] = 'published'; status_process()\" ></i>\n    </div>\n  </button>\n</div>",
+      template: "<div class=\"btn-group pull-right\">\n  <button class=\"btn btn-default\" type=\"button\">\n    <div ng-switch on=\"item[field]\">\n      <i class=\"icon-globe\" ng-switch-when=\"published\" ng-click=\"item[field] = 'passcode'; status_process()\" ></i>\n      <i class=\"icon-lock\" ng-switch-when=\"passcode\" ng-click=\"item[field] = 'published'; status_process()\" ></i>\n      <i class=\"icon-eye-close\" ng-switch-when=\"opas_invisible\" ng-click=\"item[field] = 'published'; status_process()\" ></i>\n    </div>\n  </button>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs, storySetValidation) {
         return $scope.status_process = function() {
           return storySetValidation.checkValidity($scope);
@@ -312,7 +312,7 @@
         return true;
       }
     };
-  }).directive("placeholdertextarea", function($timeout) {
+  }).directive("placeholdertextarea", function($timeout, storySetValidation) {
     return {
       restrict: "E",
       replace: true,
@@ -398,7 +398,14 @@
             control.text('');
             trigger.hide();
             triggered.show();
-            return additional.hide();
+            additional.hide();
+            if (scope.field === 'long_description') {
+              return storySetValidation.checkValidity({
+                item: scope.item,
+                root: scope.$parent.active_exhibit,
+                field_type: 'story'
+              });
+            }
           } else {
             additional.show();
             scope.length_text = "осталось символов: " + (scope.max_length - newValue.length);
@@ -726,6 +733,9 @@
                 if (scope.model.images == null) {
                   scope.model.images = [];
                 }
+                if (file.cover === true) {
+                  scope.$apply(scope.model.cover = file);
+                }
                 scope.$apply(scope.model.images.push(file));
               } else if (file.type === 'audio') {
                 scope.$apply(scope.model.stories[scope.$parent.current_museum.language].audio = file);
@@ -793,7 +803,7 @@
         });
       }
     };
-  }).directive('deleteMedia', function() {
+  }).directive('deleteMedia', function(storySetValidation) {
     return {
       restrict: 'A',
       scope: {
@@ -819,14 +829,31 @@
                     image = _ref[index];
                     if (image != null) {
                       if (image._id === data) {
-                        scope.$apply(scope.model.images.splice(index, 1));
+                        if (image.cover === true) {
+                          scope.model.cover = {};
+                        }
+                        scope.model.images.splice(index, 1);
                         scope.$digest();
                       }
                     }
                   }
+                  if (scope.model.images.length === 0 && scope.model.status === 'published') {
+                    storySetValidation.checkValidity({
+                      item: scope.model.stories[scope.$parent.$parent.current_museum.language],
+                      root: scope.model,
+                      field_type: 'story'
+                    });
+                  }
                 } else if (scope.media.type === 'audio') {
                   scope.model.audio = void 0;
                   scope.$digest();
+                  if (scope.model.status === 'published') {
+                    storySetValidation.checkValidity({
+                      item: scope.model,
+                      root: scope.$parent.$parent.active_exhibit,
+                      field_type: 'story'
+                    });
+                  }
                 }
                 return scope.$parent.last_save_time = new Date();
               }
@@ -1040,8 +1067,8 @@
           });
         };
         $scope.make_cover = function(index) {
-          var image, target_image, _i, _len, _ref, _results;
-          target_image = $scope.model.images[index];
+          var image, _i, _len, _ref, _results;
+          $scope.model.cover = $scope.model.images[index];
           _ref = $scope.model.images;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1050,6 +1077,10 @@
               image.cover = false;
             } else {
               image.cover = true;
+              setTimeout((function() {
+                console.log(this);
+                return this.order = 0;
+              }).bind(image)(), 500);
             }
             _results.push($http.put("" + $scope.$parent.backend_url + "/media/" + image._id, image).success(function(data) {
               return console.log('ok');
@@ -1087,30 +1118,7 @@
         selected = {};
         bounds = [];
         done.click(function() {
-          var image;
-          image = scope.model.images[scope.active_image_index];
-          scope.update_media(scope.active_image_index, function() {
-            var images;
-            images = scope.model.images;
-            images.sort(function(a, b) {
-              a = new Date(a.order);
-              b = new Date(b.order);
-              if (a.cover === true) {
-                return 1000;
-              } else {
-                if (a < b) {
-                  return 1;
-                } else {
-                  if (a > b) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                }
-              }
-            });
-            return scope.model.images = images;
-          });
+          scope.update_media(scope.active_image_index);
           parent.attr('style', '');
           element.hide();
           return false;

@@ -97,18 +97,27 @@
           sort_direction = $scope.sort_direction;
         }
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
-          var exhibit, exhibits, item, story, _i, _j, _len, _len1, _ref;
+          var exhibit, exhibits, image, item, story, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
           exhibits = [];
           $scope.modal_translations = {};
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             item = data[_i];
             if (item != null) {
               exhibit = item.exhibit;
-              exhibit.images = item.images;
-              exhibit.stories = {};
-              _ref = item.stories;
+              exhibit.images = [];
+              exhibit.cover = {};
+              _ref = item.images;
               for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-                story = _ref[_j];
+                image = _ref[_j];
+                exhibit.images.push(image);
+                if (image.cover === true) {
+                  exhibit.cover = image;
+                }
+              }
+              exhibit.stories = {};
+              _ref1 = item.stories;
+              for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+                story = _ref1[_k];
                 story.story.quiz = story.quiz.quiz;
                 story.story.audio = story.audio;
                 story.story.video = story.video;
@@ -193,7 +202,7 @@
         ngProgress.start();
         console.log('anim started');
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
-          var found, item, museum, story, _i, _j, _len, _len1, _ref;
+          var found, image, item, museum, story, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
           $scope.museums = [];
           found = false;
           for (_i = 0, _len = data.length; _i < _len; _i++) {
@@ -205,10 +214,19 @@
             }
             museum.package_status = "process";
             museum.stories = {};
-            museum.images = item.images;
-            _ref = item.stories;
+            museum.images = [];
+            museum.cover = {};
+            _ref = item.images;
             for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-              story = _ref[_j];
+              image = _ref[_j];
+              museum.images.push(image);
+              if (image.cover === true) {
+                museum.cover = image;
+              }
+            }
+            _ref1 = item.stories;
+            for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+              story = _ref1[_k];
               story.story.city = "Saint-Petersburg";
               story.story.quiz = story.quiz.quiz;
               story.story.audio = story.audio;
@@ -370,7 +388,7 @@
           image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
           thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
           publish_state: 'all',
-          description: '',
+          long_description: '',
           qr_code: {
             url: '/img/qr_code.png',
             print_link: 'http://localhost:8000/img/qr_code.png'
@@ -391,7 +409,7 @@
           stories: {
             ru: {
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
-              description: 'test description',
+              long_description: 'test description',
               publish_state: 'all',
               audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
               quiz: {
@@ -421,7 +439,7 @@
             },
             en: {
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
-              description: 'test description',
+              long_description: 'test description',
               publish_state: 'all',
               audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
               quiz: {
@@ -451,7 +469,7 @@
             },
             es: {
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
-              description: 'test description',
+              long_description: 'test description',
               publish_state: 'all',
               audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
               quiz: {
@@ -515,6 +533,7 @@
             name: 'English',
             language: 'en',
             publish_state: 'all',
+            long_description: '',
             quiz: {
               question: 'are you sure?',
               description: 'can you tell me?',
@@ -544,6 +563,7 @@
             name: 'Spanish',
             language: 'es',
             publish_state: 'all',
+            long_description: '',
             quiz: {
               question: 'are you sure?',
               description: 'can you tell me?',
@@ -574,6 +594,7 @@
             language: 'ru',
             publish_state: 'all',
             audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
+            long_description: '',
             quiz: {
               question: 'are you sure?',
               description: 'can you tell me?',
@@ -1270,13 +1291,7 @@
             validation_item.item = exhibit.stories[$scope.current_museum.language];
             validation_item.root = exhibit;
             validation_item.field_type = 'story';
-            switch (value) {
-              case 'passcode':
-                validation_item.item.status = 'passcode';
-                break;
-              case 'published':
-                validation_item.item.status = 'published';
-            }
+            validation_item.item.status = value;
             _results.push(storySetValidation.checkValidity(validation_item));
           } else {
             _results.push(void 0);
