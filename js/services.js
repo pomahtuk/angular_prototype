@@ -18,6 +18,9 @@
         if (scope.item.images == null) {
           scope.item.images = [];
         }
+        if (scope.item.long_description == null) {
+          scope.item.long_description = '';
+        }
         if (scope.item.long_description.length !== 0 && scope.item.audio && (scope.root.number != null) && scope.root.images.length >= 1) {
           this.markValid(scope);
           return $rootScope.$broadcast('changes_to_save', scope);
