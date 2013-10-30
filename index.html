@@ -240,13 +240,13 @@
                 <a href="#">Set visibility for selected items...</a>
                 <ul class="dropdown-menu" role="menu">
                   <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;published&#39;)"><i class="icon-globe"></i>  Published</a>
+                    <a href="#" ng-click="mass_switch_pub(&#39;published&#39;)"><i class="icon-globe"></i>  Publish</a>
                   </li>
                   <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  Private</a>
+                    <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  Make private</a>
                   </li>
                   <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  Invisible</a>
+                    <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  Make invisible</a>
                   </li>
                 </ul>
               </li>
@@ -514,7 +514,7 @@
                 </div>
               </div>
               <div class="visibility" ng-class="{&#39;invalid&#39;: exhibit.invalid}" ng-switch="" on="exhibit.stories[current_museum.language].status">
-                <i class="icon-globe placeholder" ng-switch-when="published"></i><i class="icon-lock placeholder" ng-switch-when="passcode"></i>
+                <i class="icon-globe placeholder" ng-switch-when="published"></i><i class="icon-lock placeholder" ng-switch-when="passcode"></i><i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"></i>
                 <div class="on_hover">
                   <switchpub field="status" ng-item="exhibit.stories[current_museum.language]" ng-provider="provider" root="exhibit" type="story"></switchpub>
                 </div>

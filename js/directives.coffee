@@ -124,7 +124,7 @@ angular.module("Museum.directives", [])
         </span>
       </button>
       <ul class="dropdown-menu">
-        <li ng-hide="item.status == 'opas_invisible'">
+        <li ng-hide="item.status == 'opas_invisible' || item.status == 'published'">
           <a href="#" ng-click="item.status = 'opas_invisible'; status_process()">
             <i class="icon-eye-close"></i> Make invisible
           </a>

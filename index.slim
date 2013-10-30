@@ -244,15 +244,15 @@ html lang="en" ng-app="Museum"
                   li
                     a href="#" ng-click="mass_switch_pub('published')"
                       i class="icon-globe"  
-                      |   Published
+                      |   Publish
                   li
                     a href="#" ng-click="mass_switch_pub('passcode')"
                       i class="icon-lock"  
-                      |   Private
+                      |   Make private
                   li
                     a href="#" ng-click="mass_switch_pub('opas_invisible')"
                       i class="icon-eye-close"  
-                      |   Invisible
+                      |   Make invisible
               li
                 a href="#" ng-click="delete_selected_exhibits()" Delete selected items
 
@@ -519,6 +519,7 @@ html lang="en" ng-app="Museum"
               .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
                 i class="icon-globe placeholder" ng-switch-when="published"
                 i class="icon-lock placeholder" ng-switch-when="passcode"
+                i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"
                 .on_hover
                   switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
 
