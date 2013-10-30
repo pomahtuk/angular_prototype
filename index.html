@@ -258,10 +258,11 @@
           <a class="spacer" href="#" ng-click="select_all_exhibits(&#39;select&#39;)" ng-show="select_all_enabled"><span>Select all</span></a><a class="spacer" href="#" ng-click="select_all_exhibits(&#39;cancel&#39;)" ng-show="select_all_enabled"><span>Cancel selection</span></a>
         </div>
         <div class="right_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="Search" resizer="" type="text"><button class="btn btn-default filter_opener" ng-class="{&#39;active&#39;: filters_opened}" toggle-filters="" type="button">Filters and sort</button>
+          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="Search" resizer="" type="text"><button class="btn btn-default filter_opener" ng-class="{&#39;active&#39;: filters_opened || exhibits_visibility_filter}" toggle-filters="" type="button">Filters and sort</button>
         </div>
       </div>
       <div class="filters_bar">
+        <a class="clear_fiters spacer" href="#" ng-click="exhibits_visibility_filter = false" ng-show="exhibits_visibility_filter">Clear filters</a>
         <div class="dropdown spacer">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="sort_order">{{sort_text}} <span class="caret"></span></a>
           <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
@@ -274,13 +275,16 @@
           </ul>
         </div>
         <div class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Visibility in mobile application <span class="caret"></span></a>
-          <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
-            <li role="presentation">
-              <a role="menuitem">Everyone</a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter">Visibility in mobile application<span ng-switch-when="published">: Everyone  </span><span ng-switch-when="passcode">: Private  </span><span ng-switch-when="opas_invisible">: Invisible  </span><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li ng-click="exhibits_visibility_filter = &#39;published&#39;">
+              <a href="#">Everyone</a>
             </li>
-            <li role="presentation">
-              <a role="menuitem"> Only users who have passcode</a>
+            <li ng-click="exhibits_visibility_filter = &#39;passcode&#39;">
+              <a href="#">Private</a>
+            </li>
+            <li ng-click="exhibits_visibility_filter = &#39;opas_invisible&#39;">
+              <a href="#">Invisible</a>
             </li>
           </ul>
         </div>
@@ -497,7 +501,7 @@
                 </tab></tabset>
             </div>
           </li>
-          <li class="exhibit" ng-class="{active: exhibit.active}" ng-hide="ajax_progress" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search)" post-render="">
+          <li class="exhibit" ng-class="{active: exhibit.active}" ng-hide="ajax_progress" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch()" post-render="">
             <div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{&#39;border&#39;: exhibit.selected, &#39;draft&#39;:exhibit.stories[current_museum.language].name.length == 0}">
               <div class="checkbox">
                 <input ng-change="check_selected()" ng-model="exhibit.selected" type="checkbox">

@@ -1,5 +1,22 @@
 "use strict"
 
+Array::unique = ->
+  a = []
+  l = @length
+  i = 0
+
+  while i < l
+    j = i + 1
+
+    while j < l
+      
+      # If this[i] is found later in the array
+      j = ++i  if this[i] is this[j]
+      j++
+    a.push this[i]
+    i++
+  a
+
 $.fn.refresh = -> $(this.selector)
 $.fn.isEmpty = -> @length == 0
 
@@ -48,12 +65,28 @@ angular.module("Museum.controllers", [])
       if item.stories[$scope.current_museum.language]?
         if item.stories[$scope.current_museum.language].name
           in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
-          $scope.grid()
-          return in_string || criteria is ''
+          number_is = parseInt item.number, 10 is parseInt criteria, 10
+          result = in_string || criteria is '' || number_is
+          $scope.grid() if result
+          return result
         else
           true
       else
         true
+
+  $scope.statusMatch = ->
+    (item) ->
+      # console.log item
+      if item.stories[$scope.current_museum.language]?
+        if item.stories[$scope.current_museum.language].status && $scope.exhibits_visibility_filter
+          if item.stories[$scope.current_museum.language].status is $scope.exhibits_visibility_filter
+            return true
+          else
+            return false
+        else
+          return true
+      else
+        return true
 
   $scope.museum_change_progress = true
 
@@ -182,6 +215,7 @@ angular.module("Museum.controllers", [])
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums").success (data) ->
       $scope.museums = []
       found = false
+      $scope.langs = []
       for item in data
         museum = item.exhibit
         museum.def_lang = "ru"
@@ -201,6 +235,7 @@ angular.module("Museum.controllers", [])
           story.story.video = story.video
           story.story.quiz.answers = story.quiz.answers
           museum.stories[story.story.language] = story.story
+          $scope.langs.push story.story.language
         $scope.museums.push museum
         museum.active = false
         if museum._id is museum_id
@@ -212,6 +247,7 @@ angular.module("Museum.controllers", [])
         $scope.current_museum.def_lang = "ru"
         $scope.current_museum.language = "ru"  unless museum.language?
         museum_id = $scope.current_museum._id
+      $scope.form_translations()
       $scope.reload_exhibits()
 
   $scope.reload_museum = ->
@@ -611,6 +647,15 @@ angular.module("Museum.controllers", [])
   $scope.forbid_switch  = false
   $scope.create_new_language = false
 
+
+  $scope.form_translations = ->
+    $scope.langs = $scope.langs.unique()
+    $scope.modal_translations = {}
+    for lang in $scope.langs
+      # console.log lang, $scope.translations[lang]
+      $scope.modal_translations[lang] = { name: $scope.translations[lang] }
+
+
   $scope.dropdown = {}
 
   dropDown   = $('#drop_down').removeClass('hidden').hide()
@@ -851,7 +896,6 @@ angular.module("Museum.controllers", [])
 
     $scope.dummy_museum.language = 'dummy'
 
-
     $scope.modal_options = {
       museum: $scope.dummy_museum
       translations: $scope.translations
@@ -893,6 +937,7 @@ angular.module("Museum.controllers", [])
               $scope.post_stories sub_story, 'uncommon'
 
             $scope.current_museum.stories[lang] = saved_story
+            $scope.modal_translations[lang] = { name: $scope.translations[lang] }
             $scope.current_museum.language = lang
 
             $scope.create_new_language = false
@@ -1029,6 +1074,7 @@ angular.module("Museum.controllers", [])
       museumDeleteInstance.result.then ((selected) ->
         lang = $scope.current_museum.language
         if selected is 'lang'
+          delete $scope.modal_translations[lang]
           $scope.current_museum.language = $scope.current_museum.def_lang
           for exhibit in $scope.exhibits
             $scope.delete_story exhibit.stories, lang, (stories, lang) ->
@@ -1389,7 +1435,9 @@ angular.module("Museum.controllers", [])
 
   $scope.deletion_password = ''
 
-  $scope.only_one = $scope.modal_options.languages.length is 1
+  console.log $scope.modal_options.languages
+
+  $scope.only_one = Object.keys($scope.modal_options.languages).length is 1
 
   $scope.password_input_shown = false
 

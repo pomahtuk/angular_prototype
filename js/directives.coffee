@@ -342,10 +342,10 @@ angular.module("Museum.directives", [])
           triggered.find('.form-control').focus()
       else
         additional.show()
-        if scope.$parent.element_switch is true
-          element.find('.triggered > .form-control').val newValue
-          trigger.show()
-          triggered.hide()
+        # if scope.$parent.element_switch is true
+        element.find('.triggered > .form-control').val newValue
+        trigger.show()
+        triggered.hide()
 
     true
 

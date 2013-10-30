@@ -302,11 +302,9 @@
             }
           } else {
             additional.show();
-            if (scope.$parent.element_switch === true) {
-              element.find('.triggered > .form-control').val(newValue);
-              trigger.show();
-              return triggered.hide();
-            }
+            element.find('.triggered > .form-control').val(newValue);
+            trigger.show();
+            return triggered.hide();
           }
         });
         return true;

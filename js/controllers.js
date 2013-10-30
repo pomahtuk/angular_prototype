@@ -2,6 +2,25 @@
   "use strict";
   var isSameLine, lastOfLine, tileGrid;
 
+  Array.prototype.unique = function() {
+    var a, i, j, l;
+    a = [];
+    l = this.length;
+    i = 0;
+    while (i < l) {
+      j = i + 1;
+      while (j < l) {
+        if (this[i] === this[j]) {
+          j = ++i;
+        }
+        j++;
+      }
+      a.push(this[i]);
+      i++;
+    }
+    return a;
+  };
+
   $.fn.refresh = function() {
     return $(this.selector);
   };
@@ -64,12 +83,33 @@
       $scope.exhibit_search = '';
       $scope.criteriaMatch = function(criteria) {
         return function(item) {
-          var in_string;
+          var in_string, number_is, result;
           if (item.stories[$scope.current_museum.language] != null) {
             if (item.stories[$scope.current_museum.language].name) {
               in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
-              $scope.grid();
-              return in_string || criteria === '';
+              number_is = parseInt(item.number, 10 === parseInt(criteria, 10));
+              result = in_string || criteria === '' || number_is;
+              if (result) {
+                $scope.grid();
+              }
+              return result;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        };
+      };
+      $scope.statusMatch = function() {
+        return function(item) {
+          if (item.stories[$scope.current_museum.language] != null) {
+            if (item.stories[$scope.current_museum.language].status && $scope.exhibits_visibility_filter) {
+              if (item.stories[$scope.current_museum.language].status === $scope.exhibits_visibility_filter) {
+                return true;
+              } else {
+                return false;
+              }
             } else {
               return true;
             }
@@ -205,6 +245,7 @@
           var found, image, item, museum, story, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
           $scope.museums = [];
           found = false;
+          $scope.langs = [];
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             item = data[_i];
             museum = item.exhibit;
@@ -233,6 +274,7 @@
               story.story.video = story.video;
               story.story.quiz.answers = story.quiz.answers;
               museum.stories[story.story.language] = story.story;
+              $scope.langs.push(story.story.language);
             }
             $scope.museums.push(museum);
             museum.active = false;
@@ -250,6 +292,7 @@
             }
             museum_id = $scope.current_museum._id;
           }
+          $scope.form_translations();
           return $scope.reload_exhibits();
         });
       };
@@ -626,6 +669,20 @@
       $scope.element_switch = true;
       $scope.forbid_switch = false;
       $scope.create_new_language = false;
+      $scope.form_translations = function() {
+        var lang, _i, _len, _ref, _results;
+        $scope.langs = $scope.langs.unique();
+        $scope.modal_translations = {};
+        _ref = $scope.langs;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          lang = _ref[_i];
+          _results.push($scope.modal_translations[lang] = {
+            name: $scope.translations[lang]
+          });
+        }
+        return _results;
+      };
       $scope.dropdown = {};
       dropDown = $('#drop_down').removeClass('hidden').hide();
       findActive = function() {
@@ -912,6 +969,9 @@
                   $scope.post_stories(sub_story, 'uncommon');
                 }
                 $scope.current_museum.stories[lang] = saved_story;
+                $scope.modal_translations[lang] = {
+                  name: $scope.translations[lang]
+                };
                 $scope.current_museum.language = lang;
                 return $scope.create_new_language = false;
               });
@@ -1073,6 +1133,7 @@
             var exhibit, lang, museum, _i, _j, _len, _len1, _ref, _ref1;
             lang = $scope.current_museum.language;
             if (selected === 'lang') {
+              delete $scope.modal_translations[lang];
               $scope.current_museum.language = $scope.current_museum.def_lang;
               _ref = $scope.exhibits;
               for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1538,7 +1599,8 @@
   this.ModalDeleteInstanceCtrl = function($scope, $modalInstance, modal_options) {
     $scope.modal_options = modal_options;
     $scope.deletion_password = '';
-    $scope.only_one = $scope.modal_options.languages.length === 1;
+    console.log($scope.modal_options.languages);
+    $scope.only_one = Object.keys($scope.modal_options.languages).length === 1;
     $scope.password_input_shown = false;
     $scope.ok = function() {
       var exhibit, language, result, value, _i, _len, _ref, _ref1;

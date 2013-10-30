@@ -279,10 +279,10 @@ html lang="en" ng-app="Museum"
           /   button.btn.btn-default.next type="button" 
           /     i.icon-chevron-right
           input.form-control.search.spacer type="text" placeholder="Search" ng-model="exhibit_search" resizer=""
-          button.btn.btn-default.filter_opener ng-class="{'active': filters_opened}" type="button" toggle-filters="" Filters and sort
+          button.btn.btn-default.filter_opener ng-class="{'active': filters_opened || exhibits_visibility_filter}" type="button" toggle-filters="" Filters and sort
 
       .filters_bar
-        / a.clear_fiters.spacer href="#" Clear filters
+        a.clear_fiters.spacer ng-show="exhibits_visibility_filter" ng-click="exhibits_visibility_filter = false" href="#" Clear filters
 
         .dropdown.spacer
           a#sort_order.dropdown-toggle data-toggle="dropdown" href="#"
@@ -299,14 +299,22 @@ html lang="en" ng-app="Museum"
             /   a href="#" ng-click="sort_text='Sort Z-A'; reload_exhibits('name', -1)"  Sort Z-A
 
         .dropdown
-          a.dropdown-toggle data-toggle="dropdown" href="#"
-            | Visibility in mobile application 
+          a.dropdown-toggle data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter"
+            | Visibility in mobile application
+            span ng-switch-when="published"
+              |: Everyone  
+            span ng-switch-when="passcode"
+              |: Private  
+            span ng-switch-when="opas_invisible"
+              |: Invisible  
             span.caret
-          ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
-            li role="presentation"
-              a role="menuitem" Everyone
-            li role="presentation"
-              a role="menuitem"  Only users who have passcode
+          ul.dropdown-menu
+            li ng-click="exhibits_visibility_filter = 'published'"
+              a href="#" Everyone
+            li ng-click="exhibits_visibility_filter = 'passcode'"
+              a href="#" Private
+            li ng-click="exhibits_visibility_filter = 'opas_invisible'"
+              a href="#" Invisible
 
     .page-wrapper ng-mouseover="show_museum_edit_dropdown=false"
       
@@ -498,7 +506,7 @@ html lang="en" ng-app="Museum"
 
             / .next-ex
 
-          li.exhibit post-render="" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search)" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
+          li.exhibit post-render="" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch()" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
             div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
