@@ -124,13 +124,13 @@ angular.module("Museum.directives", [])
         </span>
       </button>
       <ul class="dropdown-menu">
-        <li ng-hide="item.status == 'opas_invisible' || item.status == 'published'">
+        <li ng-hide="item.status == 'opas_invisible'">
           <a href="#" ng-click="item.status = 'opas_invisible'; status_process()">
             <i class="icon-eye-close"></i> Make invisible
           </a>
         </li>
-        <li ng-hide="item.status == 'passcode'">
-          <a href="#" ng-click="item.status = 'opas_invisible'; status_process()">
+        <li ng-hide="item.status == 'passcode'  || item.status == 'published'">
+          <a href="#" ng-click="item.status = 'passcode'; status_process()">
             <i class="icon-lock"></i> Make private
           </a>
         </li>
