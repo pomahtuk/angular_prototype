@@ -112,6 +112,8 @@ angular.module("Museum.controllers", [])
   $scope.sort_text      = 'Sort 0-9'
   $scope.ajax_progress  = true
   $scope.story_subtab   = 'video'
+  $scope.story_tab      = 'main'
+  $scope.museum_tab     = 'main'
   $scope.museum_subtab  = 'video'
 
   $scope.reload_exhibits = (sort_field = $scope.sort_field, sort_direction = $scope.sort_direction) ->

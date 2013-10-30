@@ -128,6 +128,8 @@
       $scope.sort_text = 'Sort 0-9';
       $scope.ajax_progress = true;
       $scope.story_subtab = 'video';
+      $scope.story_tab = 'main';
+      $scope.museum_tab = 'main';
       $scope.museum_subtab = 'video';
       $scope.reload_exhibits = function(sort_field, sort_direction) {
         if (sort_field == null) {

@@ -103,14 +103,25 @@
               </div>
               <div class="close" ng-click="museum_edit_dropdown_close()"></div>
             </div>
-            <div class="media_types museum_invalid_media col-xs-2" ng-class="{&#39;invalid&#39;: current_museum.invalid}">
-              <i class="icon-picture empty" ng-show="current_museum.images.length == 0"></i><i class="icon-list-ol empty" ng-show="current_museum.number.length == 0"></i><i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"></i>
-            </div>
-            <tabset><tab heading="Main">
+            <ul class="nav nav-tabs">
+              <li ng-class="{&#39;active&#39;: museum_tab == &#39;main&#39;}">
+                <a href="#" ng-click="museum_tab = &#39;main&#39;">Main<span class="media_types story" ng-class="{&#39;invalid&#39;: current_museum.invalid}"><i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"></i></span></a>
+              </li>
+              <li ng-class="{&#39;active&#39;: museum_tab == &#39;images&#39; }">
+                <a href="#" ng-click="museum_tab = &#39;images&#39;">Images<span class="media_types story" ng-class="{&#39;invalid&#39;: current_museum.invalid}"><i class="icon-picture empty" ng-show="current_museum.images.length == 0"></i></span></a>
+              </li>
+              <li ng-class="{&#39;active&#39;: museum_tab == &#39;more&#39; }">
+                <a href="#" ng-click="museum_tab = &#39;more&#39;">More</a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;main&#39; }">
                 <form class="form-horizontal" name="mainForm" role="form">
                   <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name" placeholder="current_museum.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="Audio" parent="current_museum.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="current_museum.stories[current_museum.language]" ng-title="Description" placeholder="current_museum.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                 </form>
-              </tab><tab heading="Images"><label class="col-xs-1 control-label">Images<span class="label label-danger" ng-show="current_museum.images.length == 0">Fill to publish</span></label>
+              </div>
+              <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;images&#39; }">
+                <label class="col-xs-1 control-label">Images<span class="label label-danger" ng-show="current_museum.images.length == 0">Fill to publish</span></label>
                 <ul class="images col-xs-11">
                   <li ng-repeat="image in current_museum.images">
                     <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.current_museum" rel="nofollow" stop-event="">×</a>
@@ -125,7 +136,8 @@
                     </div>
                   </li>
                 </ul>
-              </tab><tab heading="More">
+              </div>
+              <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;more&#39; }">
                 <ul class="nav nav-stacked nav-list col-xs-2">
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;video&#39; }">
                     <a href="#" ng-click="museum_subtab = &#39;video&#39;">Video</a>
@@ -191,7 +203,8 @@
                     44444
                   </div>
                 </div>
-              </tab></tabset>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -411,11 +424,25 @@
                 </div>
                 <div class="close"></div>
               </div>
-              <tabset><tab active="dropdown.new_item_creation" heading="Main">
+              <ul class="nav nav-tabs">
+                <li ng-class="{&#39;active&#39;: story_tab == &#39;main&#39; || dropdown.new_item_creation }">
+                  <a href="#" ng-click="story_tab = &#39;main&#39;">Main<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"></i></span></a>
+                </li>
+                <li ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
+                  <a href="#" ng-click="story_tab = &#39;images&#39;">Images<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"></i></span></a>
+                </li>
+                <li ng-class="{&#39;active&#39;: story_tab == &#39;more&#39; }">
+                  <a href="#" ng-click="story_tab = &#39;more&#39;">More</a>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;main&#39; }">
                   <form class="form-horizontal" name="mainForm" role="form">
                     <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio" parent="active_exhibit.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                   </form>
-                </tab><tab heading="Images"><label class="col-xs-1 control-label">Images<span class="label label-danger" ng-show="active_exhibit.images.length == 0">Fill to publish</span></label>
+                </div>
+                <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
+                  <label class="col-xs-1 control-label">Images<span class="label label-danger" ng-show="active_exhibit.images.length == 0">Fill to publish</span></label>
                   <ul class="images col-xs-11">
                     <li ng-repeat="image in active_exhibit.images">
                       <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
@@ -430,7 +457,8 @@
                       </div>
                     </li>
                   </ul>
-                </tab><tab heading="More">
+                </div>
+                <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;more&#39; }">
                   <ul class="nav nav-stacked nav-list col-xs-2">
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;video&#39; }">
                       <a href="#" ng-click="story_subtab = &#39;video&#39;">Video</a>
@@ -498,7 +526,8 @@
                       </form>
                     </div>
                   </div>
-                </tab></tabset>
+                </div>
+              </div>
             </div>
           </li>
           <li class="exhibit" ng-class="{active: exhibit.active}" ng-hide="ajax_progress" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch()" post-render="">

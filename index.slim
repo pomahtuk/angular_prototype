@@ -119,21 +119,35 @@ html lang="en" ng-app="Museum"
                 switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
               .close ng-click="museum_edit_dropdown_close()"
 
-            .media_types.museum_invalid_media.col-xs-2 ng-class="{'invalid': current_museum.invalid}"
-              i class="icon-picture empty" ng-show="current_museum.images.length == 0"
-              i class="icon-list-ol empty" ng-show="current_museum.number.length == 0"
-              i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"
-              i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"
+            / .media_types.museum_invalid_media.col-xs-2 ng-class="{'invalid': current_museum.invalid}"
+            /   i class="icon-picture empty" ng-show="current_museum.images.length == 0"
+            /   i class="icon-list-ol empty" ng-show="current_museum.number.length == 0"
+            /   i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"
+            /   i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"
 
-            tabset
-
-              tab heading="Main"
+            ul.nav.nav-tabs
+              li ng-class="{'active': museum_tab == 'main'}"
+                a href="#" ng-click="museum_tab = 'main'" 
+                  | Main
+                  span.media_types.story ng-class="{'invalid': current_museum.invalid}"
+                    i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"
+                    i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"
+              li ng-class="{'active': museum_tab == 'images' }"
+                a href="#" ng-click="museum_tab = 'images'" 
+                  | Images
+                  span.media_types.story ng-class="{'invalid': current_museum.invalid}"
+                    i class="icon-picture empty" ng-show="current_museum.images.length == 0"
+              li ng-class="{'active': museum_tab == 'more' }"
+                a href="#" ng-click="museum_tab = 'more'" More
+                
+            .tab-content
+              .tab-pane ng-class="{'active': museum_tab == 'main' }"
                 form.form-horizontal role="form" name="mainForm"
                   placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
                   audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
                   placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
 
-              tab heading="Images"
+              .tab-pane ng-class="{'active': museum_tab == 'images' }"
                 label.col-xs-1.control-label 
                   | Images
                   span.label.label-danger ng-show="current_museum.images.length == 0" Fill to publish
@@ -152,7 +166,7 @@ html lang="en" ng-app="Museum"
                       a.btn.btn-default.upload href="#" button-file-upload=""
                         | Click to upload
 
-              tab heading="More"
+              .tab-pane ng-class="{'active': museum_tab == 'more' }"
 
                 ul.nav.nav-stacked.nav-list.col-xs-2
                   li ng-class="{'active': museum_subtab == 'video' }"
@@ -426,15 +440,30 @@ html lang="en" ng-app="Museum"
                   switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="active_exhibit" 
                 .close
 
-              tabset
+              ul.nav.nav-tabs
+                li ng-class="{'active': story_tab == 'main' || dropdown.new_item_creation }"
+                  a href="#" ng-click="story_tab = 'main'" 
+                    | Main
+                    span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"
+                      i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"
+                      i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"
+                li ng-class="{'active': story_tab == 'images' }"
+                  a href="#" ng-click="story_tab = 'images'" 
+                    | Images
+                    span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"
+                      i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"
+                li ng-class="{'active': story_tab == 'more' }"
+                  a href="#" ng-click="story_tab = 'more'" More
 
-                tab heading="Main" active="dropdown.new_item_creation"
+              .tab-content
+
+                .tab-pane ng-class="{'active': story_tab == 'main' }"
                   form.form-horizontal role="form" name="mainForm"
                     placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
                     audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
                     placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
 
-                tab heading="Images"
+                .tab-pane  ng-class="{'active': story_tab == 'images' }" 
                   label.col-xs-1.control-label 
                     | Images
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" Fill to publish
@@ -453,9 +482,7 @@ html lang="en" ng-app="Museum"
                         a.btn.btn-default.upload href="#" button-file-upload=""
                           | Click to upload
 
-
-                tab heading="More"
-
+                .tab-pane ng-class="{'active': story_tab == 'more' }"
                   ul.nav.nav-stacked.nav-list.col-xs-2
                     li ng-class="{'active': story_subtab == 'video' }"
                       a href="#" ng-click="story_subtab = 'video'" Video
