@@ -441,7 +441,7 @@ html lang="en" ng-app="Museum"
                 .close
 
               ul.nav.nav-tabs
-                li ng-class="{'active': story_tab == 'main' || dropdown.new_item_creation }"
+                li ng-class="{'active': story_tab == 'main'}"
                   a href="#" ng-click="story_tab = 'main'" 
                     | Main
                     span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"

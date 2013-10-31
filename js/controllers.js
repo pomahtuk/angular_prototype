@@ -685,7 +685,6 @@
         }
         return _results;
       };
-      $scope.dropdown = {};
       dropDown = $('#drop_down').removeClass('hidden').hide();
       findActive = function() {
         return $('ul.exhibits li.exhibit.active');
@@ -782,7 +781,7 @@
           return false;
         }
         if ($scope.new_item_creation) {
-          $scope.dropdown.new_item_creation = true;
+          $scope.story_tab = 'main';
           if (findActive().length > 0) {
             $scope.closeDropDown();
           }
@@ -1036,6 +1035,7 @@
             $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true;
           }
           $scope.new_item_creation = true;
+          $scope.story_tab = 'main';
           e = {};
           e.target = $('li.exhibit.dummy > .opener.draft');
           console.log($('li.exhibit.dummy'));

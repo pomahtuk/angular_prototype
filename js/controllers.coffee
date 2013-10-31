@@ -657,9 +657,6 @@ angular.module("Museum.controllers", [])
       # console.log lang, $scope.translations[lang]
       $scope.modal_translations[lang] = { name: $scope.translations[lang] }
 
-
-  $scope.dropdown = {}
-
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
   findActive = -> $('ul.exhibits li.exhibit.active')
@@ -741,7 +738,7 @@ angular.module("Museum.controllers", [])
       return false
 
     if $scope.new_item_creation
-      $scope.dropdown.new_item_creation = true
+      $scope.story_tab = 'main'
       if findActive().length > 0
         $scope.closeDropDown()
 
@@ -1000,6 +997,7 @@ angular.module("Museum.controllers", [])
         $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true
 
       $scope.new_item_creation = true
+      $scope.story_tab = 'main'
       e = {}
       e.target = $('li.exhibit.dummy > .opener.draft')
       console.log $('li.exhibit.dummy')
