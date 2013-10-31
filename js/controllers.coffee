@@ -52,13 +52,14 @@ tileGrid = (collection, tileWidth, tileSpace, tileListMargin) ->
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', ($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing) ->
+.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', ($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) ->
   
   window.sc = $scope
 
-  console.log $routeParams, $location
-
   $scope.exhibit_search = ''
+
+  $scope.changeLng = (lng) ->
+    $i18next.options.lng = lng
 
   $scope.criteriaMatch = ( criteria ) ->
     ( item ) ->
@@ -95,17 +96,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $location.$$path?
     $location.$$path.split('/')[1]
   else
-    # "526a0a26a15cfbe815000002"
-    "526e1baa0439f8b01a000002"
+    "526a0a26a15cfbe815000002"
+    # "526e1baa0439f8b01a000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    # "526a0a26a15cfbe815000001"
-    "526e1baa0439f8b01a000001"
+    "526a0a26a15cfbe815000001"
+    # "526e1baa0439f8b01a000001"
 
-  # $scope.backend_url = "http://192.168.158.128:3000/api"
-  $scope.backend_url = "http://prototype.izi.travel/api"
+  $scope.backend_url = "http://192.168.158.128:3000/api"
+  # $scope.backend_url = "http://prototype.izi.travel/api"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -844,6 +845,7 @@ angular.module("Museum.controllers", [])
 
   get_name = (lang) ->
     if lang is $scope.current_museum.language
+      # may be translation neded
       'Экспонат_'+lang
     else
       ''
@@ -1184,15 +1186,15 @@ angular.module("Museum.controllers", [])
         for answer in story.quiz.answers
           $scope.put_answers answer
       .error ->
-        errorProcessing.addError 'Failed to update a quiz for story'
+        errorProcessing.addError $i18next 'Failed to update a quiz for story'
     .error ->
-      errorProcessing.addError 'Failed update a story'
+      errorProcessing.addError $i18next 'Failed update a story'
 
   $scope.put_answers = (answer) ->
     $http.put("#{$scope.backend_url}/quiz_answer/#{answer._id}", answer).success (data) ->
       console.log 'done'
     .error ->
-      errorProcessing.addError 'Failed to save quiz answer'
+      errorProcessing.addError $i18next 'Failed to save quiz answer'
 
   $scope.post_stories = (original_story, type = 'common', callback) ->
 
@@ -1212,16 +1214,16 @@ angular.module("Museum.controllers", [])
           answer.quiz = data._id
           $scope.post_answers answer
       .error ->
-       errorProcessing.addError 'Failed to save quiz for new story'
+       errorProcessing.addError $i18next 'Failed to save quiz for new story'
     .error ->
-      errorProcessing.addError 'Failed to save new story'
+      errorProcessing.addError $i18next 'Failed to save new story'
 
   $scope.post_answers = (answer) ->
     $http.post("#{$scope.backend_url}/quiz_answer/", answer).success (data) ->
       # console.log data
       answer._id = data._id
     .error ->
-      errorProcessing.addError 'Failed to save quiz answer'
+      errorProcessing.addError $i18next 'Failed to save quiz answer'
 
   $scope.mass_switch_pub = (value) ->
     for exhibit in $scope.exhibits
@@ -1265,13 +1267,13 @@ angular.module("Museum.controllers", [])
       console.log data
       callback(stories, lang) if callback?
     .error ->
-      errorProcessing.addError 'Failed to delete story in languane: ' + $scope.translations[lang]
+      errorProcessing.addError $i18next('Failed to delete story in languane: ') + $scope.translations[lang]
 
   $scope.delete_story_set = (target_exhibit) ->
     $http.delete("#{$scope.backend_url}/story_set/#{target_exhibit._id}/").success (data) ->
       console.log data
     .error ->
-      errorProcessing.addError 'Failed to delete exhibit with number' + target_exhibit.number
+      errorProcessing.addError $i18next('Failed to delete exhibit with number ') + target_exhibit.number
 
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
     console.log newValue
@@ -1283,7 +1285,7 @@ angular.module("Museum.controllers", [])
             console.log data
             $scope.last_save_time = new Date()
           .error (error) ->
-            errorProcessing.addError 'Failed to save museum language'
+            errorProcessing.addError $i18next 'Failed to save museum language'
       else
         console.log 'dummy'
         $scope.modal_options.current_language = 
@@ -1305,7 +1307,7 @@ angular.module("Museum.controllers", [])
         $scope.post_stories story
       dropDown.find('.item_publish_settings').show()
     .error ->
-      errorProcessing.addError 'Failed to save new exhibit'
+      errorProcessing.addError $i18next 'Failed to save new exhibit'
     $scope.new_item_creation = false
     $scope.$digest()
 
@@ -1316,7 +1318,7 @@ angular.module("Museum.controllers", [])
         $scope.last_save_time = new Date()
         console.log data
       .error ->
-        errorProcessing.addError 'Server error - Prototype error.'
+        errorProcessing.addError $i18next 'Server error - Prototype error.'
       $scope.forbid_switch  = false
 
   $scope.$on 'quiz_changes_to_save', (event, child_scope, correct_item) ->
@@ -1331,7 +1333,7 @@ angular.module("Museum.controllers", [])
         console.log data
         $scope.last_save_time = new Date()
       .error ->
-        errorProcessing.addError 'Failed to update quiz'
+        errorProcessing.addError $i18next 'Failed to update quiz'
     $scope.forbid_switch  = false
 
   $scope.$watch 'current_museum.invalid', (newValue, oldValue) ->

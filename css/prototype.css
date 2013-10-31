@@ -2332,31 +2332,39 @@ a:hover {
   color: white;
   line-height: 20px;
   margin-left: -2px;
+  text-align: left;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031734}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031735}}
 .lightbox_area .slider .thumb .cover.active {
   visibility: visible;
   max-width: 92px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031738}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031739}}
 .lightbox_area .slider .thumb .cover.active span {
   width: 66px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031741}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031742}}
 .lightbox_area .slider .thumb .cover:hover {
   max-width: 92px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031744}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031745}}
 .lightbox_area .slider .thumb:hover .cover {
   visibility: visible;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031747}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031748}}
 .lightbox_area .slider .thumb img {
   width: 105px;
   height: 80px;
   border: 2px solid transparent;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031752}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031753}}
 .lightbox_area .slider .thumb.active img {
   border: 2px solid #fd6e3b;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031757}}
+.tab-content > .active, .pill-content > .active {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

@@ -18,7 +18,7 @@
       <div class="museum_navigation_menu">
         <div class="museum_navbar row">
           <div class="left_content">
-            <i class="icon-plus-sign"></i><a class="top_nav" href="#">New museum</a><i class="icon-plus-sign"></i><a class="top_nav" href="#">New Tour</a>
+            <i class="icon-plus-sign"></i><a class="top_nav" href="#">{{ 'header.newMuseum' | i18next }}</a><i class="icon-plus-sign"></i><a class="top_nav" href="#">{{ 'header.newTour' | i18next }}</a>
           </div>
           <div class="navbar-right">
             <museum-search ng-model="museum_search"></museum-search>
@@ -30,14 +30,14 @@
                 </li>
                 <li class="divider"></li>
                 <li ng-repeat="provider in user.providers" role="presentation">
-                  <a href="{{provider.link}}" role="menuitem" tabindex="-1">Edit {{provider.name}}</a>
+                  <a href="{{provider.link}}" role="menuitem" tabindex="-1"> {{ 'Edit' | i18next }} {{provider.name}}</a>
                 </li>
                 <li class="divider"></li>
                 <li role="presentation">
-                  <a href="" role="menuitem" tabindex="-1">Profile</a>
+                  <a href="" role="menuitem" tabindex="-1">{{ 'Profile' | i18next }}</a>
                 </li>
                 <li role="presentation">
-                  <a href="" role="menuitem" tabindex="-1">Logout</a>
+                  <a href="" role="menuitem" tabindex="-1">{{ 'Logout' | i18next }}</a>
                 </li>
               </ul>
             </div>
@@ -63,20 +63,20 @@
             {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
           </h1>
           <div class="btn-group language">
-            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{{translations[current_museum.language] || 'New language'}}  <span class="caret"></span></button>
+            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{{ current_museum.language | i18next }}  <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
               <li ng-repeat="story in current_museum.stories">
-                <a href="#" ng-click="current_museum.language = story.language">{{translations[story.language]}}</a>
+                <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next }}</a>
               </li>
               <li class="divider"></li>
               <li>
-                <a href="#" ng-click="new_museum_language()">New language</a>
+                <a href="#" ng-click="new_museum_language()">{{ 'newLanguage' | i18next }}</a>
               </li>
             </ul>
           </div>
         </div>
         <div class="right_content">
-          <span class="autosaved_info" ng-show="last_save_time">Changes autosaved at {{ last_save_time | date:'HH:mm'}}</span>
+          <span class="autosaved_info" ng-show="last_save_time">{{ 'Changes autosaved at' | i18next }} {{ last_save_time | date:'HH:mm'}}</span>
           <div class="hider" ng-hide="museum_edit_dropdown_opened">
             <switchpubitem field="status" ng-item="current_museum.stories[current_museum.language]" ng-museum="current_museum" ng-provider="provider" root="current_museum" translations="translations" type="story"></switchpubitem>
           </div>
@@ -87,7 +87,7 @@
           <div can-drag-and-drop="" class="dropdown_area" id="museum_dropzone" model="current_museum" selector="museum_fileupload" selector-dropzone="museum_dropzone" upload-to="{{backend_url}}/upload/{{current_museum._id}}">
             <div class="wrapper">
               <div class="text">
-                Drop media files here to attach to this object
+                {{ 'Drop media files here to attach to this object' | i18next }}
               </div>
               <div class="progress">
                 <div class="progress-bar progress-bar-success"></div>
@@ -105,23 +105,23 @@
             </div>
             <ul class="nav nav-tabs">
               <li ng-class="{&#39;active&#39;: museum_tab == &#39;main&#39;}">
-                <a href="#" ng-click="museum_tab = &#39;main&#39;">Main<span class="media_types story" ng-class="{&#39;invalid&#39;: current_museum.invalid}"><i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"></i></span></a>
+                <a href="#" ng-click="museum_tab = &#39;main&#39;">{{ 'Main' | i18next }}<span class="media_types story" ng-class="{&#39;invalid&#39;: current_museum.invalid}"><i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"></i></span></a>
               </li>
               <li ng-class="{&#39;active&#39;: museum_tab == &#39;images&#39; }">
-                <a href="#" ng-click="museum_tab = &#39;images&#39;">Images<span class="media_types story" ng-class="{&#39;invalid&#39;: current_museum.invalid}"><i class="icon-picture empty" ng-show="current_museum.images.length == 0"></i></span></a>
+                <a href="#" ng-click="museum_tab = &#39;images&#39;">{{ 'Images' | i18next }}<span class="media_types story" ng-class="{&#39;invalid&#39;: current_museum.invalid}"><i class="icon-picture empty" ng-show="current_museum.images.length == 0"></i></span></a>
               </li>
               <li ng-class="{&#39;active&#39;: museum_tab == &#39;more&#39; }">
-                <a href="#" ng-click="museum_tab = &#39;more&#39;">More</a>
+                <a href="#" ng-click="museum_tab = &#39;more&#39;">{{ 'More' | i18next }}</a>
               </li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;main&#39; }">
                 <form class="form-horizontal" name="mainForm" role="form">
-                  <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="current_museum.stories[current_museum.language]" ng-title="Name" placeholder="current_museum.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="Audio" parent="current_museum.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="current_museum.stories[current_museum.language]" ng-title="Description" placeholder="current_museum.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
+                  <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Name&#39; | i18next }}" placeholder="current_museum.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="current_museum.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Description&#39; | i18next }}" placeholder="current_museum.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                 </form>
               </div>
               <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;images&#39; }">
-                <label class="col-xs-1 control-label">Images<span class="label label-danger" ng-show="current_museum.images.length == 0">Fill to publish</span></label>
+                <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="current_museum.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
                 <ul class="images col-xs-11">
                   <li ng-repeat="image in current_museum.images">
                     <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.current_museum" rel="nofollow" stop-event="">×</a>
@@ -129,10 +129,10 @@
                   <li class="upload_item">
                     <div class="drag_here">
                       <div class="img"></div>
-                      <span>Drag images here</span>
+                      <span>{{ 'Drag images here' | i18next }}</span>
                     </div>
                     <div class="or_upload">
-                      <span>or</span><a button-file-upload="" class="btn btn-default upload" href="#">Click to upload</a>
+                      <span>{{ 'or' | i18next }}</span><a button-file-upload="" class="btn btn-default upload" href="#">{{ 'Click to upload' | i18next }}</a>
                     </div>
                   </li>
                 </ul>
@@ -140,22 +140,22 @@
               <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;more&#39; }">
                 <ul class="nav nav-stacked nav-list col-xs-2">
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;video&#39; }">
-                    <a href="#" ng-click="museum_subtab = &#39;video&#39;">Video</a>
+                    <a href="#" ng-click="museum_subtab = &#39;video&#39;">{{ 'Video' | i18next }}</a>
                   </li>
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;qr-code&#39; }">
-                    <a href="#" ng-click="museum_subtab = &#39;qr-code&#39;">QR-code</a>
+                    <a href="#" ng-click="museum_subtab = &#39;qr-code&#39;">{{ 'QR-code' | i18next }}</a>
                   </li>
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;quiz&#39; }">
-                    <a href="#" ng-click="museum_subtab = &#39;quiz&#39;">Quiz</a>
+                    <a href="#" ng-click="museum_subtab = &#39;quiz&#39;">{{ 'Quiz' | i18next }}</a>
                   </li>
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;collections&#39; }">
-                    <a href="#" ng-click="museum_subtab = &#39;collections&#39;">Used in collections</a>
+                    <a href="#" ng-click="museum_subtab = &#39;collections&#39;">{{ 'Used in collections' | i18next }}</a>
                   </li>
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;tours&#39; }">
-                    <a href="#" ng-click="museum_subtab = &#39;tours&#39;">Linked in tours</a>
+                    <a href="#" ng-click="museum_subtab = &#39;tours&#39;">{{ 'Linked in tours' | i18next }}</a>
                   </li>
                   <li ng-class="{&#39;active&#39;: museum_subtab == &#39;settings&#39; }">
-                    <a href="#" ng-click="museum_subtab = &#39;settings&#39;">Advanced settings</a>
+                    <a href="#" ng-click="museum_subtab = &#39;settings&#39;">{{ 'Advanced settings' | i18next }}</a>
                   </li>
                 </ul>
                 <div class="tab-content col-xs-10">
@@ -168,9 +168,9 @@
                         <img alt="Qr_code" src="{{current_museum.stories[current_museum.language].qr_code || &#39;/img/qr_code.png&#39;}}">
                       </div>
                       <div class="well col-xs-5">
-                        <a class="btn qr-code" href="{{current_museum.stories[current_museum.language].qr_code}}" target="_blank">Print QR-code</a><br>
+                        <a class="btn qr-code" href="{{current_museum.stories[current_museum.language].qr_code}}" target="_blank">{{ 'Print QR-code' | i18next }}</a><br>
                           <p>
-                            You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                            {{ "You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play." | i18next }}
                           </p>
                         </br>
                       </div>
@@ -180,16 +180,16 @@
                     <div class="row">
                       <form class="form-horizontal" name="museumQuizform" role="form">
                         <div class="switch-toggle ios" quiz-switch="museum_story_quiz" switch-toggle="">
-                          <input id="museum_story_quiz_enabled" name="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="published"><label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">Enable</label><input id="museum_story_quiz_disabled" name="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="limited"><label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">Disable</label><a></a>
+                          <input id="museum_story_quiz_enabled" name="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="published"><label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">{{ 'Enable' | i18next }}</label><input id="museum_story_quiz_disabled" name="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" type="radio" value="limited"><label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)">{{ 'Disable' | i18next }}</label><a></a>
                         </div>
-                        <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="museum_story_quiz_attributes_question" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Question" type="quiz"></placeholderfield>
+                        <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="museum_story_quiz_attributes_question" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="{{ &#39;Question&#39; | i18next }}" type="quiz"></placeholderfield>
                         <div class="error">
                           <div class="controls"></div>
                         </div>
                         <div class="answers">
                           <quizanswer field="content" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer"></quizanswer>
                         </div>
-                        <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="Description" type="quiz"></placeholdertextarea>
+                        <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="current_museum.stories[current_museum.language].quiz" ng-title="{{ &#39;Description&#39; | i18next }}" type="quiz"></placeholdertextarea>
                       </form>
                     </div>
                   </div>
@@ -209,34 +209,34 @@
         </div>
       </div>
       <div class="museum_edit_opener" ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened">
-        Museum properties  <i class="icon-chevron-down"></i>
+        {{ 'Museum properties' | i18next }}<i class="icon-chevron-down"></i>
       </div>
     </div>
     <div class="float_menu">
       <div class="actions_bar">
         <error-notification></error-notification>
         <div class="left_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <button class="btn btn-warning spacer" id="create_new_item" ng-class="{&#39;disabled&#39;:new_item_creation}" ng-click="create_new_item()" type="button">New item </button>
+          <button class="btn btn-warning spacer" id="create_new_item" ng-class="{&#39;disabled&#39;:new_item_creation}" ng-click="create_new_item()" type="button">{{ 'New item' | i18next }}</button>
           <div class="btn-group spacer lang_switch">
-            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{{translations[current_museum.language] || 'New language'}}  <span class="caret"></span></button>
+            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button"> {{ current_museum.language | i18next }}   <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
               <li ng-repeat="story in current_museum.stories">
-                <a href="#" ng-click="current_museum.language = story.language">{{translations[story.language]}}</a>
+                <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
               </li>
               <li class="divider"></li>
               <li>
-                <a href="#" ng-click="new_museum_language()">New language</a>
+                <a href="#" ng-click="new_museum_language()">{{ 'newLanguage' | i18next }}</a>
               </li>
             </ul>
           </div>
           <div class="btn-group">
-            <button class="btn btn-default dropdown-toggle spacer" data-toggle="dropdown" type="button">Actions  <span class="caret"></span></button>
+            <button class="btn btn-default dropdown-toggle spacer" data-toggle="dropdown" type="button">{{ 'Actions' | i18next }}  <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
               <li ng-click="select_all_exhibits()" ng-switch="" on="all_selected">
-                <a href="#" ng-switch-when="false">Select all</a><a href="#" ng-switch-when="true">Cancel selection</a>
+                <a href="#" ng-switch-when="false">{{ 'Select all' | i18next }}</a><a href="#" ng-switch-when="true">{{ 'Cancel selection' | i18next }}</a>
               </li>
               <li class="dropdown-submenu">
-                <a href="#">Add selected items to collection...</a>
+                <a href="#">{{ 'addSelectedCollection' | i18next }}</a>
                 <ul class="dropdown-menu" role="menu">
                   <li>
                     <a href="#">Collection 1</a>
@@ -250,54 +250,54 @@
                 </ul>
               </li>
               <li class="dropdown-submenu">
-                <a href="#">Set visibility for selected items...</a>
+                <a href="#">{{ 'setItemVisibility' | i18next }}</a>
                 <ul class="dropdown-menu" role="menu">
                   <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;published&#39;)"><i class="icon-globe"></i>  Publish</a>
+                    <a href="#" ng-click="mass_switch_pub(&#39;published&#39;)"><i class="icon-globe"></i>  {{ 'Publish' | i18next }}</a>
                   </li>
                   <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  Make private</a>
+                    <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  {{ 'Make private' | i18next }}</a>
                   </li>
                   <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  Make invisible</a>
+                    <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  {{ 'Make invisible' | i18next }}</a>
                   </li>
                 </ul>
               </li>
               <li>
-                <a href="#" ng-click="delete_selected_exhibits()">Delete selected items</a>
+                <a href="#" ng-click="delete_selected_exhibits()">{{ 'Delete selected items' | i18next }}</a>
               </li>
             </ul>
           </div>
-          <a class="spacer" href="#" ng-click="select_all_exhibits(&#39;select&#39;)" ng-show="select_all_enabled"><span>Select all</span></a><a class="spacer" href="#" ng-click="select_all_exhibits(&#39;cancel&#39;)" ng-show="select_all_enabled"><span>Cancel selection</span></a>
+          <a class="spacer" href="#" ng-click="select_all_exhibits(&#39;select&#39;)" ng-show="select_all_enabled"><span>{{ 'Select all' | i18next }}</span></a><a class="spacer" href="#" ng-click="select_all_exhibits(&#39;cancel&#39;)" ng-show="select_all_enabled"><span>{{ 'Cancel selection' | i18next }}</span></a>
         </div>
         <div class="right_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="Search" resizer="" type="text"><button class="btn btn-default filter_opener" ng-class="{&#39;active&#39;: filters_opened || exhibits_visibility_filter}" toggle-filters="" type="button">Filters and sort</button>
+          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="{{ &#39;Search&#39; | i18next }}" resizer="" type="text"><button class="btn btn-default filter_opener" ng-class="{&#39;active&#39;: filters_opened || exhibits_visibility_filter}" toggle-filters="" type="button">{{ 'Filters and sorts' | i18next }}</button>
         </div>
       </div>
       <div class="filters_bar">
-        <a class="clear_fiters spacer" href="#" ng-click="exhibits_visibility_filter = false" ng-show="exhibits_visibility_filter">Clear filters</a>
+        <a class="clear_fiters spacer" href="#" ng-click="exhibits_visibility_filter = false" ng-show="exhibits_visibility_filter">{{ 'Clear filters' | i18next }}</a>
         <div class="dropdown spacer">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="sort_order">{{sort_text}} <span class="caret"></span></a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="sort_order">{{sort_text | i18next }} <span class="caret"></span></a>
           <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
             <li role="presentation">
-              <a href="#" ng-click="sort_text=&#39;Sort 0-9&#39;; reload_exhibits(&#39;number&#39;, 1)">Sort 0-9</a>
+              <a href="#" ng-click="sort_text=&#39;Sort 0-9&#39;; reload_exhibits(&#39;number&#39;, 1)">{{ 'Sort 0-9' | i18next }}</a>
             </li>
             <li role="presentation">
-              <a href="#" ng-click="sort_text=&#39;Sort 9-0&#39;; reload_exhibits(&#39;number&#39;, -1)"> Sort 9-0</a>
+              <a href="#" ng-click="sort_text=&#39;Sort 9-0&#39;; reload_exhibits(&#39;number&#39;, -1)"> {{ 'Sort 9-0' | i18next }}</a>
             </li>
           </ul>
         </div>
         <div class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter">Visibility in mobile application<span ng-switch-when="published">: Everyone  </span><span ng-switch-when="passcode">: Private  </span><span ng-switch-when="opas_invisible">: Invisible  </span><span class="caret"></span></a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter">{{ 'Visibility in mobile application' | i18next }}<span ng-switch-when="published">: {{ 'Everyone' | i18next }}</span><span ng-switch-when="passcode">: {{ 'Private' | i18next }}</span><span ng-switch-when="opas_invisible">: {{ 'Invisible' | i18next }}</span><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li ng-click="exhibits_visibility_filter = &#39;published&#39;">
-              <a href="#">Everyone</a>
+              <a href="#">{{ 'Everyone' | i18next }}</a>
             </li>
             <li ng-click="exhibits_visibility_filter = &#39;passcode&#39;">
-              <a href="#">Private</a>
+              <a href="#">{{ 'Private' | i18next }}</a>
             </li>
             <li ng-click="exhibits_visibility_filter = &#39;opas_invisible&#39;">
-              <a href="#">Invisible</a>
+              <a href="#">{{ 'Invisible' | i18next }}</a>
             </li>
           </ul>
         </div>
@@ -311,11 +311,11 @@
             <div class="modal-content">
               <div class="modal-body">
                 <h4 class="modal-title">
-                  Name of exhibit is empty
+                  {{ 'Name of exhibit is empty' | i18next }}
                 </h4>
               </div>
               <div class="modal-footer">
-                <button class="btn btn-default" ng-click="discard()" type="button">Discard item</button><button class="btn btn-default" ng-click="save_as()" type="button">Save as "item_{{exhibit.number}}"</button>
+                <button class="btn btn-default" ng-click="discard()" type="button">{{ 'Discard item' | i18next }}</button><button class="btn btn-default" ng-click="save_as()" type="button">{{ 'Save as' | i18next }} "item_{{exhibit.number}}"</button>
               </div>
             </div>
           </div>
@@ -325,16 +325,16 @@
             <div class="modal-content">
               <div class="modal-header">
                 <h3 class="modal-title">
-                  New language
+                  {{ 'New language' | i18next }}
                 </h3>
               </div>
               <div class="modal-body description">
                 <form class="form-horizontal">
-                  <new-lang-switch museum="museum"></new-lang-switch><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="museum.stories.dummy" ng-title="Name" placeholder="museum.stories.dummy.name" type="story"></placeholderfield>
+                  <new-lang-switch museum="museum"></new-lang-switch><placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="museum.stories.dummy" ng-title="{{ &#39;Name&#39; | i18next }}" placeholder="museum.stories.dummy.name" type="story"></placeholderfield>
                 </form>
               </div>
               <div class="modal-footer">
-                <button class="btn btn-warning" ng-class="{&#39;disabled&#39;: museum.stories.dummy.name.length == 0 &amp;&amp; museum.language != &#39;new_lang&#39; }" ng-click="save_as()" type="button">Create</button><button class="btn btn-default" ng-click="discard()" type="button">Cancel</button>
+                <button class="btn btn-warning" ng-class="{&#39;disabled&#39;: museum.stories.dummy.name.length == 0 &amp;&amp; museum.language != &#39;new_lang&#39; }" ng-click="save_as()" type="button">{{ 'Create' | i18next }}</button><button class="btn btn-default" ng-click="discard()" type="button">{{ 'Cancel' | i18next }}</button>
               </div>
             </div>
           </div>
@@ -383,19 +383,19 @@
                 <form class="form-horizontal">
                   <div class="multiply" ng-hide="only_one">
                     <div class="form-group">
-                      <label class="control-label" for="only_default"><input id="only_default" name="variant" ng-checked="variant.checked" ng-model="variant.checked" type="radio" value="lang">Delete museum in {{modal_options.current_language.name}} language (including exhibits an collections)</label>
+                      <label class="control-label" for="only_default"><input id="only_default" name="variant" ng-checked="variant.checked" ng-model="variant.checked" type="radio" value="lang">{{ 'Delete museum in' | i18next }} {{modal_options.current_language.language | i18next }} {{ 'language (including exhibits an collections)' | i18next }}</label>
                     </div>
                     <div class="form-group">
-                      <label class="control-label" for="museum_lang_all"><input id="museum_lang_all" name="variant" ng-checked="variant.checked" ng-model="variant.checked" type="radio" value="all">Delete whole museum  (including exhibits an collections)</label>
+                      <label class="control-label" for="museum_lang_all"><input id="museum_lang_all" name="variant" ng-checked="variant.checked" ng-model="variant.checked" type="radio" value="all">{{ 'Delete whole museum (including exhibits an collections)' | i18next }}</label>
                     </div>
                   </div>
                   <div class="password">
-                    <label class="control-label" for="modal_delete_password">Please, enter your password to confirm deletion</label><input id="modal_delete_password" name="modal_delete_password" ng-model="$parent.deletion_password" type="password">
+                    <label class="control-label" for="modal_delete_password">{{ 'Please, enter your password to confirm deletion' | i18next }}</label><input id="modal_delete_password" name="modal_delete_password" ng-model="$parent.deletion_password" type="password">
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
-                <button class="btn btn-default" ng-click="ok()" type="button">Delete</button><button class="btn btn-default" ng-click="cancel()" type="button">Cancel</button>
+                <button class="btn btn-default" ng-click="ok()" type="button">{{ 'Delete' | i18next }}</button><button class="btn btn-default" ng-click="cancel()" type="button">{{ 'Cancel' | i18next }}</button>
               </div>
             </div>
           </div>
@@ -405,7 +405,7 @@
             <div can-drag-and-drop="" class="dropdown_area" id="dropzone" model="active_exhibit" selector="fileupload" selector-dropzone="dropzone" upload-to="{{backend_url}}/upload/{{active_exhibit._id}}">
               <div class="wrapper">
                 <div class="text">
-                  Drop media files here to attach to this object
+                  {{ 'Drop media files here to attach to this object' | i18next }}
                 </div>
                 <div class="progress" id="progress">
                   <div class="progress-text">
@@ -426,34 +426,34 @@
               </div>
               <ul class="nav nav-tabs">
                 <li ng-class="{&#39;active&#39;: story_tab == &#39;main&#39;}">
-                  <a href="#" ng-click="story_tab = &#39;main&#39;">Main<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"></i></span></a>
+                  <a href="#" ng-click="story_tab = &#39;main&#39;">{{ 'Main' | i18next }}<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"></i></span></a>
                 </li>
                 <li ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
-                  <a href="#" ng-click="story_tab = &#39;images&#39;">Images<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"></i></span></a>
+                  <a href="#" ng-click="story_tab = &#39;images&#39;">{{ 'Images' | i18next }}<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"></i></span></a>
                 </li>
                 <li ng-class="{&#39;active&#39;: story_tab == &#39;more&#39; }">
-                  <a href="#" ng-click="story_tab = &#39;more&#39;">More</a>
+                  <a href="#" ng-click="story_tab = &#39;more&#39;">{{ 'More' | i18next }}</a>
                 </li>
               </ul>
               <div class="tab-content">
                 <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;main&#39; }">
                   <form class="form-horizontal" name="mainForm" role="form">
-                    <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Name" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Audio" parent="active_exhibit.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.language]" ng-title="Description" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
+                    <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Name&#39; | i18next }}" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="active_exhibit.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Description&#39; | i18next }}" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                   </form>
                 </div>
                 <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
-                  <label class="col-xs-1 control-label">Images<span class="label label-danger" ng-show="active_exhibit.images.length == 0">Fill to publish</span></label>
+                  <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
                   <ul class="images col-xs-11">
                     <li ng-repeat="image in active_exhibit.images">
-                      <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="Are you sure you wish to delete this image?" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                      <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                     </li>
                     <li class="upload_item">
                       <div class="drag_here">
                         <div class="img"></div>
-                        <span>Drag images here</span>
+                        <span>{{ 'Drag images here' | i18next }}</span>
                       </div>
                       <div class="or_upload">
-                        <span>or</span><a button-file-upload="" class="btn btn-default upload" href="#">Click to upload</a>
+                        <span>{{ 'or' | i18next }}</span><a button-file-upload="" class="btn btn-default upload" href="#">{{ 'Click to upload' | i18next }}</a>
                       </div>
                     </li>
                   </ul>
@@ -461,22 +461,22 @@
                 <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;more&#39; }">
                   <ul class="nav nav-stacked nav-list col-xs-2">
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;video&#39; }">
-                      <a href="#" ng-click="story_subtab = &#39;video&#39;">Video</a>
+                      <a href="#" ng-click="story_subtab = &#39;video&#39;">{{ 'Video' | i18next }}</a>
                     </li>
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;qr-code&#39; }">
-                      <a href="#" ng-click="story_subtab = &#39;qr-code&#39;">QR-code</a>
+                      <a href="#" ng-click="story_subtab = &#39;qr-code&#39;">{{ 'QR-code' | i18next }}</a>
                     </li>
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;quiz&#39; }">
-                      <a href="#" ng-click="story_subtab = &#39;quiz&#39;">Quiz</a>
+                      <a href="#" ng-click="story_subtab = &#39;quiz&#39;">{{ 'Quiz' | i18next }}</a>
                     </li>
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;collections&#39; }">
-                      <a href="#" ng-click="story_subtab = &#39;collections&#39;">Used in collections</a>
+                      <a href="#" ng-click="story_subtab = &#39;collections&#39;">{{ 'Used in collections' | i18next }}</a>
                     </li>
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;tours&#39; }">
-                      <a href="#" ng-click="story_subtab = &#39;tours&#39;">Linked in tours</a>
+                      <a href="#" ng-click="story_subtab = &#39;tours&#39;">{{ 'Linked in tours' | i18next }}</a>
                     </li>
                     <li ng-class="{&#39;active&#39;: story_subtab == &#39;settings&#39; }">
-                      <a href="#" ng-click="story_subtab = &#39;settings&#39;">Advanced settings</a>
+                      <a href="#" ng-click="story_subtab = &#39;settings&#39;">{{ 'Advanced settings' | i18next }}</a>
                     </li>
                   </ul>
                   <div class="tab-content col-xs-10">
@@ -489,9 +489,9 @@
                           <img alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || &#39;/img/qr_code.png&#39;}}">
                         </div>
                         <div class="well col-xs-5">
-                          <a class="btn qr-code" href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank">Print QR-code</a><br>
+                          <a class="btn qr-code" href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank">{{ 'Print QR-code' | i18next }}</a><br>
                             <p>
-                              You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                              {{ "You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play." | i18next }}
                             </p>
                           </br>
                         </div>
@@ -501,16 +501,16 @@
                       <div class="row">
                         <form class="form-horizontal" name="quizform" role="form">
                           <div class="switch-toggle ios" quiz-switch="story_quiz" switch-toggle="">
-                            <input id="story_quiz_enabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="published"><label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">Enable</label><input id="story_quiz_disabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="limited"><label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">Disable</label><a></a>
+                            <input id="story_quiz_enabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="published"><label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">{{ 'Enable' | i18next }}</label><input id="story_quiz_disabled" name="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" type="radio" value="limited"><label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)">{{ 'Disable' | i18next }}</label><a></a>
                           </div>
-                          <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Question" type="quiz"></placeholderfield>
+                          <placeholderfield ng-field="question" ng-help="help text for popup" ng-id="story_quiz_attributes_question" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="{{ &#39;Question&#39; | i18next }}" type="quiz"></placeholderfield>
                           <div class="error">
                             <div class="controls"></div>
                           </div>
                           <div class="answers">
                             <quizanswer field="content" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-item="answer" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers" type="quiz_answer"></quizanswer>
                           </div>
-                          <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="Description" type="quiz"></placeholdertextarea>
+                          <placeholdertextarea ng-field="comment" ng-help="help text for popup 3" ng-id="quiz_description" ng-item="active_exhibit.stories[current_museum.language].quiz" ng-title="{{ &#39;Description&#39; | i18next }}" type="quiz"></placeholdertextarea>
                         </form>
                       </div>
                     </div>
@@ -522,7 +522,7 @@
                     </div>
                     <div class="tab-pane" ng-class="{&#39;active&#39;: story_subtab == &#39;settings&#39; }">
                       <form class="form-horizontal" role="form">
-                        <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="OPAS №" placeholder="active_exhibit.number" type="story_set"></placeholderfield>
+                        <placeholderfield ng-field="number" ng-help="help text for popup" ng-id="opas_number" ng-item="active_exhibit" ng-title="{{ &#39;OPAS №&#39; | i18next }}" placeholder="active_exhibit.number" type="story_set"></placeholderfield>
                       </form>
                     </div>
                   </div>
@@ -567,10 +567,10 @@
               </div>
             </div>
           </li>
-          <li ng-repeat="story in stories">
-            {{story}}
-          </li>
         </ul>
+        <div>
+          <a href="#" ng-click="changeLng(&#39;en&#39;)">English</a><a href="#" ng-click="changeLng(&#39;ru&#39;)">Russian</a>
+        </div>
       </div>
     </div>
     <to-top></to-top>
@@ -579,6 +579,7 @@
     <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
     <script src="lib/ui-bootstrap-0.6.0.js"></script>
     <script src="lib/angularLocalStorage.js"></script>
+    <script src="lib/ng-i18next.js"></script>
     <script src="lib/jquery-1.10.2.js"></script>
     <script src="lib/jquery.scrollTo.js"></script>
     <script src="lib/jquery.jplayer.min.js"></script>
@@ -594,6 +595,7 @@
     <script src="lib/jquery.Jcrop.min.js"></script>
     <script src="lib/jquery.color.js"></script>
     <script src="lib/jquery-scrollspy.js"></script>
+    <script src="lib/i18next-1.7.1.js"></script>
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>

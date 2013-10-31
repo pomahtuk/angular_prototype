@@ -28,10 +28,10 @@ html lang="en" ng-app="Museum"
             /     | Statistic
             i.icon-plus-sign
             a.top_nav href="#"
-              | New museum
+              | {{ 'header.newMuseum' | i18next }}
             i.icon-plus-sign
             a.top_nav href="#" 
-              | New Tour
+              | {{ 'header.newTour' | i18next }}
           .navbar-right
             
             museum-search ng-model="museum_search"
@@ -47,12 +47,12 @@ html lang="en" ng-app="Museum"
                 li.divider
                 li role="presentation" ng-repeat="provider in user.providers"
                   a role="menuitem" tabindex="-1" href="{{provider.link}}" 
-                    | Edit {{provider.name}}
+                    |  {{ 'Edit' | i18next }} {{provider.name}}
                 li.divider
                 li role="presentation"
-                  a role="menuitem" tabindex="-1" href="" Profile
+                  a role="menuitem" tabindex="-1" href="" {{ 'Profile' | i18next }}
                 li role="presentation"
-                  a role="menuitem" tabindex="-1" href="" Logout
+                  a role="menuitem" tabindex="-1" href="" {{ 'Logout' | i18next }}
         
         .museum_filters
           a.time_changed href="#" ng-click="museum_type_filter = ''" ng-class="{'active': museum_type_filter == ''}"
@@ -84,17 +84,17 @@ html lang="en" ng-app="Museum"
             | {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
           .btn-group.language
             button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
-              | {{translations[current_museum.language] || 'New language'}}  
+              | {{ current_museum.language | i18next }}  
               span.caret
             ul.dropdown-menu role="menu"
               li ng-repeat="story in current_museum.stories"
                 a href="#" ng-click="current_museum.language = story.language"
-                  | {{translations[story.language]}}
+                  | {{ story.language | i18next }}
               li.divider
               li
-                a href="#" ng-click="new_museum_language()" New language
+                a href="#" ng-click="new_museum_language()" {{ 'newLanguage' | i18next }}
         .right_content
-          span.autosaved_info ng-show="last_save_time" Changes autosaved at {{ last_save_time | date:'HH:mm'}}
+          span.autosaved_info ng-show="last_save_time" {{ 'Changes autosaved at' | i18next }} {{ last_save_time | date:'HH:mm'}}
           .hider ng-hide="museum_edit_dropdown_opened"
             switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
 
@@ -103,7 +103,7 @@ html lang="en" ng-app="Museum"
           #museum_dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{current_museum._id}}" model="current_museum" selector="museum_fileupload" selector-dropzone="museum_dropzone"
             .wrapper
               .text
-                | Drop media files here to attach to this object
+                | {{ 'Drop media files here to attach to this object' | i18next }}
               .progress
                 .progress-bar.progress-bar-success
 
@@ -128,29 +128,29 @@ html lang="en" ng-app="Museum"
             ul.nav.nav-tabs
               li ng-class="{'active': museum_tab == 'main'}"
                 a href="#" ng-click="museum_tab = 'main'" 
-                  | Main
+                  | {{ 'Main' | i18next }}
                   span.media_types.story ng-class="{'invalid': current_museum.invalid}"
                     i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"
                     i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"
               li ng-class="{'active': museum_tab == 'images' }"
                 a href="#" ng-click="museum_tab = 'images'" 
-                  | Images
+                  | {{ 'Images' | i18next }}
                   span.media_types.story ng-class="{'invalid': current_museum.invalid}"
                     i class="icon-picture empty" ng-show="current_museum.images.length == 0"
               li ng-class="{'active': museum_tab == 'more' }"
-                a href="#" ng-click="museum_tab = 'more'" More
+                a href="#" ng-click="museum_tab = 'more'" {{ 'More' | i18next }}
                 
             .tab-content
               .tab-pane ng-class="{'active': museum_tab == 'main' }"
                 form.form-horizontal role="form" name="mainForm"
-                  placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
-                  audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
-                  placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
+                  placeholderfield ng-item="current_museum.stories[current_museum.language]" ng-id="name" ng-title="{{ 'Name' | i18next }}" ng-field="name" ng-help="help text for popup 2" placeholder="current_museum.stories[current_museum.def_lang].name" type='story'
+                  audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
+                  placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="{{ 'Description' | i18next }}" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
 
               .tab-pane ng-class="{'active': museum_tab == 'images' }"
                 label.col-xs-1.control-label 
-                  | Images
-                  span.label.label-danger ng-show="current_museum.images.length == 0" Fill to publish
+                  | {{ 'Images' | i18next }}
+                  span.label.label-danger ng-show="current_museum.images.length == 0" {{ 'Fill to publish' | i18next }}
                 ul.images.col-xs-11
                   li ng-repeat="image in current_museum.images"
                     a.img_thumbnail href="#" open-lightbox="{{$index}}"
@@ -160,27 +160,29 @@ html lang="en" ng-app="Museum"
                   li.upload_item
                     .drag_here
                       .img
-                      span Drag images here
+                      span 
+                        | {{ 'Drag images here' | i18next }}
                     .or_upload
-                      span or
+                      span 
+                        | {{ 'or' | i18next }}
                       a.btn.btn-default.upload href="#" button-file-upload=""
-                        | Click to upload
+                        | {{ 'Click to upload' | i18next }}
 
               .tab-pane ng-class="{'active': museum_tab == 'more' }"
 
                 ul.nav.nav-stacked.nav-list.col-xs-2
                   li ng-class="{'active': museum_subtab == 'video' }"
-                    a href="#" ng-click="museum_subtab = 'video'" Video
+                    a href="#" ng-click="museum_subtab = 'video'" {{ 'Video' | i18next }}
                   li ng-class="{'active': museum_subtab == 'qr-code' }"
-                    a href="#" ng-click="museum_subtab = 'qr-code'" QR-code
+                    a href="#" ng-click="museum_subtab = 'qr-code'" {{ 'QR-code' | i18next }}
                   li ng-class="{'active': museum_subtab == 'quiz' }"
-                    a href="#" ng-click="museum_subtab = 'quiz'" Quiz
+                    a href="#" ng-click="museum_subtab = 'quiz'" {{ 'Quiz' | i18next }}
                   li ng-class="{'active': museum_subtab == 'collections' }"
-                    a href="#" ng-click="museum_subtab = 'collections'" Used in collections
+                    a href="#" ng-click="museum_subtab = 'collections'" {{ 'Used in collections' | i18next }}
                   li ng-class="{'active': museum_subtab == 'tours' }"
-                    a href="#" ng-click="museum_subtab = 'tours'" Linked in tours
+                    a href="#" ng-click="museum_subtab = 'tours'" {{ 'Linked in tours' | i18next }}
                   li ng-class="{'active': museum_subtab == 'settings' }"
-                    a href="#" ng-click="museum_subtab = 'settings'" Advanced settings
+                    a href="#" ng-click="museum_subtab = 'settings'" {{ 'Advanced settings' | i18next }}
 
                 .tab-content.col-xs-10
                   .tab-pane ng-class="{'active': museum_subtab == 'video' }"
@@ -190,24 +192,25 @@ html lang="en" ng-app="Museum"
                       .qr_image.col-xs-5
                         img alt="Qr_code" src="{{current_museum.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
                       .well.col-xs-5
-                        a.btn.qr-code href="{{current_museum.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
+                        a.btn.qr-code href="{{current_museum.stories[current_museum.language].qr_code}}" target="_blank" {{ 'Print QR-code' | i18next }}
                         br
-                          p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                          p 
+                            | {{ "You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play." | i18next }}
                   .tab-pane ng-class="{'active': museum_subtab == 'quiz' }" 
                     .row
                       form.form-horizontal role="form" name="museumQuizform"
                         .switch-toggle.ios switch-toggle="" quiz-switch="museum_story_quiz"
                           input id="museum_story_quiz_enabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="published" type="radio" name="museum_story_quiz_enabled" 
-                          label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Enable
+                          label for="museum_story_quiz_enabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" {{ 'Enable' | i18next }}
                           input id="museum_story_quiz_disabled" ng-model="current_museum.stories[current_museum.language].quiz.state" value="limited" type="radio" name="museum_story_quiz_disabled"
-                          label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" Disable
+                          label for="museum_story_quiz_disabled" ng-click="quiz_state(museumQuizform, current_museum.stories[current_museum.language].quiz)" {{ 'Disable' | i18next }}
                           a
-                        placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup" type="quiz"
+                        placeholderfield ng-item="current_museum.stories[current_museum.language].quiz" ng-id="museum_story_quiz_attributes_question" ng-title="{{ 'Question' | i18next }}" ng-field="question" ng-help="help text for popup" type="quiz"
                         .error
                           .controls
                         .answers
                           quizanswer ng-item="answer" ng-collection="current_museum.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in current_museum.stories[current_museum.language].quiz.answers" type="quiz_answer" field="content"
-                        placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3" type="quiz"
+                        placeholdertextarea ng-item="current_museum.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="{{ 'Description' | i18next }}" ng-field="comment" ng-help="help text for popup 3" type="quiz"
                   .tab-pane ng-class="{'active': museum_subtab == 'collections' }" 
                     |2222
                   .tab-pane ng-class="{'active': museum_subtab == 'tours' }" 
@@ -216,35 +219,36 @@ html lang="en" ng-app="Museum"
                     |44444
 
       .museum_edit_opener ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened"
-        | Museum properties  
+        | {{ 'Museum properties' | i18next }}
         i.icon-chevron-down
 
     .float_menu
       .actions_bar
         error-notification
         .left_content ng-mouseover="show_museum_edit_dropdown=false"
-          button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" ng-class="{'disabled':new_item_creation}" New item 
+          button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" ng-class="{'disabled':new_item_creation}" 
+            | {{ 'New item' | i18next }}
           .btn-group.spacer.lang_switch
             button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
-              | {{translations[current_museum.language] || 'New language'}}  
+              |  {{ current_museum.language | i18next }}   
               span.caret
             ul.dropdown-menu role="menu"
               li ng-repeat="story in current_museum.stories"
                 a href="#" ng-click="current_museum.language = story.language"
-                  | {{translations[story.language]}}
+                  | {{ story.language | i18next}}
               li.divider
               li
-                a href="#" ng-click="new_museum_language()" New language
+                a href="#" ng-click="new_museum_language()" {{ 'newLanguage' | i18next }}
           .btn-group
             button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
-              | Actions  
+              | {{ 'Actions' | i18next }}  
               span.caret
             ul.dropdown-menu role="menu"
               li ng-switch="" on="all_selected" ng-click="select_all_exhibits()" 
-                a href="#" ng-switch-when="false" Select all
-                a href="#" ng-switch-when="true" Cancel selection
+                a href="#" ng-switch-when="false" {{ 'Select all' | i18next }}
+                a href="#" ng-switch-when="true" {{ 'Cancel selection' | i18next }}
               li.dropdown-submenu
-                a href="#" Add selected items to collection...
+                a href="#" {{ 'addSelectedCollection' | i18next }}
                 ul.dropdown-menu role="menu"
                   li
                     a href="#" Collection 1
@@ -253,22 +257,22 @@ html lang="en" ng-app="Museum"
                   li
                     a href="#" Collection 3
               li.dropdown-submenu
-                a href="#" Set visibility for selected items...
+                a href="#" {{ 'setItemVisibility' | i18next }}
                 ul.dropdown-menu role="menu"
                   li
                     a href="#" ng-click="mass_switch_pub('published')"
                       i class="icon-globe"  
-                      |   Publish
+                      |   {{ 'Publish' | i18next }}
                   li
                     a href="#" ng-click="mass_switch_pub('passcode')"
                       i class="icon-lock"  
-                      |   Make private
+                      |   {{ 'Make private' | i18next }}
                   li
                     a href="#" ng-click="mass_switch_pub('opas_invisible')"
                       i class="icon-eye-close"  
-                      |   Make invisible
+                      |   {{ 'Make invisible' | i18next }}
               li
-                a href="#" ng-click="delete_selected_exhibits()" Delete selected items
+                a href="#" ng-click="delete_selected_exhibits()" {{ 'Delete selected items' | i18next }}
 
           / .btn-group.spacer
           /   button.btn.btn-default.undo type="button" 
@@ -277,9 +281,11 @@ html lang="en" ng-app="Museum"
           /     i.icon-repeat
 
           a.spacer href="#" ng-click="select_all_exhibits('select')" ng-show="select_all_enabled"
-            span Select all
+            span 
+              | {{ 'Select all' | i18next }}
           a.spacer href="#" ng-click="select_all_exhibits('cancel')" ng-show="select_all_enabled"
-            span Cancel selection
+            span 
+              | {{ 'Cancel selection' | i18next }}
 
         .right_content ng-mouseover="show_museum_edit_dropdown=false"
           / span.limits.spacer
@@ -292,21 +298,22 @@ html lang="en" ng-app="Museum"
           /     i.icon-chevron-left
           /   button.btn.btn-default.next type="button" 
           /     i.icon-chevron-right
-          input.form-control.search.spacer type="text" placeholder="Search" ng-model="exhibit_search" resizer=""
-          button.btn.btn-default.filter_opener ng-class="{'active': filters_opened || exhibits_visibility_filter}" type="button" toggle-filters="" Filters and sort
+          input.form-control.search.spacer type="text" placeholder="{{ 'Search' | i18next }}" ng-model="exhibit_search" resizer=""
+          button.btn.btn-default.filter_opener ng-class="{'active': filters_opened || exhibits_visibility_filter}" type="button" toggle-filters="" 
+            | {{ 'Filters and sorts' | i18next }}
 
       .filters_bar
-        a.clear_fiters.spacer ng-show="exhibits_visibility_filter" ng-click="exhibits_visibility_filter = false" href="#" Clear filters
+        a.clear_fiters.spacer ng-show="exhibits_visibility_filter" ng-click="exhibits_visibility_filter = false" href="#" {{ 'Clear filters' | i18next }}
 
         .dropdown.spacer
           a#sort_order.dropdown-toggle data-toggle="dropdown" href="#"
-            | {{sort_text}} 
+            | {{sort_text | i18next }} 
             span.caret
           ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
             li role="presentation"
-              a href="#" ng-click="sort_text='Sort 0-9'; reload_exhibits('number', 1)" Sort 0-9
+              a href="#" ng-click="sort_text='Sort 0-9'; reload_exhibits('number', 1)" {{ 'Sort 0-9' | i18next }}
             li role="presentation"
-              a href="#" ng-click="sort_text='Sort 9-0'; reload_exhibits('number', -1)"  Sort 9-0
+              a href="#" ng-click="sort_text='Sort 9-0'; reload_exhibits('number', -1)"  {{ 'Sort 9-0' | i18next }}
             / li role="presentation"
             /   a href="#" ng-click="sort_text='Sort A-Z'; reload_exhibits('name', 1)"  Sort A-Z
             / li role="presentation"
@@ -314,21 +321,21 @@ html lang="en" ng-app="Museum"
 
         .dropdown
           a.dropdown-toggle data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter"
-            | Visibility in mobile application
+            | {{ 'Visibility in mobile application' | i18next }}
             span ng-switch-when="published"
-              |: Everyone  
+              |: {{ 'Everyone' | i18next }}
             span ng-switch-when="passcode"
-              |: Private  
+              |: {{ 'Private' | i18next }}
             span ng-switch-when="opas_invisible"
-              |: Invisible  
+              |: {{ 'Invisible' | i18next }}
             span.caret
           ul.dropdown-menu
             li ng-click="exhibits_visibility_filter = 'published'"
-              a href="#" Everyone
+              a href="#" {{ 'Everyone' | i18next }}
             li ng-click="exhibits_visibility_filter = 'passcode'"
-              a href="#" Private
+              a href="#" {{ 'Private' | i18next }}
             li ng-click="exhibits_visibility_filter = 'opas_invisible'"
-              a href="#" Invisible
+              a href="#" {{ 'Invisible' | i18next }}
 
     .page-wrapper ng-mouseover="show_museum_edit_dropdown=false"
       
@@ -340,24 +347,26 @@ html lang="en" ng-app="Museum"
           .modal-dialog#dummyModal
             .modal-content
               .modal-body
-                h4.modal-title Name of exhibit is empty
+                h4.modal-title 
+                  | {{ 'Name of exhibit is empty' | i18next }}
               .modal-footer
-                  button.btn.btn-default type="button" ng-click="discard()" Discard item
-                  button.btn.btn-default type="button" ng-click="save_as()" Save as "item_{{exhibit.number}}"
+                  button.btn.btn-default type="button" ng-click="discard()" {{ 'Discard item' | i18next }}
+                  button.btn.btn-default type="button" ng-click="save_as()" {{ 'Save as' | i18next }} "item_{{exhibit.number}}"
 
         script type="text/ng-template" id="myMuseumModalContent.html"
           .modal-dialog#new_museum
             .modal-content
               .modal-header
-                h3.modal-title New language
+                h3.modal-title 
+                  | {{ 'New language' | i18next }}
               .modal-body.description
                 form.form-horizontal
                   new-lang-switch museum="museum"
-                  placeholderfield ng-item="museum.stories.dummy" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="museum.stories.dummy.name" type='story'
+                  placeholderfield ng-item="museum.stories.dummy" ng-id="name" ng-title="{{ 'Name' | i18next }}" ng-field="name" ng-help="help text for popup 2" placeholder="museum.stories.dummy.name" type='story'
 
               .modal-footer
-                  button.btn.btn-warning ng-class="{'disabled': museum.stories.dummy.name.length == 0 && museum.language != 'new_lang' }" type="button" ng-click="save_as()" Create
-                  button.btn.btn-default type="button" ng-click="discard()" Cancel
+                  button.btn.btn-warning ng-class="{'disabled': museum.stories.dummy.name.length == 0 && museum.language != 'new_lang' }" type="button" ng-click="save_as()" {{ 'Create' | i18next }}
+                  button.btn.btn-default type="button" ng-click="discard()" {{ 'Cancel' | i18next }}
 
         script type="text/ng-template" id="myModalContent.html"
           .modal-dialog#delete_story
@@ -403,17 +412,17 @@ html lang="en" ng-app="Museum"
                     .form-group
                       label.control-label for="only_default" 
                         input type="radio" name="variant" value="lang" id="only_default" ng-model="variant.checked" ng-checked="variant.checked" 
-                        | Delete museum in {{modal_options.current_language.name}} language (including exhibits an collections)
+                        | {{ 'Delete museum in' | i18next }} {{modal_options.current_language.language | i18next }} {{ 'language (including exhibits an collections)' | i18next }}
                     .form-group
                       label.control-label for="museum_lang_all"
                         input type="radio" name="variant" value="all" id="museum_lang_all" ng-model="variant.checked" ng-checked="variant.checked" 
-                        | Delete whole museum  (including exhibits an collections)
+                        | {{ 'Delete whole museum (including exhibits an collections)' | i18next }}
                   .password
-                    label.control-label for="modal_delete_password" Please, enter your password to confirm deletion
+                    label.control-label for="modal_delete_password" {{ 'Please, enter your password to confirm deletion' | i18next }}
                     input type="password" ng-model="$parent.deletion_password" name="modal_delete_password" id="modal_delete_password"
               .modal-footer
-                  button type="button" class="btn btn-default" ng-click="ok()" Delete
-                  button type="button" class="btn btn-default" ng-click="cancel()" Cancel
+                  button type="button" class="btn btn-default" ng-click="ok()" {{ 'Delete' | i18next }}
+                  button type="button" class="btn btn-default" ng-click="cancel()" {{ 'Cancel' | i18next }}
 
         ul.exhibits
 
@@ -421,7 +430,7 @@ html lang="en" ng-app="Museum"
             #dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{active_exhibit._id}}" model="active_exhibit" selector="fileupload" selector-dropzone="dropzone"
               .wrapper
                 .text
-                  | Drop media files here to attach to this object
+                  | {{ 'Drop media files here to attach to this object' | i18next }}
                 #progress.progress
                   .progress-text
                     | Загружено ... из ..., скорость: 256kb/s
@@ -443,59 +452,61 @@ html lang="en" ng-app="Museum"
               ul.nav.nav-tabs
                 li ng-class="{'active': story_tab == 'main'}"
                   a href="#" ng-click="story_tab = 'main'" 
-                    | Main
+                    | {{ 'Main' | i18next }}
                     span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"
                       i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"
                       i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"
                 li ng-class="{'active': story_tab == 'images' }"
                   a href="#" ng-click="story_tab = 'images'" 
-                    | Images
+                    | {{ 'Images' | i18next }}
                     span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"
                       i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"
                 li ng-class="{'active': story_tab == 'more' }"
-                  a href="#" ng-click="story_tab = 'more'" More
+                  a href="#" ng-click="story_tab = 'more'" {{ 'More' | i18next }}
 
               .tab-content
 
                 .tab-pane ng-class="{'active': story_tab == 'main' }"
                   form.form-horizontal role="form" name="mainForm"
-                    placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="Name" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
-                    audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="Audio" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
-                    placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="Description" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
+                    placeholderfield ng-item="active_exhibit.stories[current_museum.language]" ng-id="name" ng-title="{{ 'Name' | i18next }}" ng-field="name" ng-help="help text for popup 2" placeholder="active_exhibit.stories[current_museum.def_lang].name" type='story'
+                    audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
+                    placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="{{ 'Description' | i18next }}" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
 
                 .tab-pane  ng-class="{'active': story_tab == 'images' }" 
                   label.col-xs-1.control-label 
-                    | Images
-                    span.label.label-danger ng-show="active_exhibit.images.length == 0" Fill to publish
+                    | {{ 'Images' | i18next }}
+                    span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
                   ul.images.col-xs-11
                     li ng-repeat="image in active_exhibit.images"
                       a.img_thumbnail href="#" open-lightbox="{{$index}}"
                         img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
-                      a.remove href="#" data-confirm="Are you sure you wish to delete this image?" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.active_exhibit" rel="nofollow" ×
+                      a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.active_exhibit" rel="nofollow" ×
 
                     li.upload_item
                       .drag_here
                         .img
-                        span Drag images here
+                        span 
+                          | {{ 'Drag images here' | i18next }}
                       .or_upload
-                        span or
+                        span 
+                          | {{ 'or' | i18next }}
                         a.btn.btn-default.upload href="#" button-file-upload=""
-                          | Click to upload
+                          | {{ 'Click to upload' | i18next }}
 
                 .tab-pane ng-class="{'active': story_tab == 'more' }"
                   ul.nav.nav-stacked.nav-list.col-xs-2
                     li ng-class="{'active': story_subtab == 'video' }"
-                      a href="#" ng-click="story_subtab = 'video'" Video
+                      a href="#" ng-click="story_subtab = 'video'" {{ 'Video' | i18next }}
                     li ng-class="{'active': story_subtab == 'qr-code' }"
-                      a href="#" ng-click="story_subtab = 'qr-code'" QR-code
+                      a href="#" ng-click="story_subtab = 'qr-code'" {{ 'QR-code' | i18next }}
                     li ng-class="{'active': story_subtab == 'quiz' }"
-                      a href="#" ng-click="story_subtab = 'quiz'" Quiz
+                      a href="#" ng-click="story_subtab = 'quiz'" {{ 'Quiz' | i18next }}
                     li ng-class="{'active': story_subtab == 'collections' }"
-                      a href="#" ng-click="story_subtab = 'collections'" Used in collections
+                      a href="#" ng-click="story_subtab = 'collections'" {{ 'Used in collections' | i18next }}
                     li ng-class="{'active': story_subtab == 'tours' }"
-                      a href="#" ng-click="story_subtab = 'tours'" Linked in tours
+                      a href="#" ng-click="story_subtab = 'tours'" {{ 'Linked in tours' | i18next }}
                     li ng-class="{'active': story_subtab == 'settings' }"
-                      a href="#" ng-click="story_subtab = 'settings'" Advanced settings
+                      a href="#" ng-click="story_subtab = 'settings'" {{ 'Advanced settings' | i18next }}
 
                   .tab-content.col-xs-10
                     .tab-pane ng-class="{'active': story_subtab == 'video' }"
@@ -505,31 +516,32 @@ html lang="en" ng-app="Museum"
                         .qr_image.col-xs-5
                           img alt="Qr_code" src="{{active_exhibit.stories[current_museum.language].qr_code || '/img/qr_code.png'}}"
                         .well.col-xs-5
-                          a.btn.qr-code href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank" Print QR-code
+                          a.btn.qr-code href="{{active_exhibit.stories[current_museum.language].qr_code}}" target="_blank" {{ 'Print QR-code' | i18next }}
                           br
-                            p You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play.
+                            p 
+                              | {{ "You can print the Exhibit's QR-code and place it near the Exhibit. When the MTG Client reads this code, it will open the Exhibit's page immediately. If there is no MTG Client installed on the user's phone, then it will take the user to a download page on either AppStore or Google Play." | i18next }}
                     .tab-pane ng-class="{'active': story_subtab == 'quiz' }" 
                       .row
                         form.form-horizontal role="form" name="quizform"
                           .switch-toggle.ios switch-toggle="" quiz-switch="story_quiz"
                             input id="story_quiz_enabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" value="published" type="radio" name="story_quiz_enabled" 
-                            label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)" Enable
+                            label for="story_quiz_enabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)" {{ 'Enable' | i18next }}
                             input id="story_quiz_disabled" ng-model="active_exhibit.stories[current_museum.language].quiz.status" value="limited" type="radio" name="story_quiz_enabled"
-                            label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)" Disable
+                            label for="story_quiz_disabled" ng-click="quiz_state(quizform, active_exhibit.stories[current_museum.language].quiz)" {{ 'Disable' | i18next }}
                             a
-                          placeholderfield ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="story_quiz_attributes_question" ng-title="Question" ng-field="question" ng-help="help text for popup" type="quiz"
+                          placeholderfield ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="story_quiz_attributes_question" ng-title="{{ 'Question' | i18next }}" ng-field="question" ng-help="help text for popup" type="quiz"
                           .error
                             .controls
                           .answers
                             quizanswer ng-item="answer" ng-collection="active_exhibit.stories[current_museum.language].quiz.answers" ng-id="story_quiz_attributes_answers_attributes_{{$index}}_content" ng-repeat="answer in active_exhibit.stories[current_museum.language].quiz.answers" type="quiz_answer" field="content"
-                          placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="Description" ng-field="comment" ng-help="help text for popup 3" type="quiz"
+                          placeholdertextarea ng-item="active_exhibit.stories[current_museum.language].quiz" ng-id="quiz_description" ng-title="{{ 'Description' | i18next }}" ng-field="comment" ng-help="help text for popup 3" type="quiz"
                     .tab-pane ng-class="{'active': story_subtab == 'collections' }" 
                       |2222
                     .tab-pane ng-class="{'active': story_subtab == 'tours' }" 
                       |33333
                     .tab-pane ng-class="{'active': story_subtab == 'settings' }"
                       form.form-horizontal role="form" 
-                        placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="OPAS №" ng-field="number" ng-help="help text for popup" type="story_set" placeholder="active_exhibit.number"
+                        placeholderfield ng-item="active_exhibit" ng-id="opas_number" ng-title="{{ 'OPAS №' | i18next }}" ng-field="number" ng-help="help text for popup" type="story_set" placeholder="active_exhibit.number"
 
             / .next-ex
 
@@ -567,8 +579,9 @@ html lang="en" ng-app="Museum"
                 h4 
                   | {{new_exhibit.number || '' }} {{new_exhibit.stories[current_museum.language].name || '' }}
 
-          li ng-repeat="story in stories"
-            | {{story}}
+        div
+          a href="#" ng-click="changeLng('en')" English
+          a href="#" ng-click="changeLng('ru')" Russian
 
     to-top
 
@@ -576,7 +589,8 @@ html lang="en" ng-app="Museum"
     script src="lib/angular/angular-cookies.js"
     script src="lib/ui-bootstrap-tpls-0.6.0.js"
     script src="lib/ui-bootstrap-0.6.0.js"
-    script src="lib/angularLocalStorage.js"      
+    script src="lib/angularLocalStorage.js"
+    script src="lib/ng-i18next.js"
     / jquery part
     script src="lib/jquery-1.10.2.js"
     script src="lib/jquery.scrollTo.js"
@@ -593,6 +607,7 @@ html lang="en" ng-app="Museum"
     script src="lib/jquery.Jcrop.min.js"
     script src="lib/jquery.color.js"
     script src="lib/jquery-scrollspy.js"
+    script src="lib/i18next-1.7.1.js"
     / script src="lib/qrcode.js"
     / app part
     script src="js/app.js"

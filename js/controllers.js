@@ -76,11 +76,13 @@
   };
 
   angular.module("Museum.controllers", []).controller('IndexController', [
-    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', function($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing) {
+    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', function($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) {
       var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
       window.sc = $scope;
-      console.log($routeParams, $location);
       $scope.exhibit_search = '';
+      $scope.changeLng = function(lng) {
+        return $i18next.options.lng = lng;
+      };
       $scope.criteriaMatch = function(criteria) {
         return function(item) {
           var in_string, number_is, result;
@@ -120,9 +122,9 @@
       };
       $scope.museum_change_progress = true;
       ngProgress.color('#fd6e3b');
-      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526e1baa0439f8b01a000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526e1baa0439f8b01a000001";
-      $scope.backend_url = "http://prototype.izi.travel/api";
+      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526a0a26a15cfbe815000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526a0a26a15cfbe815000001";
+      $scope.backend_url = "http://192.168.158.128:3000/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -1293,17 +1295,17 @@
             }
             return _results;
           }).error(function() {
-            return errorProcessing.addError('Failed to update a quiz for story');
+            return errorProcessing.addError($i18next('Failed to update a quiz for story'));
           });
         }).error(function() {
-          return errorProcessing.addError('Failed update a story');
+          return errorProcessing.addError($i18next('Failed update a story'));
         });
       };
       $scope.put_answers = function(answer) {
         return $http.put("" + $scope.backend_url + "/quiz_answer/" + answer._id, answer).success(function(data) {
           return console.log('done');
         }).error(function() {
-          return errorProcessing.addError('Failed to save quiz answer');
+          return errorProcessing.addError($i18next('Failed to save quiz answer'));
         });
       };
       $scope.post_stories = function(original_story, type, callback) {
@@ -1330,17 +1332,17 @@
             }
             return _results;
           }).error(function() {
-            return errorProcessing.addError('Failed to save quiz for new story');
+            return errorProcessing.addError($i18next('Failed to save quiz for new story'));
           });
         }).error(function() {
-          return errorProcessing.addError('Failed to save new story');
+          return errorProcessing.addError($i18next('Failed to save new story'));
         });
       };
       $scope.post_answers = function(answer) {
         return $http.post("" + $scope.backend_url + "/quiz_answer/", answer).success(function(data) {
           return answer._id = data._id;
         }).error(function() {
-          return errorProcessing.addError('Failed to save quiz answer');
+          return errorProcessing.addError($i18next('Failed to save quiz answer'));
         });
       };
       $scope.mass_switch_pub = function(value) {
@@ -1408,14 +1410,14 @@
             return callback(stories, lang);
           }
         }).error(function() {
-          return errorProcessing.addError('Failed to delete story in languane: ' + $scope.translations[lang]);
+          return errorProcessing.addError($i18next('Failed to delete story in languane: ') + $scope.translations[lang]);
         });
       };
       $scope.delete_story_set = function(target_exhibit) {
         return $http["delete"]("" + $scope.backend_url + "/story_set/" + target_exhibit._id + "/").success(function(data) {
           return console.log(data);
         }).error(function() {
-          return errorProcessing.addError('Failed to delete exhibit with number' + target_exhibit.number);
+          return errorProcessing.addError($i18next('Failed to delete exhibit with number ') + target_exhibit.number);
         });
       };
       $scope.$watch('current_museum.language', function(newValue, oldValue) {
@@ -1428,7 +1430,7 @@
                 console.log(data);
                 return $scope.last_save_time = new Date();
               }).error(function(error) {
-                return errorProcessing.addError('Failed to save museum language');
+                return errorProcessing.addError($i18next('Failed to save museum language'));
               });
             }
           } else {
@@ -1458,7 +1460,7 @@
           }
           return dropDown.find('.item_publish_settings').show();
         }).error(function() {
-          return errorProcessing.addError('Failed to save new exhibit');
+          return errorProcessing.addError($i18next('Failed to save new exhibit'));
         });
         $scope.new_item_creation = false;
         return $scope.$digest();
@@ -1470,7 +1472,7 @@
             $scope.last_save_time = new Date();
             return console.log(data);
           }).error(function() {
-            return errorProcessing.addError('Server error - Prototype error.');
+            return errorProcessing.addError($i18next('Server error - Prototype error.'));
           });
           return $scope.forbid_switch = false;
         }
@@ -1487,7 +1489,7 @@
             console.log(data);
             return $scope.last_save_time = new Date();
           }).error(function() {
-            return errorProcessing.addError('Failed to update quiz');
+            return errorProcessing.addError($i18next('Failed to update quiz'));
           });
         }
         return $scope.forbid_switch = false;

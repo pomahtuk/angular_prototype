@@ -76,7 +76,7 @@ angular.module("Museum.directives", [])
     true
 
 # Custom HTML elements
-.directive "switchpubitem", ($timeout, storySetValidation) ->
+.directive "switchpubitem", ($timeout, storySetValidation, $i18next) ->
   restrict: "E"
   replace: true
   transclude: true
@@ -95,8 +95,8 @@ angular.module("Museum.directives", [])
         <div class="extra">
           <i class="icon-globe"></i>
         </div>
-        <span ng-switch-default>Publish</span>
-        <span ng-switch-when="published">Published</span>
+        <span ng-switch-default>{{ 'Publish' | i18next }}</span>
+        <span ng-switch-when="published">{{ 'Published' | i18next }}</span>
       </button>
 
 
@@ -104,8 +104,8 @@ angular.module("Museum.directives", [])
         <div class="extra">
           <i class="icon-lock"></i>
         </div>
-        <span ng-switch-when="passcode">Private</span>
-        <span ng-switch-when="published">Make private</span>
+        <span ng-switch-when="passcode">{{ 'Private' | i18next }}</span>
+        <span ng-switch-when="published">{{ 'Make private' | i18next }}</span>
       </button>
 
 
@@ -113,7 +113,7 @@ angular.module("Museum.directives", [])
         <div class="extra">
           <i class="icon-eye-close"></i>
         </div>
-        <span>Invisible</span>
+        <span>{{ 'Invisible' | i18next }}</span>
         <!--<span>Make private</span>-->
       </button>
 
@@ -126,12 +126,12 @@ angular.module("Museum.directives", [])
       <ul class="dropdown-menu">
         <li ng-hide="item.status == 'opas_invisible'">
           <a href="#" ng-click="item.status = 'opas_invisible'; status_process()">
-            <i class="icon-eye-close"></i> Make invisible
+            <i class="icon-eye-close"></i> {{ 'Make invisible' | i18next }}
           </a>
         </li>
         <li ng-hide="item.status == 'passcode'  || item.status == 'published'">
           <a href="#" ng-click="item.status = 'passcode'; status_process()">
-            <i class="icon-lock"></i> Make private
+            <i class="icon-lock"></i> {{ 'Make private' | i18next }}
           </a>
         </li>
       </ul>
@@ -181,14 +181,14 @@ angular.module("Museum.directives", [])
     museum: '=museum'
   template: """
     <div class="form-group">
-      <label class="col-xs-2 control-label" for="museum_language_select">Language</label>
-      <div class="help ng-scope" popover="Select language" popover-animation="true" popover-placement="bottom" popover-trigger="mouseenter">
+      <label class="col-xs-2 control-label" for="museum_language_select">{{ 'Language' | i18next }}</label>
+      <div class="help ng-scope" popover="{{ 'Select language' | i18next }}" popover-animation="true" popover-placement="bottom" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
       <div class="col-xs-6 triggered">
         <select class="form-control" ng-model="museum.language">
-          <option disabled="" selected="" value="dummy">Select a new language</option>
-          <option value="{{translation}}" ng-repeat="(translation, lang) in $parent.$parent.translations">{{lang}}</option>
+          <option disabled="" selected="" value="dummy">{{ 'Select a new language' | i18next }}</option>
+          <option value="{{translation}}" ng-repeat="(translation, lang) in $parent.$parent.translations">{{translation | i18next }}</option>
         </select>
      </div>
     </div>
@@ -226,7 +226,7 @@ angular.module("Museum.directives", [])
         <i class="icon-question-sign"></i>
       </div>
       {{active_exhibit}}
-      <span class="empty_name_error {{field}}">can't be empty</span>
+      <span class="empty_name_error {{field}}">{{ "can't be empty" | i18next }}</span>
       <div class="col-xs-7 trigger">
         <span class="placeholder" ng-click="update_old()">{{item[field]}}</span>
       </div>
@@ -268,7 +268,6 @@ angular.module("Museum.directives", [])
     control = element.find('.triggered > .form-control')
     additional = triggered.find('.additional_controls')
 
-
     element.find('span.placeholder').click ->
       trigger.hide()
       triggered.show()
@@ -282,12 +281,10 @@ angular.module("Museum.directives", [])
     element.find('.triggered > .form-control').blur ->
       elem = $ @
       value = elem.val()
-      console.log 'bluring'
       $timeout ->
         unless scope.$parent.new_item_creation && scope.field is 'number'
           scope.item[scope.field] = value
           scope.$digest()
-          console.log 'now saving'
           if elem.val().length > 0
             scope.status_process()
           else
@@ -349,7 +346,7 @@ angular.module("Museum.directives", [])
 
     true
 
-.directive "placeholdertextarea", ($timeout, storySetValidation) ->
+.directive "placeholdertextarea", ($timeout, storySetValidation, $i18next) ->
   restrict: "E"
   replace: true
   require: "?ngModel"
@@ -366,7 +363,7 @@ angular.module("Museum.directives", [])
     <div class="form-group textfield large_field">
       <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">
         {{title}}
-        <span class="label label-danger" ng-show="field == 'long_description' && item[field].length == 0">Fill to publish</span>
+        <span class="label label-danger" ng-show="field == 'long_description' && item[field].length == 0">{{ "Fill to publish" | i18next }}</span>
       </label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
@@ -415,7 +412,7 @@ angular.module("Museum.directives", [])
       triggered.show()
       control.text scope.item[scope.field]
       control.focus()
-      scope.length_text = "#{scope.max_length - control.text().length} symbols left"
+      scope.length_text = "#{scope.max_length - control.text().length} #{$i18next('symbols left')}"
       sumbols_left.show()
 
     control.focus ->
@@ -440,14 +437,14 @@ angular.module("Museum.directives", [])
       value = elem.text()
       if value.length > scope.max_length
         elem.text value.substr(0, scope.max_length)
-      scope.length_text = "#{scope.max_length - value.length}  symbols left"
+      scope.length_text = "#{scope.max_length - value.length} #{$i18next('symbols left')}"
       scope.$digest()
 
     scope.$watch 'item[field]', (newValue, oldValue) ->
       scope.max_length ||= 2000
       
       unless newValue
-        scope.length_text = "2000 symbols left"
+        scope.length_text = "2000 #{$i18next('symbols left')}"
         control.text ''
         trigger.hide()
         triggered.show()
@@ -457,7 +454,7 @@ angular.module("Museum.directives", [])
           storySetValidation.checkValidity {item: scope.item, root: scope.$parent.active_exhibit, field_type: 'story'}
       else
         additional.show()
-        scope.length_text = "осталось символов: #{scope.max_length - newValue.length}"
+        scope.length_text = "#{scope.max_length - newValue.length} #{$i18next('symbols left')}"
         # if newValue.length >= scope.max_length
         #   scope.item[scope.field] = newValue.substr(0, scope.max_length-1)
         if scope.$parent.element_switch is true
@@ -480,7 +477,7 @@ angular.module("Museum.directives", [])
   template: """
     <div class="form-group textfield string optional checkbox_added">
       <label class="string optional control-label col-xs-2" for="{{id}}">
-        <span class='correct_answer_indicator'>correct</span>
+        <span class='correct_answer_indicator'>{{ "correct" | i18next }}</span>
       </label>
       <input class="coorect_answer_radio" name="correct_answer" type="radio" value="{{item._id}}" ng-model="checked" ng-click="check_items(item)">
       <div class="col-xs-5 trigger">
@@ -488,7 +485,7 @@ angular.module("Museum.directives", [])
       </div>
       <div class="col-xs-5 triggered">
         <input class="form-control" id="{{id}}" name="{{item._id}}" placeholder="Enter option" type="text" ng-model="item[field]" required>
-        <div class="error_text">can't be blank</div>
+        <div class="error_text">{{ "can't be blank" | i18next }}</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
@@ -563,7 +560,7 @@ angular.module("Museum.directives", [])
     <div class="statuses">
       <div class='preloader' ng-show="item=='progress'"></div>
       <div class="save_status" ng-show="item=='done'">
-        <i class="icon-ok-sign"></i>saved
+        <i class="icon-ok-sign"></i>{{ "saved" | i18next }}
       </div>
     </div>
   """
@@ -600,11 +597,11 @@ angular.module("Museum.directives", [])
   template: """
     <div class="form-group audio">
       <label class="col-xs-2 control-label" for="audio">
-        Audio
-        <span class="label label-danger" ng-show="edit_mode == 'empty'">Fill to publish</span>
+        {{ "Audio" | i18next }}
+        <span class="label label-danger" ng-show="edit_mode == 'empty'">{{ "Fill to publish" | i18next }}</span>
       </label>
       <div class="help">
-        <i class="icon-question-sign" data-content="Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system." data-placement="bottom"></i>
+        <i class="icon-question-sign" data-content="{{ "Supplementary field." | i18next }}" data-placement="bottom"></i>
       </div>
       <div class="col-xs-9 trigger" ng-show="edit_mode == 'value'">
         <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
@@ -662,7 +659,7 @@ angular.module("Museum.directives", [])
       </div>
       <div class="col-xs-9 processing" ng-show="edit_mode == 'processing'">
         <img class="upload_audio" src="/img/medium_loader.GIF" style="float: left;"/> 
-        <span>&nbsp;&nbsp;processing audio</span>
+        <span>{{ "&nbsp;&nbsp;processing audio" | i18next }}</span>
       </div>
       <status-indicator ng-binding="item" ng-field="field"></statusIndicator>
     </div>
@@ -718,10 +715,10 @@ angular.module("Museum.directives", [])
     <div class="searches">
       <div class="search" ng-hide="museum_search_visible" ng-click="museum_search_visible=true; museum_input_focus = true">
         <i class="icon-search"></i>
-        <a href="#">{{item || 'Search'}}</a>
+        <a href="#">{{item || 'Search' | i18next }}</a>
       </div>
       <div class="search_input" ng-show="museum_search_visible">
-        <input class="form-control" ng-model="item" placeholder="Search" type="text" focus-me="museum_input_focus">
+        <input class="form-control" ng-model="item" placeholder="{{ "Search" | i18next }}" type="text" focus-me="museum_input_focus">
         <a class="search_reset" href="#" ng-click="item=''">
           <i class="icon-remove-sign"></i>
         </a>
@@ -748,7 +745,7 @@ angular.module("Museum.directives", [])
   link: (scope, element, attrs) ->
     true
 
-.directive 'canDragAndDrop', (errorProcessing) ->
+.directive 'canDragAndDrop', (errorProcessing, $i18next) ->
   restrict : 'A'
   scope:
     model: '=model'
@@ -815,10 +812,10 @@ angular.module("Museum.directives", [])
             if type is 'audio'
               scope.model.stories[scope.$parent.current_museum.language].audio = 'processing'
           else
-            errorProcessing.addError 'File is bigger than 50mb'
+            errorProcessing.addError $i18next 'File is bigger than 50mb'
             hide_drop_area()
         else
-          errorProcessing.addError 'Unsupported file type'
+          errorProcessing.addError $i18next 'Unsupported file type'
           hide_drop_area()
       success: (result) ->
         console.log result, scope.model
@@ -836,15 +833,15 @@ angular.module("Museum.directives", [])
       error: (result, status, errorThrown) ->
         console.log status, result, errorThrown
         if errorThrown == 'abort'
-          errorProcessing.addError 'Uploading aborted'
+          errorProcessing.addError $i18next 'Uploading aborted'
         else
           if result.status == 422
             response = jQuery.parseJSON(result.responseText)
             responseText = response.link[0]
-            rrorProcessing.addError 'Error during file upload. Prototype error'
+            rrorProcessing.addError $i18next 'Error during file upload. Prototype error'
           else
-            errorProcessing.addError 'Error during file upload. Prototype error'
-        errorProcessing.addError 'Error during file upload. Prototype error'
+            errorProcessing.addError $i18next 'Error during file upload. Prototype error'
+        errorProcessing.addError $i18next 'Error during file upload. Prototype error'
         hide_drop_area()
       progressall: (e, data) ->
         progress = parseInt(data.loaded / data.total * 100, 10)
@@ -854,7 +851,7 @@ angular.module("Museum.directives", [])
         if speed > 1000
           speed =  Math.round(speed / delimiter) / 10
           speed_text = "#{speed} Мб/с"
-        $(".progress .progress-text").html "&nbsp;&nbsp; Загружено #{Math.round(data.loaded / 1024)} Кб из #{Math.round(data.total / 1024)} Кб, скорость: #{speed_text}"
+        $(".progress .progress-text").html "#{$i18next('&nbsp;&nbsp; Uploaded')} #{Math.round(data.loaded / 1024)} #{$i18next('Kb of')} #{Math.round(data.total / 1024)} #{$i18next('Kb, speed:')} #{speed_text}"
         $(".progress .progress-bar").css "width", progress + "%"
         if data.loaded is data.total
           scope.$parent.last_save_time = new Date()
@@ -1053,7 +1050,7 @@ angular.module("Museum.directives", [])
       lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
     true
 
-.directive 'lightboxCropper', ($http, errorProcessing) ->
+.directive 'lightboxCropper', ($http, errorProcessing, $i18next) ->
   restrict: "E"
   replace: true
   transclude: true
@@ -1062,12 +1059,12 @@ angular.module("Museum.directives", [])
   template: """
     <div class="lightbox_area">
       <div class="explain_text">
-        Select the preview area. Images won't crop. You can always return to this later on.
+        {{ "Select the preview area. Images won't crop. You can always return to this later on." | i18next }}
       </div>
-      <button class="btn btn-warning apply_resize" type="button">Done</button>
+      <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
       <div class="content">
         <div class="preview">
-          PREVIEW
+          {{ "PREVIEW" | i18next }}
           <div class="mobile">
             <div class="image">
               <img src="{{model.images[active_image_index].url}}">
@@ -1085,8 +1082,8 @@ angular.module("Museum.directives", [])
         <div class="thumb item_{{$index}}" ng-class="{'active':image.active}" ng-repeat="image in model.images">
           <img ng-click="set_index($index)" src="{{image.thumbnailUrl}}" >
           <a class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch on="image.cover">
-            <span ng-switch-when="true"><i class="icon-ok"></i> Cover</span>
-            <span ng-switch-default><i class="icon-ok"></i> Set cover</span>
+            <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
+            <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
           </a>
         </div>
         <a class="right" href="#" ng-click="set_index(active_image_index + 1)">
@@ -1116,7 +1113,7 @@ angular.module("Museum.directives", [])
         $http.put("#{$scope.$parent.backend_url}/media/#{image._id}", image).success (data) ->
           console.log 'ok'
         .error ->
-          errorProcessing.addError 'Failed to set cover' 
+          errorProcessing.addError $i18next 'Failed to set cover' 
 
     $scope.check_active_image = ->
       for image, index in $scope.model.images
@@ -1158,7 +1155,7 @@ angular.module("Museum.directives", [])
         callback() if callback
         return true
       .error ->
-        errorProcessing.addError 'Failed to update a thumbnail'
+        errorProcessing.addError $i18next 'Failed to update a thumbnail'
         return false
 
     showPreview = (coords) ->
@@ -1241,7 +1238,7 @@ angular.module("Museum.directives", [])
 
     true
 
-.directive 'switchToggle', ($timeout) ->
+.directive 'switchToggle', ($timeout, $i18next) ->
   restrict: 'A'
   controller:  ($scope, $rootScope, $element, $attrs, $http) ->
     selector = $attrs['quizSwitch']
@@ -1252,7 +1249,7 @@ angular.module("Museum.directives", [])
           $http.put("#{$scope.backend_url}/quiz/#{item._id}", item).success (data) ->
             console.log data
           .error ->
-            errorProcessing.addError 'Failed to save quiz state'
+            errorProcessing.addError $i18next 'Failed to save quiz state'
           true
         , 0
       else
@@ -1276,12 +1273,12 @@ angular.module("Museum.directives", [])
     $("##{selector}_enabled, ##{selector}_disabled").change ->
       elem = $ @
       if elem.attr('id') is "#{selector}_enabled"
-        $("label[for=#{selector}_enabled]").text('Enabled')
-        $("label[for=#{selector}_disabled]").text('Disable')
+        $("label[for=#{selector}_enabled]").text($i18next('Enabled'))
+        $("label[for=#{selector}_disabled]").text($i18next('Disable'))
         true
       else
-        $("label[for=#{selector}_disabled]").text('Disabled')
-        $("label[for=#{selector}_enabled]").text('Enable')
+        $("label[for=#{selector}_disabled]").text($i18next('Disabled'))
+        $("label[for=#{selector}_enabled]").text($i18next('Enable'))
         true
 
 .directive 'errorNotification', (errorProcessing) ->

@@ -1730,6 +1730,7 @@ a
           color: #fff
           line-height: 20px
           margin-left: -2px
+          text-align: left
 
         &.active
           visibility: visible
@@ -1751,3 +1752,9 @@ a
 
       &.active img
         border: 2px solid $exhibitTextColorHover
+
+
+.tab-content > .active, .pill-content > .active
+  display: block
+  overflow-y: auto
+  overflow-x: hidden

@@ -106,7 +106,7 @@
         return true;
       }
     };
-  }).directive("switchpubitem", function($timeout, storySetValidation) {
+  }).directive("switchpubitem", function($timeout, storySetValidation, $i18next) {
     return {
       restrict: "E",
       replace: true,
@@ -121,7 +121,7 @@
         field_type: '@type',
         root: '=root'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>Publish</span>\n    <span ng-switch-when=\"published\">Published</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">Private</span>\n    <span ng-switch-when=\"published\">Make private</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>Invisible</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> Make invisible\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'  || item.status == 'published'\">\n      <a href=\"#\" ng-click=\"item.status = 'passcode'; status_process()\">\n        <i class=\"icon-lock\"></i> Make private\n      </a>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>{{ 'Publish' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Published' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">{{ 'Private' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Make private' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>{{ 'Invisible' | i18next }}</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> {{ 'Make invisible' | i18next }}\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'  || item.status == 'published'\">\n      <a href=\"#\" ng-click=\"item.status = 'passcode'; status_process()\">\n        <i class=\"icon-lock\"></i> {{ 'Make private' | i18next }}\n      </a>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs, storySetValidation) {
         return $scope.status_process = function() {
           return storySetValidation.checkValidity($scope);
@@ -162,7 +162,7 @@
       scope: {
         museum: '=museum'
       },
-      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"museum_language_select\">Language</label>\n  <div class=\"help ng-scope\" popover=\"Select language\" popover-animation=\"true\" popover-placement=\"bottom\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-xs-6 triggered\">\n    <select class=\"form-control\" ng-model=\"museum.language\">\n      <option disabled=\"\" selected=\"\" value=\"dummy\">Select a new language</option>\n      <option value=\"{{translation}}\" ng-repeat=\"(translation, lang) in $parent.$parent.translations\">{{lang}}</option>\n    </select>\n </div>\n</div>",
+      template: "<div class=\"form-group\">\n  <label class=\"col-xs-2 control-label\" for=\"museum_language_select\">{{ 'Language' | i18next }}</label>\n  <div class=\"help ng-scope\" popover=\"{{ 'Select language' | i18next }}\" popover-animation=\"true\" popover-placement=\"bottom\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-xs-6 triggered\">\n    <select class=\"form-control\" ng-model=\"museum.language\">\n      <option disabled=\"\" selected=\"\" value=\"dummy\">{{ 'Select a new language' | i18next }}</option>\n      <option value=\"{{translation}}\" ng-repeat=\"(translation, lang) in $parent.$parent.translations\">{{translation | i18next }}</option>\n    </select>\n </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         return true;
       },
@@ -192,7 +192,7 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield {{field}}\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">can't be empty</span>\n  <div class=\"col-xs-7 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-7 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required>\n    <input type=\"text\" class=\"form-control\" id=\"{{id}}\" value=\"{{item[field]}}\" placeholder=\"{{placeholder}}\">\n    <div class=\"additional_controls\">\n      <a href=\"#\" class=\"apply\"><i class=\"icon-ok\"></i></a>\n      <!--<a href=\"#\" class=\"cancel\"><i class=\"icon-remove\"></i></a>-->\n    </div>\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield {{field}}\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">{{ \"can't be empty\" | i18next }}</span>\n  <div class=\"col-xs-7 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-7 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required>\n    <input type=\"text\" class=\"form-control\" id=\"{{id}}\" value=\"{{item[field]}}\" placeholder=\"{{placeholder}}\">\n    <div class=\"additional_controls\">\n      <a href=\"#\" class=\"apply\"><i class=\"icon-ok\"></i></a>\n      <!--<a href=\"#\" class=\"cancel\"><i class=\"icon-remove\"></i></a>-->\n    </div>\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -239,12 +239,10 @@
           var elem, value;
           elem = $(this);
           value = elem.val();
-          console.log('bluring');
           return $timeout(function() {
             if (!(scope.$parent.new_item_creation && scope.field === 'number')) {
               scope.item[scope.field] = value;
               scope.$digest();
-              console.log('now saving');
               if (elem.val().length > 0) {
                 scope.status_process();
               } else {
@@ -310,7 +308,7 @@
         return true;
       }
     };
-  }).directive("placeholdertextarea", function($timeout, storySetValidation) {
+  }).directive("placeholdertextarea", function($timeout, storySetValidation, $i18next) {
     return {
       restrict: "E",
       replace: true,
@@ -325,7 +323,7 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield large_field\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">\n    {{title}}\n    <span class=\"label label-danger\" ng-show=\"field == 'long_description' && item[field].length == 0\">Fill to publish</span>\n  </label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-xs-7 trigger\">\n    <div class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</div>\n  </div>\n  <div class=\"col-xs-7 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required\">\n    <div class=\"content_editable\" contenteditable=\"true\" id=\"{{id}}\" placeholder=\"{{placeholder}}\">{{item[field]}}</div>\n    <div class=\"additional_controls\">\n      <a href=\"#\" class=\"apply\"><i class=\"icon-ok\"></i></a>\n      <!--<a href=\"#\" class=\"cancel\"><i class=\"icon-remove\"></i></a>-->\n    </div>\n  </div>\n  <span class=\"sumbols_left\">\n    {{length_text}}\n  </span>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield large_field\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">\n    {{title}}\n    <span class=\"label label-danger\" ng-show=\"field == 'long_description' && item[field].length == 0\">{{ \"Fill to publish\" | i18next }}</span>\n  </label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  <div class=\"col-xs-7 trigger\">\n    <div class=\"placeholder large\" ng-click=\"update_old()\">{{item[field]}}</div>\n  </div>\n  <div class=\"col-xs-7 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required\">\n    <div class=\"content_editable\" contenteditable=\"true\" id=\"{{id}}\" placeholder=\"{{placeholder}}\">{{item[field]}}</div>\n    <div class=\"additional_controls\">\n      <a href=\"#\" class=\"apply\"><i class=\"icon-ok\"></i></a>\n      <!--<a href=\"#\" class=\"cancel\"><i class=\"icon-remove\"></i></a>-->\n    </div>\n  </div>\n  <span class=\"sumbols_left\">\n    {{length_text}}\n  </span>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -357,7 +355,7 @@
           triggered.show();
           control.text(scope.item[scope.field]);
           control.focus();
-          scope.length_text = "" + (scope.max_length - control.text().length) + " symbols left";
+          scope.length_text = "" + (scope.max_length - control.text().length) + " " + ($i18next('symbols left'));
           return sumbols_left.show();
         });
         control.focus(function() {
@@ -386,13 +384,13 @@
           if (value.length > scope.max_length) {
             elem.text(value.substr(0, scope.max_length));
           }
-          scope.length_text = "" + (scope.max_length - value.length) + "  symbols left";
+          scope.length_text = "" + (scope.max_length - value.length) + " " + ($i18next('symbols left'));
           return scope.$digest();
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           scope.max_length || (scope.max_length = 2000);
           if (!newValue) {
-            scope.length_text = "2000 symbols left";
+            scope.length_text = "2000 " + ($i18next('symbols left'));
             control.text('');
             trigger.hide();
             triggered.show();
@@ -406,7 +404,7 @@
             }
           } else {
             additional.show();
-            scope.length_text = "осталось символов: " + (scope.max_length - newValue.length);
+            scope.length_text = "" + (scope.max_length - newValue.length) + " " + ($i18next('symbols left'));
             if (scope.$parent.element_switch === true) {
               trigger.show();
               triggered.hide();
@@ -430,7 +428,7 @@
         field: '@field',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator'>correct</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" required>\n    <div class=\"error_text\">can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield string optional checkbox_added\">\n  <label class=\"string optional control-label col-xs-2\" for=\"{{id}}\">\n    <span class='correct_answer_indicator'>{{ \"correct\" | i18next }}</span>\n  </label>\n  <input class=\"coorect_answer_radio\" name=\"correct_answer\" type=\"radio\" value=\"{{item._id}}\" ng-model=\"checked\" ng-click=\"check_items(item)\">\n  <div class=\"col-xs-5 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-5 triggered\">\n    <input class=\"form-control\" id=\"{{id}}\" name=\"{{item._id}}\" placeholder=\"Enter option\" type=\"text\" ng-model=\"item[field]\" required>\n    <div class=\"error_text\">{{ \"can't be blank\" | i18next }}</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -519,7 +517,7 @@
         item: '=ngBinding',
         field: '=ngField'
       },
-      template: "<div class=\"statuses\">\n  <div class='preloader' ng-show=\"item=='progress'\"></div>\n  <div class=\"save_status\" ng-show=\"item=='done'\">\n    <i class=\"icon-ok-sign\"></i>saved\n  </div>\n</div>",
+      template: "<div class=\"statuses\">\n  <div class='preloader' ng-show=\"item=='progress'\"></div>\n  <div class=\"save_status\" ng-show=\"item=='done'\">\n    <i class=\"icon-ok-sign\"></i>{{ \"saved\" | i18next }}\n  </div>\n</div>",
       link: function(scope, element, attrs) {
         scope.$watch('item', function(newValue, oldValue) {
           if (newValue) {
@@ -554,7 +552,7 @@
         field: '@ngField',
         parent: '=parent'
       },
-      template: "<div class=\"form-group audio\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">\n    Audio\n    <span class=\"label label-danger\" ng-show=\"edit_mode == 'empty'\">Fill to publish</span>\n  </label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"Supplementary field. You may indicate the exhibit’s inventory, or any other number, that will help you to identify the exhibit within your own internal information system.\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-9 trigger\" ng-show=\"edit_mode == 'value'\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-timeline\">\n          <div class=\"dropdown\">\n            <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n            <ul class=\"dropdown-menu\" role=\"menu\">\n              <li role=\"presentation\">\n                <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n              </li>\n              <li role=\"presentation\">\n                <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n              </li>\n              <li role=\"presentation\">\n                <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n              </li>\n            </ul>\n          </div>\n          <div class=\"jp-progress\">\n            <div class=\"jp-seek-bar\">\n              <div class=\"jp-play-bar\">\n              </div>\n            </div>\n          </div>\n          <div class=\"jp-time-holder\">\n            <div class=\"jp-current-time\">\n            </div>\n            <div class=\"jp-duration\">\n            </div>\n          </div>\n          <div class=\"jp-no-solution\">\n            <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode == 'empty'\">\n    <img class=\"upload_audio\" src=\"/img/audio_drag.png\" />\n    <span>drag audio here or </span>\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Click to upload</a>\n  </div>\n  <div class=\"col-xs-9 processing\" ng-show=\"edit_mode == 'processing'\">\n    <img class=\"upload_audio\" src=\"/img/medium_loader.GIF\" style=\"float: left;\"/> \n    <span>&nbsp;&nbsp;processing audio</span>\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group audio\">\n  <label class=\"col-xs-2 control-label\" for=\"audio\">\n    {{ \"Audio\" | i18next }}\n    <span class=\"label label-danger\" ng-show=\"edit_mode == 'empty'\">{{ \"Fill to publish\" | i18next }}</span>\n  </label>\n  <div class=\"help\">\n    <i class=\"icon-question-sign\" data-content=\"{{ \"Supplementary field.\" | i18next }}\" data-placement=\"bottom\"></i>\n  </div>\n  <div class=\"col-xs-9 trigger\" ng-show=\"edit_mode == 'value'\">\n    <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n    </div>\n    <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n      <div class=\"jp-type-single\">\n        <div class=\"jp-gui jp-interface\">\n          <ul class=\"jp-controls\">\n            <li>\n            <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n            <li>\n            <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n            </li>\n          </ul>\n        </div>\n        <div class=\"jp-timeline\">\n          <div class=\"dropdown\">\n            <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" id=\"visibility_filter\">{{item[field].name}}<span class=\"caret\"></span></a>\n            <ul class=\"dropdown-menu\" role=\"menu\">\n              <li role=\"presentation\">\n                <a href=\"#\" class=\"replace_media\" data-confirm=\"Are you sure you wish to replace this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{item[field]._id}}\">Replace</a>\n              </li>\n              <li role=\"presentation\">\n                <a href=\"{{item[field].url}}\" target=\"_blank\">Download</a>\n              </li>\n              <li role=\"presentation\">\n                <a class=\"remove\" href=\"#\" data-confirm=\"Are you sure you wish to delete this audio?\" data-method=\"delete\" data-link=\"{{$parent.$parent.backend_url}}/media/{{media._id}}\" delete-media=\"\" stop-event=\"\" media=\"item[field]\" parent=\"item\">Delete</a>\n              </li>\n            </ul>\n          </div>\n          <div class=\"jp-progress\">\n            <div class=\"jp-seek-bar\">\n              <div class=\"jp-play-bar\">\n              </div>\n            </div>\n          </div>\n          <div class=\"jp-time-holder\">\n            <div class=\"jp-current-time\">\n            </div>\n            <div class=\"jp-duration\">\n            </div>\n          </div>\n          <div class=\"jp-no-solution\">\n            <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"triggered\" ng-show=\"edit_mode == 'empty'\">\n    <img class=\"upload_audio\" src=\"/img/audio_drag.png\" />\n    <span>drag audio here or </span>\n    <a href=\"#\" class=\"btn btn-default\" button-file-upload=\"\">Click to upload</a>\n  </div>\n  <div class=\"col-xs-9 processing\" ng-show=\"edit_mode == 'processing'\">\n    <img class=\"upload_audio\" src=\"/img/medium_loader.GIF\" style=\"float: left;\"/> \n    <span>{{ \"&nbsp;&nbsp;processing audio\" | i18next }}</span>\n  </div>\n  <status-indicator ng-binding=\"item\" ng-field=\"field\"></statusIndicator>\n</div>",
       link: function(scope, element, attrs) {
         scope.edit_mode = false;
         element = $(element);
@@ -603,7 +601,7 @@
       scope: {
         item: '=ngModel'
       },
-      template: "<div class=\"searches\">\n  <div class=\"search\" ng-hide=\"museum_search_visible\" ng-click=\"museum_search_visible=true; museum_input_focus = true\">\n    <i class=\"icon-search\"></i>\n    <a href=\"#\">{{item || 'Search'}}</a>\n  </div>\n  <div class=\"search_input\" ng-show=\"museum_search_visible\">\n    <input class=\"form-control\" ng-model=\"item\" placeholder=\"Search\" type=\"text\" focus-me=\"museum_input_focus\">\n    <a class=\"search_reset\" href=\"#\" ng-click=\"item=''\">\n      <i class=\"icon-remove-sign\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"searches\">\n  <div class=\"search\" ng-hide=\"museum_search_visible\" ng-click=\"museum_search_visible=true; museum_input_focus = true\">\n    <i class=\"icon-search\"></i>\n    <a href=\"#\">{{item || 'Search' | i18next }}</a>\n  </div>\n  <div class=\"search_input\" ng-show=\"museum_search_visible\">\n    <input class=\"form-control\" ng-model=\"item\" placeholder=\"{{ \"Search\" | i18next }}\" type=\"text\" focus-me=\"museum_input_focus\">\n    <a class=\"search_reset\" href=\"#\" ng-click=\"item=''\">\n      <i class=\"icon-remove-sign\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element) {
         $scope.museum_search_visible = false;
         $scope.museum_input_focus = false;
@@ -633,7 +631,7 @@
         return true;
       }
     };
-  }).directive('canDragAndDrop', function(errorProcessing) {
+  }).directive('canDragAndDrop', function(errorProcessing, $i18next) {
     return {
       restrict: 'A',
       scope: {
@@ -713,11 +711,11 @@
                   return scope.model.stories[scope.$parent.current_museum.language].audio = 'processing';
                 }
               } else {
-                errorProcessing.addError('File is bigger than 50mb');
+                errorProcessing.addError($i18next('File is bigger than 50mb'));
                 return hide_drop_area();
               }
             } else {
-              errorProcessing.addError('Unsupported file type');
+              errorProcessing.addError($i18next('Unsupported file type'));
               return hide_drop_area();
             }
           },
@@ -748,17 +746,17 @@
             var response, responseText;
             console.log(status, result, errorThrown);
             if (errorThrown === 'abort') {
-              errorProcessing.addError('Uploading aborted');
+              errorProcessing.addError($i18next('Uploading aborted'));
             } else {
               if (result.status === 422) {
                 response = jQuery.parseJSON(result.responseText);
                 responseText = response.link[0];
-                rrorProcessing.addError('Error during file upload. Prototype error');
+                rrorProcessing.addError($i18next('Error during file upload. Prototype error'));
               } else {
-                errorProcessing.addError('Error during file upload. Prototype error');
+                errorProcessing.addError($i18next('Error during file upload. Prototype error'));
               }
             }
-            errorProcessing.addError('Error during file upload. Prototype error');
+            errorProcessing.addError($i18next('Error during file upload. Prototype error'));
             return hide_drop_area();
           },
           progressall: function(e, data) {
@@ -771,7 +769,7 @@
               speed = Math.round(speed / delimiter) / 10;
               speed_text = "" + speed + " Мб/с";
             }
-            $(".progress .progress-text").html("&nbsp;&nbsp; Загружено " + (Math.round(data.loaded / 1024)) + " Кб из " + (Math.round(data.total / 1024)) + " Кб, скорость: " + speed_text);
+            $(".progress .progress-text").html("" + ($i18next('&nbsp;&nbsp; Uploaded')) + " " + (Math.round(data.loaded / 1024)) + " " + ($i18next('Kb of')) + " " + (Math.round(data.total / 1024)) + " " + ($i18next('Kb, speed:')) + " " + speed_text);
             $(".progress .progress-bar").css("width", progress + "%");
             if (data.loaded === data.total) {
               scope.$parent.last_save_time = new Date();
@@ -1048,7 +1046,7 @@
         return true;
       }
     };
-  }).directive('lightboxCropper', function($http, errorProcessing) {
+  }).directive('lightboxCropper', function($http, errorProcessing, $i18next) {
     return {
       restrict: "E",
       replace: true,
@@ -1056,7 +1054,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    Select the preview area. Images won't crop. You can always return to this later on.\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">Done</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      PREVIEW\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <div class=\"thumb item_{{$index}}\" ng-class=\"{'active':image.active}\" ng-repeat=\"image in model.images\">\n      <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" >\n      <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n        <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> Cover</span>\n        <span ng-switch-default><i class=\"icon-ok\"></i> Set cover</span>\n      </a>\n    </div>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <div class=\"thumb item_{{$index}}\" ng-class=\"{'active':image.active}\" ng-repeat=\"image in model.images\">\n      <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" >\n      <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n        <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n        <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n      </a>\n    </div>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1083,7 +1081,7 @@
             _results.push($http.put("" + $scope.$parent.backend_url + "/media/" + image._id, image).success(function(data) {
               return console.log('ok');
             }).error(function() {
-              return errorProcessing.addError('Failed to set cover');
+              return errorProcessing.addError($i18next('Failed to set cover'));
             }));
           }
           return _results;
@@ -1130,7 +1128,7 @@
             }
             return true;
           }).error(function() {
-            errorProcessing.addError('Failed to update a thumbnail');
+            errorProcessing.addError($i18next('Failed to update a thumbnail'));
             return false;
           });
         };
@@ -1233,7 +1231,7 @@
         return true;
       }
     };
-  }).directive('switchToggle', function($timeout) {
+  }).directive('switchToggle', function($timeout, $i18next) {
     return {
       restrict: 'A',
       controller: function($scope, $rootScope, $element, $attrs, $http) {
@@ -1246,7 +1244,7 @@
               $http.put("" + $scope.backend_url + "/quiz/" + item._id, item).success(function(data) {
                 return console.log(data);
               }).error(function() {
-                return errorProcessing.addError('Failed to save quiz state');
+                return errorProcessing.addError($i18next('Failed to save quiz state'));
               });
               return true;
             }, 0);
@@ -1279,12 +1277,12 @@
           var elem;
           elem = $(this);
           if (elem.attr('id') === ("" + selector + "_enabled")) {
-            $("label[for=" + selector + "_enabled]").text('Enabled');
-            $("label[for=" + selector + "_disabled]").text('Disable');
+            $("label[for=" + selector + "_enabled]").text($i18next('Enabled'));
+            $("label[for=" + selector + "_disabled]").text($i18next('Disable'));
             return true;
           } else {
-            $("label[for=" + selector + "_disabled]").text('Disabled');
-            $("label[for=" + selector + "_enabled]").text('Enable');
+            $("label[for=" + selector + "_disabled]").text($i18next('Disabled'));
+            $("label[for=" + selector + "_enabled]").text($i18next('Enable'));
             return true;
           }
         });
