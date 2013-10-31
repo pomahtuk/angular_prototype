@@ -88,6 +88,7 @@
             if (item.stories[$scope.current_museum.language].name) {
               in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
               number_is = parseInt(item.number, 10 === parseInt(criteria, 10));
+              console.log(result, number_is, criteria === '', in_string);
               result = in_string || criteria === '' || number_is;
               if (result) {
                 $scope.grid();

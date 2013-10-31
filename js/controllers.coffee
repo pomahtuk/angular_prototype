@@ -66,6 +66,7 @@ angular.module("Museum.controllers", [])
         if item.stories[$scope.current_museum.language].name
           in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
           number_is = parseInt item.number, 10 is parseInt criteria, 10
+          console.log result, number_is, criteria is '', in_string
           result = in_string || criteria is '' || number_is
           $scope.grid() if result
           return result
