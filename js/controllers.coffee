@@ -676,7 +676,7 @@ angular.module("Museum.controllers", [])
   $scope.closeDropDown = ->
     console.log 'closing'
     active = findActive()
-    $scope.active_exhibit.active = false
+    $scope.active_exhibit.active = false if $scope.active_exhibit?
     if active.hasClass 'dummy'
       $scope.dummy_focusout_process(active)
     dropDown.hide()
