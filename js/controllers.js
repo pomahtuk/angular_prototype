@@ -301,7 +301,6 @@
             }
             museum_id = $scope.current_museum._id;
           }
-          $scope.form_translations();
           return $scope.reload_exhibits();
         });
       };
@@ -650,20 +649,6 @@
       $scope.element_switch = true;
       $scope.forbid_switch = false;
       $scope.create_new_language = false;
-      $scope.form_translations = function() {
-        var lang, _i, _len, _ref, _results;
-        $scope.langs = $scope.langs.unique();
-        $scope.modal_translations = {};
-        _ref = $scope.langs;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          lang = _ref[_i];
-          _results.push($scope.modal_translations[lang] = {
-            name: $scope.translations[lang]
-          });
-        }
-        return _results;
-      };
       dropDown = $('#drop_down').removeClass('hidden').hide();
       findActive = function() {
         return $('ul.exhibits li.exhibit.active');

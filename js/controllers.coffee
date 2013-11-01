@@ -252,7 +252,7 @@ angular.module("Museum.controllers", [])
         $scope.current_museum.def_lang = "ru"
         $scope.current_museum.language = "ru"  unless museum.language?
         museum_id = $scope.current_museum._id
-      $scope.form_translations()
+      # $scope.form_translations()
       $scope.reload_exhibits()
 
   $scope.reload_museum = ->
@@ -632,13 +632,6 @@ angular.module("Museum.controllers", [])
   $scope.element_switch = true
   $scope.forbid_switch  = false
   $scope.create_new_language = false
-
-  $scope.form_translations = ->
-    $scope.langs = $scope.langs.unique()
-    $scope.modal_translations = {}
-    for lang in $scope.langs
-      # console.log lang, $scope.translations[lang]
-      $scope.modal_translations[lang] = { name: $scope.translations[lang] }
 
   dropDown   = $('#drop_down').removeClass('hidden').hide()
 
