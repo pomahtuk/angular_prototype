@@ -245,6 +245,7 @@ angular.module("Museum.controllers", [])
           $scope.current_museum = museum
           found = true
           for key, value of museum.stories
+            console.log key
             $scope.modal_translations[key] = {name: $i18next(key)}
       unless found
         $scope.current_museum = $scope.museums[0]

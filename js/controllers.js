@@ -286,6 +286,7 @@
               _ref2 = museum.stories;
               for (key in _ref2) {
                 value = _ref2[key];
+                console.log(key);
                 $scope.modal_translations[key] = {
                   name: $i18next(key)
                 };
