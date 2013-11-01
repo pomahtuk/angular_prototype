@@ -445,7 +445,7 @@
                   <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
                   <ul class="images col-xs-11">
                     <li ng-repeat="image in active_exhibit.images">
-                      <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                      <a class="img_thumbnail" href="#" open-lightbox="{{$index}}"><span class="cover" ng-class="{&#39;active&#39;:image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                     </li>
                     <li class="upload_item">
                       <div class="drag_here">

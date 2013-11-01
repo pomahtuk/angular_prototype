@@ -702,7 +702,7 @@ ul.exhibits
     &.active
       .checkbox
         display: block
-        z-index: 10
+        z-index: 4
 
       .opener:not(.draft):not(.dummy)
         .description 
@@ -724,10 +724,14 @@ ul.exhibits
           .on_hover
             display: block
 
+    .opas_invisible, .passcode
+      +opacity(0.5)
+
     .dummy, .draft
       position: relative
       cursor: pointer
       +opacity(0.5)
+      -webkit-filter: blur(1px) grayscale(0.5)
 
       .description h4
         font-style: italic
@@ -849,7 +853,7 @@ ul.exhibits
         float: left
         .img
           width: 148px
-          height: 90px
+          height: 75px
           background: url('../img/img_drag.png') no-repeat center
         span
           display: block
@@ -973,6 +977,11 @@ ul.exhibits
 
   .label.label-danger
     display: none
+    &.informer
+      display: block
+      position: absolute
+      right: 13px
+      top: 25px
 
   &.invalid
     .label.label-danger
@@ -1707,44 +1716,6 @@ a
       cursor: pointer
       position: relative
 
-      .cover
-        +border-radius(20px)
-        +inline-block
-        display: block
-        position: absolute
-        bottom: 10px
-        left: 10px
-        background: #47a447
-        overflow: hidden
-        padding: 0px 5px
-        max-width: 20px
-        height: 20px
-        transition: all 0.2s
-        -webkit-transition: all 0.2s
-        visibility: hidden
-
-        span
-          +inline-block
-          width: 80px
-          float: left
-          color: #fff
-          line-height: 20px
-          margin-left: -2px
-          text-align: left
-
-        &.active
-          visibility: visible
-          max-width: 92px
-          
-          span
-            width: 66px
-
-        &:hover
-          max-width: 92px
-
-      &:hover .cover
-        visibility: visible
-
       img
         width: 105px
         height: 80px
@@ -1752,6 +1723,44 @@ a
 
       &.active img
         border: 2px solid $exhibitTextColorHover
+
+      &:hover .cover
+        visibility: visible
+
+.cover
+  +border-radius(20px)
+  +inline-block
+  display: block
+  position: absolute
+  bottom: 10px
+  left: 10px
+  background: #47a447
+  overflow: hidden
+  padding: 0px 5px
+  max-width: 20px
+  height: 20px
+  transition: all 0.2s
+  -webkit-transition: all 0.2s
+  visibility: hidden
+
+  span
+    +inline-block
+    max-width: 80px
+    float: left
+    color: #fff
+    line-height: 20px
+    margin-left: -2px
+    text-align: left
+
+  &.active
+    visibility: visible
+    max-width: 92px
+    
+    span
+      max-width: 80px
+
+  &:hover
+    max-width: 92px
 
 
 .tab-content > .active, .pill-content > .active

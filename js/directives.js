@@ -121,7 +121,7 @@
         field_type: '@type',
         root: '=root'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>{{ 'Publish' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Published' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">{{ 'Private' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Make private' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>{{ 'Invisible' | i18next }}</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> {{ 'Make invisible' | i18next }}\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'  || item.status == 'published'\">\n      <a href=\"#\" ng-click=\"item.status = 'passcode'; status_process()\">\n        <i class=\"icon-lock\"></i> {{ 'Make private' | i18next }}\n      </a>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>{{ 'Publish' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Published' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">{{ 'Private' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Make private' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'opas_invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>{{ 'Invisible' | i18next }}</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> {{ 'Make invisible' | i18next }}\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'  || item.status == 'published'\">\n      <a href=\"#\" ng-click=\"item.status = 'passcode'; status_process()\">\n        <i class=\"icon-lock\"></i> {{ 'Make private' | i18next }}\n      </a>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs, storySetValidation) {
         return $scope.status_process = function() {
           return storySetValidation.checkValidity($scope);
@@ -192,7 +192,7 @@
         placeholder: '=placeholder',
         field_type: '@type'
       },
-      template: "<div class=\"form-group textfield {{field}}\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">{{title}}</label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <span class=\"empty_name_error {{field}}\">{{ \"can't be empty\" | i18next }}</span>\n  <div class=\"col-xs-7 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-7 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required>\n    <input type=\"text\" class=\"form-control\" id=\"{{id}}\" value=\"{{item[field]}}\" placeholder=\"{{placeholder}}\">\n    <div class=\"additional_controls\">\n      <a href=\"#\" class=\"apply\"><i class=\"icon-ok\"></i></a>\n      <!--<a href=\"#\" class=\"cancel\"><i class=\"icon-remove\"></i></a>-->\n    </div>\n    <div class=\"error_text {{field}}\" >can't be blank</div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
+      template: "<div class=\"form-group textfield {{field}}\">\n  <label class=\"col-xs-2 control-label\" for=\"{{id}}\" ng-click=\"edit_mode = false\">\n    {{title}}\n    <span class=\"label label-danger informer\" ng-show=\"empty_name_error\">{{ \"can't be empty\" | i18next }}</span>\n  </label>\n  <div class=\"help\" popover=\"{{help}}\" popover-placement=\"bottom\" popover-animation=\"true\" popover-trigger=\"mouseenter\">\n    <i class=\"icon-question-sign\"></i>\n  </div>\n  {{active_exhibit}}\n  <div class=\"col-xs-7 trigger\">\n    <span class=\"placeholder\" ng-click=\"update_old()\">{{item[field]}}</span>\n  </div>\n  <div class=\"col-xs-7 triggered\">\n    <input type=\"hidden\" id=\"original_{{id}}\" ng-model=\"item[field]\" required>\n    <input type=\"text\" class=\"form-control\" id=\"{{id}}\" value=\"{{item[field]}}\" placeholder=\"{{placeholder}}\">\n    <div class=\"additional_controls\">\n      <a href=\"#\" class=\"apply\"><i class=\"icon-ok\"></i></a>\n      <!--<a href=\"#\" class=\"cancel\"><i class=\"icon-remove\"></i></a>-->\n    </div>\n  </div>\n  <status-indicator ng-binding=\"status\"></statusIndicator>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs) {
         if ($scope.item.statuses == null) {
           $scope.item.statuses = {};
@@ -225,6 +225,7 @@
         triggered = element.find('.triggered');
         control = element.find('.triggered > .form-control');
         additional = triggered.find('.additional_controls');
+        scope.empty_name_error = false;
         element.find('span.placeholder').click(function() {
           trigger.hide();
           triggered.show();
@@ -239,6 +240,7 @@
           var elem, value;
           elem = $(this);
           value = elem.val();
+          additional.hide();
           return $timeout(function() {
             if (!(scope.$parent.new_item_creation && scope.field === 'number')) {
               scope.item[scope.field] = value;
@@ -253,7 +255,6 @@
               triggered.hide();
               return trigger.show();
             } else {
-              additional.hide();
               elem.addClass('ng-invalid');
               if (scope.field === 'name' && scope.item.status !== 'dummy') {
                 elem.val(scope.oldValue);
@@ -276,10 +277,12 @@
             $timeout(function() {
               elem.val(scope.oldValue);
               scope.item[scope.field] = scope.oldValue;
+              scope.empty_name_error = true;
+              console.log(scope.empty_name_error);
               scope.$digest();
-              element.find('.error_text').show();
               setTimeout(function() {
-                return element.find('.error_text').hide();
+                scope.empty_name_error = false;
+                return scope.$digest();
               }, 2000);
               return scope.status_process();
             }, 0, false);
@@ -986,9 +989,9 @@
                     if (!scope.new_item_creation) {
                       if (!newValue) {
                         scope.active_exhibit.stories[scope.current_museum.language].name = oldValue;
-                        $('.empty_name_error.name').show();
+                        scope.empty_name_error = true;
                         return setTimeout(function() {
-                          return $('.empty_name_error.name').hide();
+                          return scope.empty_name_error = false;
                         }, 1500);
                       }
                     }

@@ -109,7 +109,7 @@ angular.module("Museum.directives", [])
       </button>
 
 
-      <button class="btn btn-default" ng-show="item.status == 'opas_invisible'" ng-class="{'active btn-danger': item.status == 'opas_invisible' }" ng-click="item.status = 'invisible'; status_process()" type="button">
+      <button class="btn btn-default" ng-show="item.status == 'opas_invisible'" ng-class="{'active btn-danger': item.status == 'opas_invisible' }" ng-click="item.status = 'opas_invisible'; status_process()" type="button">
         <div class="extra">
           <i class="icon-eye-close"></i>
         </div>
@@ -221,12 +221,14 @@ angular.module("Museum.directives", [])
     field_type: '@type'
   template: """
     <div class="form-group textfield {{field}}">
-      <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">{{title}}</label>
+      <label class="col-xs-2 control-label" for="{{id}}" ng-click="edit_mode = false">
+        {{title}}
+        <span class="label label-danger informer" ng-show="empty_name_error">{{ "can't be empty" | i18next }}</span>
+      </label>
       <div class="help" popover="{{help}}" popover-placement="bottom" popover-animation="true" popover-trigger="mouseenter">
         <i class="icon-question-sign"></i>
       </div>
       {{active_exhibit}}
-      <span class="empty_name_error {{field}}">{{ "can't be empty" | i18next }}</span>
       <div class="col-xs-7 trigger">
         <span class="placeholder" ng-click="update_old()">{{item[field]}}</span>
       </div>
@@ -237,7 +239,6 @@ angular.module("Museum.directives", [])
           <a href="#" class="apply"><i class="icon-ok"></i></a>
           <!--<a href="#" class="cancel"><i class="icon-remove"></i></a>-->
         </div>
-        <div class="error_text {{field}}" >can't be blank</div>
       </div>
       <status-indicator ng-binding="status"></statusIndicator>
     </div>
@@ -268,6 +269,8 @@ angular.module("Museum.directives", [])
     control = element.find('.triggered > .form-control')
     additional = triggered.find('.additional_controls')
 
+    scope.empty_name_error = false
+
     element.find('span.placeholder').click ->
       trigger.hide()
       triggered.show()
@@ -281,6 +284,7 @@ angular.module("Museum.directives", [])
     element.find('.triggered > .form-control').blur ->
       elem = $ @
       value = elem.val()
+      additional.hide()
       $timeout ->
         unless scope.$parent.new_item_creation && scope.field is 'number'
           scope.item[scope.field] = value
@@ -293,7 +297,6 @@ angular.module("Museum.directives", [])
           triggered.hide()
           trigger.show()
         else
-          additional.hide()
           elem.addClass 'ng-invalid'
           if scope.field is 'name' && scope.item.status isnt 'dummy'
             elem.val scope.oldValue
@@ -315,10 +318,12 @@ angular.module("Museum.directives", [])
         $timeout ->
           elem.val scope.oldValue
           scope.item[scope.field] = scope.oldValue
+          scope.empty_name_error = true
+          console.log scope.empty_name_error
           scope.$digest()
-          element.find('.error_text').show()
           setTimeout ->
-            element.find('.error_text').hide()
+            scope.empty_name_error = false
+            scope.$digest()
           , 2000
           scope.status_process()
         , 0, false
@@ -1008,9 +1013,9 @@ angular.module("Museum.directives", [])
                 unless scope.new_item_creation
                   unless newValue 
                     scope.active_exhibit.stories[scope.current_museum.language].name = oldValue
-                    $('.empty_name_error.name').show()
+                    scope.empty_name_error = true
                     setTimeout ->
-                      $('.empty_name_error.name').hide()
+                      scope.empty_name_error = false
                     , 1500
                 # else
                 #   if newValue and $scope.$parent.new_item_creation

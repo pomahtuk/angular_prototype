@@ -120,7 +120,6 @@ angular.module("Museum.controllers", [])
   $scope.reload_exhibits = (sort_field = $scope.sort_field, sort_direction = $scope.sort_direction) ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
       exhibits = []
-      $scope.modal_translations = {}
       for item in data
         if item?
           exhibit = item.exhibit
@@ -138,7 +137,6 @@ angular.module("Museum.controllers", [])
             story.story.video = story.video
             story.story.quiz.answers = story.quiz.answers
             exhibit.stories[story.story.language] = story.story
-            $scope.modal_translations[story.story.language] = {name: $scope.translations[story.story.language]}
           exhibits.push exhibit
       ngProgress.complete()
       console.log 'anim completed'
@@ -219,6 +217,7 @@ angular.module("Museum.controllers", [])
       $scope.museums = []
       found = false
       $scope.langs = []
+      $scope.modal_translations = {}
       for item in data
         museum = item.exhibit
         museum.def_lang = "ru"
@@ -239,6 +238,7 @@ angular.module("Museum.controllers", [])
           story.story.quiz.answers = story.quiz.answers
           museum.stories[story.story.language] = story.story
           $scope.langs.push story.story.language
+          $scope.modal_translations[story.story.language] = {name: $i18next(story.story.language)}
         $scope.museums.push museum
         museum.active = false
         if museum._id is museum_id
@@ -649,7 +649,6 @@ angular.module("Museum.controllers", [])
   $scope.element_switch = true
   $scope.forbid_switch  = false
   $scope.create_new_language = false
-
 
   $scope.form_translations = ->
     $scope.langs = $scope.langs.unique()
@@ -1101,7 +1100,6 @@ angular.module("Museum.controllers", [])
       true
 
   $scope.delete_exhibit = (target_exhibit, languages) ->
-    # console.log Object.keys(target_exhibit.stories).length, languages
     if languages.length >= Object.keys(target_exhibit.stories).length
       $scope.closeDropDown()
       for exhibit, index in $scope.exhibits
@@ -1336,6 +1334,16 @@ angular.module("Museum.controllers", [])
         errorProcessing.addError $i18next 'Failed to update quiz'
     $scope.forbid_switch  = false
 
+  $scope.$watch 'exhibits_visibility_filter', (newValue, oldValue) ->
+    if newValue?
+      if newValue isnt oldValue
+        $scope.closeDropDown()
+
+  $scope.$watch 'exhibit_search', (newValue, oldValue) ->
+    if newValue?
+      if newValue isnt oldValue
+        $scope.closeDropDown()
+
   $scope.$watch 'current_museum.invalid', (newValue, oldValue) ->
     console.log newValue?, newValue
     if newValue? and newValue
@@ -1358,10 +1366,13 @@ angular.module("Museum.controllers", [])
       console.log 'anim started'
       $scope.museum_change_progress = true
       museum_id = newValue.split('/')[1]
+      $scope.modal_translations = {}
       for museum in $scope.museums
         if museum._id is museum_id
           museum.active = true
           $scope.current_museum = museum
+          for key, value of museum.stories
+            $scope.modal_translations[key] = {name: $i18next(key)}
         else
           museum.active = false
       $scope.reload_exhibits()
