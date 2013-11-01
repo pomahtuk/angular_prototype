@@ -403,35 +403,7 @@
         fr: 'French',
         kg: 'Klingon'
       };
-      $scope.modal_translations = {
-        ru: {
-          name: 'Russian'
-        },
-        en: {
-          name: 'English'
-        },
-        es: {
-          name: 'Spanish'
-        },
-        ge: {
-          name: 'German'
-        },
-        fi: {
-          name: 'Finnish'
-        },
-        sw: {
-          name: 'Sweedish'
-        },
-        it: {
-          name: 'Italian'
-        },
-        fr: {
-          name: 'French'
-        },
-        kg: {
-          name: 'Klingon'
-        }
-      };
+      $scope.modal_translations = {};
       $scope.exhibits = [
         {
           index: 0,
