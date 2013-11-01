@@ -978,7 +978,7 @@ ul.exhibits .exhibit.active {
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\00003703}}
 ul.exhibits .exhibit:hover .checkbox, ul.exhibits .exhibit.active .checkbox {
   display: block;
-  z-index: 4;
+  z-index: 3;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\00003709}}
 ul.exhibits .exhibit:hover .opener:not(.draft):not(.dummy) .description h4, ul.exhibits .exhibit.active .opener:not(.draft):not(.dummy) .description h4 {
@@ -1017,9 +1017,9 @@ ul.exhibits .exhibit .dummy, ul.exhibits .exhibit .draft {
   cursor: pointer;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
   opacity: 0.5;
-  -webkit-filter: blur(1.5px) grayscale(0.5);
-  -moz-filter: blur(1.5px) grayscale(0.5);
-  filter: blur(1.5px) grayscale(0.5);
+  -webkit-filter: blur(1px) grayscale(0.5);
+  -moz-filter: blur(1px) grayscale(0.5);
+  filter: blur(1px) grayscale(0.5);
   filter: url(blur.svg#blur);
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\00003739}}
@@ -1235,7 +1235,7 @@ ul.exhibits .exhibit .museum_opas_invisible.published:after, ul.exhibits .exhibi
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\00003910}}
 #drop_down .images .upload_item .or_upload span, #museum_edit_dropdown .images .upload_item .or_upload span {
   line-height: 112px;
-  padding: 0px 5px;
+  padding: 0px 0px;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\00003913}}
 #drop_down .images .upload_item .or_upload .upload, #museum_edit_dropdown .images .upload_item .or_upload .upload {
