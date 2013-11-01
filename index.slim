@@ -323,7 +323,7 @@ html lang="en" ng-app="Museum"
           a.dropdown-toggle data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter"
             | {{ 'Visibility in mobile application' | i18next }}
             span ng-switch-when="published"
-              |: {{ 'Public' | i18next }}
+              |: {{ 'Published' | i18next }}
             span ng-switch-when="passcode"
               |: {{ 'Private' | i18next }}
             span ng-switch-when="opas_invisible"
@@ -331,7 +331,7 @@ html lang="en" ng-app="Museum"
             span.caret
           ul.dropdown-menu
             li ng-click="exhibits_visibility_filter = 'published'"
-              a href="#" {{ 'Public' | i18next }}
+              a href="#" {{ 'Published' | i18next }}
             li ng-click="exhibits_visibility_filter = 'passcode'"
               a href="#" {{ 'Private' | i18next }}
             li ng-click="exhibits_visibility_filter = 'opas_invisible'"

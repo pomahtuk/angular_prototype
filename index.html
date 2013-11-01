@@ -288,10 +288,10 @@
           </ul>
         </div>
         <div class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter">{{ 'Visibility in mobile application' | i18next }}<span ng-switch-when="published">: {{ 'Public' | i18next }}</span><span ng-switch-when="passcode">: {{ 'Private' | i18next }}</span><span ng-switch-when="opas_invisible">: {{ 'Invisible' | i18next }}</span><span class="caret"></span></a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter">{{ 'Visibility in mobile application' | i18next }}<span ng-switch-when="published">: {{ 'Published' | i18next }}</span><span ng-switch-when="passcode">: {{ 'Private' | i18next }}</span><span ng-switch-when="opas_invisible">: {{ 'Invisible' | i18next }}</span><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li ng-click="exhibits_visibility_filter = &#39;published&#39;">
-              <a href="#">{{ 'Public' | i18next }}</a>
+              <a href="#">{{ 'Published' | i18next }}</a>
             </li>
             <li ng-click="exhibits_visibility_filter = &#39;passcode&#39;">
               <a href="#">{{ 'Private' | i18next }}</a>
