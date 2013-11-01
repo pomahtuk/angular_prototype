@@ -238,13 +238,14 @@ angular.module("Museum.controllers", [])
           story.story.quiz.answers = story.quiz.answers
           museum.stories[story.story.language] = story.story
           $scope.langs.push story.story.language
-          $scope.modal_translations[story.story.language] = {name: $i18next(story.story.language)}
         $scope.museums.push museum
         museum.active = false
         if museum._id is museum_id
           museum.active = true
           $scope.current_museum = museum
           found = true
+          for key, value of museum.stories
+            $scope.modal_translations[key] = {name: $i18next(key)}
       unless found
         $scope.current_museum = $scope.museums[0]
         $scope.current_museum.def_lang = "ru"

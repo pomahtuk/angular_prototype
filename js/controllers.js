@@ -242,7 +242,7 @@
         ngProgress.start();
         console.log('anim started');
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
-          var found, image, item, museum, story, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+          var found, image, item, key, museum, story, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
           $scope.museums = [];
           found = false;
           $scope.langs = [];
@@ -276,9 +276,6 @@
               story.story.quiz.answers = story.quiz.answers;
               museum.stories[story.story.language] = story.story;
               $scope.langs.push(story.story.language);
-              $scope.modal_translations[story.story.language] = {
-                name: $i18next(story.story.language)
-              };
             }
             $scope.museums.push(museum);
             museum.active = false;
@@ -286,6 +283,13 @@
               museum.active = true;
               $scope.current_museum = museum;
               found = true;
+              _ref2 = museum.stories;
+              for (key in _ref2) {
+                value = _ref2[key];
+                $scope.modal_translations[key] = {
+                  name: $i18next(key)
+                };
+              }
             }
           }
           if (!found) {
