@@ -550,7 +550,7 @@ html lang="en" ng-app="Museum"
             / .next-ex
 
           li.exhibit post-render="" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch()" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
-            div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
+            div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
               .checkbox
                 input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
               .image

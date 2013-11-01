@@ -733,7 +733,8 @@ ul.exhibits
       position: relative
       cursor: pointer
       +opacity(0.5)
-      -webkit-filter: blur(1px) grayscale(0.5)
+      +filter(blur(1.5px) grayscale(0.5))
+      filter: url(blur.svg#blur) /* FF, IE10 & Opera */
 
       .description h4
         font-style: italic
@@ -742,6 +743,49 @@ ul.exhibits
 
       .visibility
         display: none
+
+    .museum_passcode
+      &.published
+        +opacity(0.5)
+        position: relative
+
+        &:after
+          +border-radius(60px)
+          background: #fff        
+          font-family: FontAwesome
+          content: "\f023"
+          color: #333
+          font-size: 50px
+          line-height: 60px
+          text-align: center
+          display: block
+          position: absolute
+          top: 47px
+          left: 70px
+          width: 60px
+          height: 60px
+
+    .museum_opas_invisible
+      &.published, &.passcode
+        +opacity(0.5)
+        position: relative
+
+        &:after
+          +border-radius(60px)
+          background: #fff
+          font-family: FontAwesome
+          content: "\f070"
+          color: #333
+          font-size: 50px
+          line-height: 60px
+          text-align: center
+          display: block
+          position: absolute
+          top: 47px
+          left: 70px
+          width: 60px
+          height: 60px
+
 
 .in
   #dropzone, #museum_dropzone

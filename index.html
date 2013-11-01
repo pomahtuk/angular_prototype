@@ -531,7 +531,7 @@
             </div>
           </li>
           <li class="exhibit" ng-class="{active: exhibit.active}" ng-hide="ajax_progress" ng-repeat="exhibit in exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch()" post-render="">
-            <div class="opener {{exhibit.stories[current_museum.language].status}}" ng-class="{&#39;border&#39;: exhibit.selected, &#39;draft&#39;:exhibit.stories[current_museum.language].name.length == 0}">
+            <div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{&#39;border&#39;: exhibit.selected, &#39;draft&#39;:exhibit.stories[current_museum.language].name.length == 0}">
               <div class="checkbox">
                 <input ng-change="check_selected()" ng-model="exhibit.selected" type="checkbox">
               </div>
