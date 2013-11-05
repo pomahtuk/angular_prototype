@@ -595,6 +595,50 @@
         return true;
       }
     };
+  }).directive("player", function() {
+    return {
+      restrict: "E",
+      replace: true,
+      require: "?ngModel",
+      scope: {
+        item: '=ngItem',
+        help: '@ngHelp',
+        id: '@ngId',
+        title: '@ngTitle',
+        field: '@ngField',
+        parent: '=parent'
+      },
+      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" draggable ng-repeat=\"image in $parent.active_exhibit.images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseleave=\"set_hover(image, false)\">{{ charFromNum(image.order) }}</div>\n  </div>\n</div>",
+      controller: function($scope, $element, $attrs) {
+        $scope.charFromNum = function(num) {
+          return String.fromCharCode(num + 97).toUpperCase();
+        };
+        return $scope.set_hover = function(image, sign) {
+          image.hovered = sign;
+          console.log($scope.$parent.active_exhibit);
+          return $scope.$parent.active_exhibit.has_hovered = sign;
+        };
+      },
+      link: function(scope, element, attrs) {
+        scope.$watch('item[field]', function(newValue, oldValue) {
+          if (newValue) {
+            $("#jquery_jplayer_" + scope.id).jPlayer({
+              cssSelectorAncestor: "#jp_container_" + scope.id,
+              swfPath: "/js",
+              wmode: "window",
+              preload: "auto",
+              smoothPlayBar: true,
+              supplied: "mp3, ogg"
+            });
+            return $("#jquery_jplayer_" + scope.id).jPlayer("setMedia", {
+              mp3: newValue.url,
+              ogg: newValue.thumbnailUrl
+            });
+          }
+        });
+        return true;
+      }
+    };
   }).directive("museumSearch", function() {
     return {
       restrict: "E",
@@ -1057,7 +1101,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <div class=\"thumb item_{{$index}}\" ng-class=\"{'active':image.active}\" ng-repeat=\"image in model.images\">\n      <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" >\n      <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n        <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n        <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n      </a>\n    </div>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\">\n      <li class=\"thumb dragable_image item_{{$index}} \" ng-class=\"{'active':image.active}\" draggable ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" />\n        <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1229,6 +1273,67 @@
               });
             }
             return scope.check_active_image();
+          }
+        });
+        return true;
+      }
+    };
+  }).directive('sortable', function($http, errorProcessing, $i18next) {
+    return {
+      restrict: 'A',
+      scope: {
+        images: "=sortable"
+      },
+      link: function(scope, element, attrs) {
+        var backend;
+        element = $(element);
+        backend = scope.$parent.backend_url || scope.$parent.$parent.backend_url;
+        element.disableSelection();
+        return element.sortable({
+          placeholder: "ui-state-highlight",
+          start: function(event, ui) {
+            return ui.item.data('start', ui.item.index());
+          },
+          update: function(event, ui) {
+            var elements, end, image, index, start, _i, _len, _ref;
+            elements = element.find('li');
+            start = ui.item.data('start');
+            end = ui.item.index();
+            scope.images.splice(end, 0, scope.images.splice(start, 1)[0]);
+            console.log(scope.images[end]);
+            if (scope.images[end].order !== end) {
+              _ref = scope.images;
+              for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                image = _ref[index];
+                image.order = index;
+                $http.put("" + backend + "/media/" + image._id, image).success(function(data) {
+                  return console.log('ok');
+                }).error(function() {
+                  return errorProcessing.addError($i18next('Failed to update order'));
+                });
+              }
+              return scope.$apply();
+            }
+          }
+        });
+      }
+    };
+  }).directive('draggable', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attrs) {
+        element = $(element);
+        element.draggable({
+          axis: "x",
+          containment: "parent",
+          cursor: "pointer",
+          drag: function(event, ui) {
+            if (ui.position.left < 0) {
+              return ui.helper.css('left', 0);
+            }
+          },
+          stop: function(event, ui) {
+            return console.log(event, ui);
           }
         });
         return true;

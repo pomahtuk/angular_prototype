@@ -709,6 +709,83 @@ angular.module("Museum.directives", [])
           ogg: newValue.thumbnailUrl
     true
 
+.directive "player", ->
+  restrict: "E"
+  replace: true
+  require: "?ngModel"
+  scope:
+    item: '=ngItem'
+    help: '@ngHelp'
+    id: '@ngId'
+    title: '@ngTitle'
+    field: '@ngField'
+    parent: '=parent'
+  template: """
+    <div class="player">
+      <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
+      </div>
+      <div class="jp-audio" id="jp_container_{{id}}">
+        <div class="jp-type-single">
+          <div class="jp-gui jp-interface">
+            <ul class="jp-controls">
+              <li>
+              <a class="jp-play" href="javascript:;" tabindex="1"></a>
+              </li>
+              <li>
+              <a class="jp-pause" href="javascript:;" tabindex="1"></a>
+              </li>
+            </ul>
+          </div>
+          <div class="jp-timeline">
+            <a class="dropdown-toggle" href="#">{{item[field].name}}</a>
+            <div class="jp-progress">
+              <div class="jp-seek-bar">
+                <div class="jp-play-bar">
+                </div>
+              </div>
+            </div>
+            <div class="jp-time-holder">
+              <div class="jp-current-time">
+              </div>
+              <div class="jp-duration">
+              </div>
+            </div>
+            <div class="jp-no-solution">
+              <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="points_position_holder">
+        <div class="image_connection" draggable ng-repeat="image in $parent.active_exhibit.images" ng-mouseenter="set_hover(image, true)" ng-mouseleave="set_hover(image, false)">{{ charFromNum(image.order) }}</div>
+      </div>
+    </div>
+  """
+  controller: ($scope, $element, $attrs) ->
+    $scope.charFromNum = (num)  ->
+      String.fromCharCode(num + 97).toUpperCase()
+
+    $scope.set_hover = (image, sign) ->
+      image.hovered = sign
+      console.log $scope.$parent.active_exhibit
+      $scope.$parent.active_exhibit.has_hovered = sign
+
+  link: (scope, element, attrs) ->
+    scope.$watch 'item[field]', (newValue, oldValue) ->
+      if newValue
+        $("#jquery_jplayer_#{scope.id}").jPlayer
+          cssSelectorAncestor: "#jp_container_#{scope.id}"
+          swfPath: "/js"
+          wmode: "window"
+          preload: "auto"
+          smoothPlayBar: true
+          # keyEnabled: true
+          supplied: "mp3, ogg"
+        $("#jquery_jplayer_#{scope.id}").jPlayer "setMedia",
+          mp3: newValue.url
+          ogg: newValue.thumbnailUrl
+    true
+
 .directive "museumSearch", ->
   restrict: "E"
   replace: true
@@ -1084,13 +1161,15 @@ angular.module("Museum.directives", [])
         <a class="left" href="#" ng-click="set_index(active_image_index - 1)">
           <i class="icon-angle-left"></i>
         </a>
-        <div class="thumb item_{{$index}}" ng-class="{'active':image.active}" ng-repeat="image in model.images">
-          <img ng-click="set_index($index)" src="{{image.thumbnailUrl}}" >
-          <a class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch on="image.cover">
-            <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
-            <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
-          </a>
-        </div>
+        <ul class="images_sortable" sortable="model.images">
+          <li class="thumb dragable_image item_{{$index}} " ng-class="{'active':image.active}" draggable ng-repeat="image in images">
+            <img ng-click="set_index($index)" src="{{image.thumbnailUrl}}" />
+            <a class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch on="image.cover">
+              <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
+              <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
+            </a>
+          </li>
+        </ul>
         <a class="right" href="#" ng-click="set_index(active_image_index + 1)">
           <i class="icon-angle-right"></i>
         </a>
@@ -1240,6 +1319,114 @@ angular.module("Museum.directives", [])
         if newValue is 0
           left.css({'opacity': 0})
         scope.check_active_image()      
+
+    true
+
+.directive 'sortable', ($http, errorProcessing, $i18next) ->
+  restrict: 'A'
+  scope:
+    images: "=sortable"
+  link: (scope, element, attrs) ->
+    element  = $ element
+    backend  = scope.$parent.backend_url || scope.$parent.$parent.backend_url
+    element.disableSelection()
+    element.sortable
+      placeholder: "ui-state-highlight"
+      start: (event, ui) ->
+        ui.item.data 'start', ui.item.index()
+      update: ( event, ui ) ->
+        elements = element.find('li')
+        start    = ui.item.data('start')
+        end      = ui.item.index()
+        scope.images.splice(end, 0, scope.images.splice(start, 1)[0])
+        console.log scope.images[end]
+        if scope.images[end].order isnt end
+          for image, index in scope.images
+            image.order = index
+            $http.put("#{backend}/media/#{image._id}", image).success (data) ->
+              console.log 'ok'
+            .error ->
+              errorProcessing.addError $i18next 'Failed to update order' 
+          scope.$apply()
+
+# .directive 'plumb', ->
+#   restrict: 'A'
+#   link: (scope, element, attrs) ->
+#     endpointOptions =
+#       anchor: "BottomCenter"
+#       maxConnections: -1
+#       isSource: true
+#       isTarget: true
+#       endpoint: ["Dot",
+#         radius: 7
+#       ]
+#       setDragAllowedWhenFull: true
+#       paintStyle:
+#         fillStyle: "#5b9ada"
+
+#       connectorStyle:
+#         lineWidth: 4
+#         strokeStyle: "#5b9ada"
+
+#       connector: ["Bezier",
+#         curviness: 1
+#       ]
+
+#     starpointOptions = 
+#       anchor: "TopCenter"
+#       maxConnections: -1
+#       isSource: true
+#       isTarget: true
+#       endpoint: ["Dot",
+#         radius: 151
+#       ]
+#       setDragAllowedWhenFull: true
+#       paintStyle:
+#         fillStyle: "#5b9ada"
+
+#       connectorStyle:
+#         lineWidth: 4
+#         strokeStyle: "#5b9ada"
+
+#       connector: ["Bezier",
+#         curviness: 1
+#       ]
+
+#     jsPlumb.bind "ready", ->
+#       jsPlumb.addEndpoint "block1", endpointOptions
+#       jsPlumb.addEndpoint "block2", endpointOptions
+#       jsPlumb.addEndpoint "block3", endpointOptions
+#       jsPlumb.draggable "block1", {containment:"parent", axis: "x"}
+#       jsPlumb.draggable "block2", {containment:"parent", axis: "x"}
+#       jsPlumb.draggable "block3", {containment:"parent", axis: "x"}
+
+
+.directive 'draggable', ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+    element  = $ element
+    element.draggable
+      axis: "x"
+      containment: "parent"
+      cursor: "pointer"
+      drag: (event, ui) ->
+        if ui.position.left < 0
+          ui.helper.css('left', 0)
+      stop: ( event, ui ) -> 
+        console.log event, ui
+
+# .directive 'droppable', ->
+#   restrict: 'A'
+#   link: (scope, element, attrs) ->
+#     element  = $ element
+#     element.droppable
+#       accept: '.dragable_image'
+#       drop: ( event, ui ) -> 
+#         console.log 'dropped'
+#         dropped = ui.draggable
+#         droppedOn = $ @
+#         dropped.attr('style', '').clone().appendTo(droppedOn)
+
 
     true
 

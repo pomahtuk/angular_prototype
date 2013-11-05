@@ -90,6 +90,7 @@
   "Failed to set cover": "Не удалось установить обложку",
   "Failed to update a thumbnail": "Не удалось обновить превью",
   "Failed to save quiz state": "Не удалось сохранить статус квиза",
+  "Failed to update order": "Не удалось обновить порядок",
 
   "Publish": "Опубликовать",
   "Published": "Опубликовано",
@@ -121,6 +122,8 @@
   "Cover": "Обложка",
   "Set as cover": "Сделать обложкой",
   "Done": "Готово",
+
+  "Sync images and audio": "Синхронизировать изображения и аудио",
 
   "ru": "Русский",
   "en": "Английский",

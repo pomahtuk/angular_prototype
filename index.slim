@@ -472,19 +472,26 @@ html lang="en" ng-app="Museum"
                     audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
                     placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="{{ 'Description' | i18next }}" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
 
-                .tab-pane  ng-class="{'active': story_tab == 'images' }" 
+                .tab-pane.row  ng-class="{'active': story_tab == 'images' }" plumb=""
+                  .timline_container_holder
+                    button.btn.btn-default.timeline_toggler ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened}"
+                      | {{ 'Sync images and audio' | i18next }}
+                    .timline_container ng-class="{'opened':exhibit_timline_opened}"
+                      .col-xs-1.control-label 
+                        | {{ 'Audio' | i18next }}
+                      player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
                   label.col-xs-1.control-label 
                     | {{ 'Images' | i18next }}
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
-                  ul.images.col-xs-11
-                    li ng-repeat="image in active_exhibit.images"
-                      a.img_thumbnail href="#" open-lightbox="{{$index}}"
+                  ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images"
+                    li ng-repeat="image in images" id="exhibit_id_{{$index}}" ng-class="{'hovered': image.hovered}"
+                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}"
                         span class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 
                             |  {{ "Cover" | i18next }}
                         img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
-                      a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.active_exhibit" rel="nofollow" ×
+                      a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.$parent.active_exhibit" rel="nofollow" ×
 
                     li.upload_item
                       .drag_here
@@ -597,6 +604,7 @@ html lang="en" ng-app="Museum"
     script src="lib/ng-i18next.js"
     / jquery part
     script src="lib/jquery-1.10.2.js"
+    script src="lib/jquery-ui-1.10.3.custom.js"
     script src="lib/jquery.scrollTo.js"
     script src="lib/jquery.jplayer.min.js"
     script src="lib/jQuery-File-Upload/vendor/jquery.ui.widget.js"
@@ -612,6 +620,7 @@ html lang="en" ng-app="Museum"
     script src="lib/jquery.color.js"
     script src="lib/jquery-scrollspy.js"
     script src="lib/i18next-1.7.1.js"
+    script src="lib/jquery.jsPlumb-1.5.3-min.js"
     / script src="lib/qrcode.js"
     / app part
     script src="js/app.js"
