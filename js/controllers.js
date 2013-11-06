@@ -859,6 +859,28 @@
           return '';
         }
       };
+      $scope.set_hover = function(image, sign) {
+        return image.hovered = sign;
+      };
+      $scope.recalculate_marker_positions = function(item) {
+        var container_width, duration, image, left, marker, pixel_sec_weight, total_seconds, _i, _len, _ref, _results;
+        duration = $('.jp-duration:visible').text();
+        total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
+        container_width = $('.points_position_holder:visible').width() - 20;
+        pixel_sec_weight = total_seconds / container_width;
+        _ref = $('.image_connection:visible');
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          marker = _ref[_i];
+          marker = $(marker);
+          image = item.mapped_images[marker.data('image-index')];
+          left = image.timestamp / pixel_sec_weight;
+          _results.push(marker.css({
+            'left': "" + left + "px"
+          }));
+        }
+        return _results;
+      };
       $scope.create_dummy_story = function(id) {
         var dummy_story, i, _i;
         dummy_story = {

@@ -476,16 +476,21 @@ html lang="en" ng-app="Museum"
                   .timline_container_holder
                     button.btn.btn-default.timeline_toggler ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened}"
                       | {{ 'Sync images and audio' | i18next }}
-                    .timline_container ng-class="{'opened':exhibit_timline_opened}"
+                    .timline_container ng-class="{'opened':exhibit_timline_opened}" droppable=""
                       .col-xs-1.control-label 
                         | {{ 'Audio' | i18next }}
                       player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
                   label.col-xs-1.control-label 
                     | {{ 'Images' | i18next }}
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
-                  ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images"
-                    li ng-repeat="image in images" id="exhibit_id_{{$index}}" ng-class="{'hovered': image.hovered}"
-                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}"
+                  ul class="images col-xs-11 {{active_exhibit.has_hovered}}"
+                    li.dragable_image draggable-revert="" ng-repeat="image in active_exhibit.images" data-array-index="{{$index}}" ng-class="{'hovered': image.hovered}"
+                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)"
+                        .label_timestamp ng-show="image.timestamp >= 0"
+                          span.letter_label
+                            | {{ image.order | numstring }} 
+                          span.time 
+                            | {{ image.timestamp | timerepr }}
                         span class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 
@@ -620,8 +625,6 @@ html lang="en" ng-app="Museum"
     script src="lib/jquery.color.js"
     script src="lib/jquery-scrollspy.js"
     script src="lib/i18next-1.7.1.js"
-    script src="lib/jquery.jsPlumb-1.5.3-min.js"
-    / script src="lib/qrcode.js"
     / app part
     script src="js/app.js"
     script src="js/services.js"

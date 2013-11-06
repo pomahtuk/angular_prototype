@@ -757,7 +757,9 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="points_position_holder">
-        <div class="image_connection" draggable ng-repeat="image in $parent.active_exhibit.images" ng-mouseenter="set_hover(image, true)" ng-mouseleave="set_hover(image, false)">{{ charFromNum(image.order) }}</div>
+        <div class="image_connection" connection-draggable ng-class="{'hovered': image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
+          {{ charFromNum(image.order) }}
+        </div>
       </div>
     </div>
   """
@@ -767,10 +769,10 @@ angular.module("Museum.directives", [])
 
     $scope.set_hover = (image, sign) ->
       image.hovered = sign
-      console.log $scope.$parent.active_exhibit
       $scope.$parent.active_exhibit.has_hovered = sign
 
   link: (scope, element, attrs) ->
+    # console.log scope.$parent.active_exhibit
     scope.$watch 'item[field]', (newValue, oldValue) ->
       if newValue
         $("#jquery_jplayer_#{scope.id}").jPlayer
@@ -784,6 +786,7 @@ angular.module("Museum.directives", [])
         $("#jquery_jplayer_#{scope.id}").jPlayer "setMedia",
           mp3: newValue.url
           ogg: newValue.thumbnailUrl
+
     true
 
 .directive "museumSearch", ->
@@ -1127,9 +1130,12 @@ angular.module("Museum.directives", [])
     parent   = element.parents('#drop_down, #museum_edit_dropdown')
     lightbox = parent.find('.lightbox_area')
     element.click ->
-      lightbox.show()
-      parent.height(lightbox.height() + 60) if lightbox.height() + 60 > parent.height()
-      lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
+      if element.parents('li').hasClass('dragged')
+        element.parents('li').removeClass('dragged')
+      else
+        lightbox.show()
+        parent.height(lightbox.height() + 60) if lightbox.height() + 60 > parent.height()
+        lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
     true
 
 .directive 'lightboxCropper', ($http, errorProcessing, $i18next) ->
@@ -1162,7 +1168,7 @@ angular.module("Museum.directives", [])
           <i class="icon-angle-left"></i>
         </a>
         <ul class="images_sortable" sortable="model.images">
-          <li class="thumb dragable_image item_{{$index}} " ng-class="{'active':image.active}" draggable ng-repeat="image in images">
+          <li class="thumb item_{{$index}} " ng-class="{'active':image.active, 'timestamp': image.timestamp >= 0}" ng-repeat="image in images">
             <img ng-click="set_index($index)" src="{{image.thumbnailUrl}}" />
             <a class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch on="image.cover">
               <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
@@ -1231,11 +1237,9 @@ angular.module("Museum.directives", [])
       false
 
     scope.update_media = (index, callback) ->
-      # console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index]._id}", selected).success (data) ->
         console.log  data
-        scope.model.images[index] = data
-        # scope.$digest()
+        angular.extend(scope.model.images[index], data)
         callback() if callback
         return true
       .error ->
@@ -1332,6 +1336,8 @@ angular.module("Museum.directives", [])
     element.disableSelection()
     element.sortable
       placeholder: "ui-state-highlight"
+      cancel: ".timestamp"
+      items: "li:not(.timestamp)"
       start: (event, ui) ->
         ui.item.data 'start', ui.item.index()
       update: ( event, ui ) ->
@@ -1349,84 +1355,127 @@ angular.module("Museum.directives", [])
               errorProcessing.addError $i18next 'Failed to update order' 
           scope.$apply()
 
-# .directive 'plumb', ->
-#   restrict: 'A'
-#   link: (scope, element, attrs) ->
-#     endpointOptions =
-#       anchor: "BottomCenter"
-#       maxConnections: -1
-#       isSource: true
-#       isTarget: true
-#       endpoint: ["Dot",
-#         radius: 7
-#       ]
-#       setDragAllowedWhenFull: true
-#       paintStyle:
-#         fillStyle: "#5b9ada"
-
-#       connectorStyle:
-#         lineWidth: 4
-#         strokeStyle: "#5b9ada"
-
-#       connector: ["Bezier",
-#         curviness: 1
-#       ]
-
-#     starpointOptions = 
-#       anchor: "TopCenter"
-#       maxConnections: -1
-#       isSource: true
-#       isTarget: true
-#       endpoint: ["Dot",
-#         radius: 151
-#       ]
-#       setDragAllowedWhenFull: true
-#       paintStyle:
-#         fillStyle: "#5b9ada"
-
-#       connectorStyle:
-#         lineWidth: 4
-#         strokeStyle: "#5b9ada"
-
-#       connector: ["Bezier",
-#         curviness: 1
-#       ]
-
-#     jsPlumb.bind "ready", ->
-#       jsPlumb.addEndpoint "block1", endpointOptions
-#       jsPlumb.addEndpoint "block2", endpointOptions
-#       jsPlumb.addEndpoint "block3", endpointOptions
-#       jsPlumb.draggable "block1", {containment:"parent", axis: "x"}
-#       jsPlumb.draggable "block2", {containment:"parent", axis: "x"}
-#       jsPlumb.draggable "block3", {containment:"parent", axis: "x"}
-
-
 .directive 'draggable', ->
   restrict: 'A'
   link: (scope, element, attrs) ->
+    console.log 'inited draggable'
     element  = $ element
     element.draggable
       axis: "x"
       containment: "parent"
       cursor: "pointer"
-      drag: (event, ui) ->
-        if ui.position.left < 0
-          ui.helper.css('left', 0)
-      stop: ( event, ui ) -> 
+      stop: ( event, ui ) ->
         console.log event, ui
 
-# .directive 'droppable', ->
-#   restrict: 'A'
-#   link: (scope, element, attrs) ->
-#     element  = $ element
-#     element.droppable
-#       accept: '.dragable_image'
-#       drop: ( event, ui ) -> 
-#         console.log 'dropped'
-#         dropped = ui.draggable
-#         droppedOn = $ @
-#         dropped.attr('style', '').clone().appendTo(droppedOn)
+.directive 'draggableRevert', ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+    element  = $ element
+    element.draggable
+      revert: true
+      cursor: "pointer"
+      start: ( event, ui ) ->
+        ui.helper.addClass('dragged')
+      stop: ( event, ui ) ->
+        event.stopPropagation()
 
+.directive 'droppable', ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+
+    sort_weight_func = (a, b) ->
+      if weight_calc(a) > weight_calc(b)
+        return 1
+      else if weight_calc(a) < weight_calc(b)
+        return -1
+      else
+        return 0
+
+    sort_time_func = (a, b) ->
+      if a.timestamp >= 0
+        if a.timestamp > b.timestamp
+          return 1
+        else if a.timestamp < b.timestamp
+          return -1
+        else
+          return 0
+      else
+        return 0
+
+    weight_calc = (item) ->
+      weight = 0
+      weight += item.order
+      weight -= 100 if item.timestamp >= 0
+      return weight
+
+    element  = $ element
+    console.log scope, element
+    element.droppable
+      accept: '.dragable_image'
+      out: ( event, ui ) ->
+        element.removeClass 'can_drop'
+      over: ( event, ui ) ->
+        element.addClass 'can_drop'
+      drop: ( event, ui ) -> 
+        console.log 'dropped'
+        element.removeClass 'can_drop'
+        found     = false
+        dropped   = ui.draggable
+        droppedOn = $ @
+        dropped.attr('style', '')
+        target_image =  scope.active_exhibit.images[dropped.data('array-index')]
+        scope.active_exhibit.mapped_images = [] unless scope.active_exhibit.mapped_images?
+        for image in scope.active_exhibit.mapped_images
+          if image._id is target_image._id
+            found = true
+            break
+       
+        unless found
+          scope.active_exhibit.mapped_images.push target_image 
+
+          duration = element.find('.jp-duration').text()
+          total_seconds     = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
+          container_width   = element.find('.points_position_holder').width() - 20
+          pixel_sec_weight  = total_seconds / container_width
+          current_position = ui.offset.left * 0.89 - 42
+          current_time = Math.round current_position * pixel_sec_weight
+
+          target_image.timestamp = current_time
+          scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func)
+          for item, index in scope.active_exhibit.images
+            item.order = index
+          scope.$digest()
+
+          scope.recalculate_marker_positions(scope.active_exhibit)
+
+          setTimeout ->
+            element.find('.image_connection').draggable
+              axis: "x"
+              containment: "parent"
+              cursor: "pointer"
+              drag: (event, ui) ->
+                duration = element.find('.jp-duration').text()
+                total_seconds     = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
+                container_width   = element.find('.points_position_holder').width() - 20
+                pixel_sec_weight  = total_seconds / container_width
+                current_position = ui.position.left - 42
+                current_time = Math.round current_position * pixel_sec_weight
+                image = scope.active_exhibit.mapped_images[ui.helper.data('image-index')]
+                if image.timestamp isnt current_time
+                  image.timestamp = current_time
+                  scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func)
+                  for item, index in scope.active_exhibit.images
+                    item.order = index
+                  scope.$digest()
+                true
+              stop: ( event, ui ) ->
+                console.log 'drag_stop'
+                scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func)
+                for item, index in scope.active_exhibit.images
+                  item.order = index
+                scope.$digest()
+                event.stopPropagation()
+          , 200
 
     true
 

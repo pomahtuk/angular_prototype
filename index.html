@@ -444,7 +444,7 @@
                 <div class="tab-pane row" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }" plumb="">
                   <div class="timline_container_holder">
                     <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:exhibit_timline_opened}" ng-click="exhibit_timline_opened = !exhibit_timline_opened">{{ 'Sync images and audio' | i18next }}</button>
-                    <div class="timline_container" ng-class="{&#39;opened&#39;:exhibit_timline_opened}">
+                    <div class="timline_container" droppable="" ng-class="{&#39;opened&#39;:exhibit_timline_opened}">
                       <div class="col-xs-1 control-label">
                         {{ 'Audio' | i18next }}
                       </div>
@@ -452,9 +452,13 @@
                     </div>
                   </div>
                   <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
-                  <ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images">
-                    <li id="exhibit_id_{{$index}}" ng-class="{&#39;hovered&#39;: image.hovered}" ng-repeat="image in images">
-                      <a class="img_thumbnail" data-start="{{$index}}" href="#" open-lightbox="{{$index}}"><span class="cover" ng-class="{&#39;active&#39;:image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                  <ul class="images col-xs-11 {{active_exhibit.has_hovered}}">
+                    <li class="dragable_image" data-array-index="{{$index}}" draggable-revert="" ng-class="{&#39;hovered&#39;: image.hovered}" ng-repeat="image in active_exhibit.images">
+                      <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)" open-lightbox="{{$index}}">
+                        <div class="label_timestamp" ng-show="image.timestamp &gt;= 0">
+                          <span class="letter_label">{{ image.order | numstring }} </span><span class="time">{{ image.timestamp | timerepr }}</span>
+                        </div>
+                        <span class="cover" ng-class="{&#39;active&#39;:image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" src="{{image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                     </li>
                     <li class="upload_item">
                       <div class="drag_here">
@@ -606,7 +610,6 @@
     <script src="lib/jquery.color.js"></script>
     <script src="lib/jquery-scrollspy.js"></script>
     <script src="lib/i18next-1.7.1.js"></script>
-    <script src="lib/jquery.jsPlumb-1.5.3-min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>

@@ -38,7 +38,6 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
     console.log 'valid'
     scope.root.invalid = false
 
-
 .service "errorProcessing", ($rootScope, $timeout) ->
   errors: []
   addError: (error) ->

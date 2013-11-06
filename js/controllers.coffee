@@ -826,6 +826,26 @@ angular.module("Museum.controllers", [])
     else
       ''
 
+  $scope.set_hover = (image, sign) ->
+    image.hovered = sign
+
+  $scope.recalculate_marker_positions = (item) ->
+    duration          = $('.jp-duration:visible').text()
+    total_seconds     = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
+    container_width   = $('.points_position_holder:visible').width() - 20
+    pixel_sec_weight  = total_seconds / container_width
+
+    for marker in $('.image_connection:visible')
+      marker = $ marker
+      image  = item.mapped_images[marker.data('image-index')]
+      left   = image.timestamp / pixel_sec_weight
+      marker.css({'left':"#{left}px"})
+
+
+    # current_position = ui.offset.left * 0.89 - 42
+    # console.log current_position
+    # current_time = Math.round current_position * pixel_sec_weight
+
   $scope.create_dummy_story = (id) ->
     dummy_story = {
       playback_algorithm: 'generic'

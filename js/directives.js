@@ -608,14 +608,13 @@
         field: '@ngField',
         parent: '=parent'
       },
-      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" draggable ng-repeat=\"image in $parent.active_exhibit.images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseleave=\"set_hover(image, false)\">{{ charFromNum(image.order) }}</div>\n  </div>\n</div>",
+      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" connection-draggable ng-class=\"{'hovered': image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.order) }}\n    </div>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.charFromNum = function(num) {
           return String.fromCharCode(num + 97).toUpperCase();
         };
         return $scope.set_hover = function(image, sign) {
           image.hovered = sign;
-          console.log($scope.$parent.active_exhibit);
           return $scope.$parent.active_exhibit.has_hovered = sign;
         };
       },
@@ -1084,11 +1083,15 @@
         parent = element.parents('#drop_down, #museum_edit_dropdown');
         lightbox = parent.find('.lightbox_area');
         element.click(function() {
-          lightbox.show();
-          if (lightbox.height() + 60 > parent.height()) {
-            parent.height(lightbox.height() + 60);
+          if (element.parents('li').hasClass('dragged')) {
+            return element.parents('li').removeClass('dragged');
+          } else {
+            lightbox.show();
+            if (lightbox.height() + 60 > parent.height()) {
+              parent.height(lightbox.height() + 60);
+            }
+            return lightbox.find(".slider img.thumb.item_" + attrs.openLightbox).click();
           }
-          return lightbox.find(".slider img.thumb.item_" + attrs.openLightbox).click();
         });
         return true;
       }
@@ -1101,7 +1104,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\">\n      <li class=\"thumb dragable_image item_{{$index}} \" ng-class=\"{'active':image.active}\" draggable ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" />\n        <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.active, 'timestamp': image.timestamp >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" />\n        <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1169,7 +1172,7 @@
         scope.update_media = function(index, callback) {
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index]._id, selected).success(function(data) {
             console.log(data);
-            scope.model.images[index] = data;
+            angular.extend(scope.model.images[index], data);
             if (callback) {
               callback();
             }
@@ -1291,6 +1294,8 @@
         element.disableSelection();
         return element.sortable({
           placeholder: "ui-state-highlight",
+          cancel: ".timestamp",
+          items: "li:not(.timestamp)",
           start: function(event, ui) {
             return ui.item.data('start', ui.item.index());
           },
@@ -1322,18 +1327,159 @@
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
+        console.log('inited draggable');
         element = $(element);
-        element.draggable({
+        return element.draggable({
           axis: "x",
           containment: "parent",
           cursor: "pointer",
-          drag: function(event, ui) {
-            if (ui.position.left < 0) {
-              return ui.helper.css('left', 0);
-            }
-          },
           stop: function(event, ui) {
             return console.log(event, ui);
+          }
+        });
+      }
+    };
+  }).directive('draggableRevert', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attrs) {
+        element = $(element);
+        return element.draggable({
+          revert: true,
+          cursor: "pointer",
+          start: function(event, ui) {
+            return ui.helper.addClass('dragged');
+          },
+          stop: function(event, ui) {
+            return event.stopPropagation();
+          }
+        });
+      }
+    };
+  }).directive('droppable', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attrs) {
+        var sort_time_func, sort_weight_func, weight_calc;
+        sort_weight_func = function(a, b) {
+          if (weight_calc(a) > weight_calc(b)) {
+            return 1;
+          } else if (weight_calc(a) < weight_calc(b)) {
+            return -1;
+          } else {
+            return 0;
+          }
+        };
+        sort_time_func = function(a, b) {
+          if (a.timestamp >= 0) {
+            if (a.timestamp > b.timestamp) {
+              return 1;
+            } else if (a.timestamp < b.timestamp) {
+              return -1;
+            } else {
+              return 0;
+            }
+          } else {
+            return 0;
+          }
+        };
+        weight_calc = function(item) {
+          var weight;
+          weight = 0;
+          weight += item.order;
+          if (item.timestamp >= 0) {
+            weight -= 100;
+          }
+          return weight;
+        };
+        element = $(element);
+        console.log(scope, element);
+        element.droppable({
+          accept: '.dragable_image',
+          out: function(event, ui) {
+            return element.removeClass('can_drop');
+          },
+          over: function(event, ui) {
+            return element.addClass('can_drop');
+          },
+          drop: function(event, ui) {
+            var container_width, current_position, current_time, dropped, droppedOn, duration, found, image, index, item, pixel_sec_weight, target_image, total_seconds, _i, _j, _len, _len1, _ref, _ref1;
+            console.log('dropped');
+            element.removeClass('can_drop');
+            found = false;
+            dropped = ui.draggable;
+            droppedOn = $(this);
+            dropped.attr('style', '');
+            target_image = scope.active_exhibit.images[dropped.data('array-index')];
+            if (scope.active_exhibit.mapped_images == null) {
+              scope.active_exhibit.mapped_images = [];
+            }
+            _ref = scope.active_exhibit.mapped_images;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              image = _ref[_i];
+              if (image._id === target_image._id) {
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              scope.active_exhibit.mapped_images.push(target_image);
+              duration = element.find('.jp-duration').text();
+              total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
+              container_width = element.find('.points_position_holder').width() - 20;
+              pixel_sec_weight = total_seconds / container_width;
+              current_position = ui.offset.left * 0.89 - 42;
+              current_time = Math.round(current_position * pixel_sec_weight);
+              target_image.timestamp = current_time;
+              scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func);
+              _ref1 = scope.active_exhibit.images;
+              for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
+                item = _ref1[index];
+                item.order = index;
+              }
+              scope.$digest();
+              scope.recalculate_marker_positions(scope.active_exhibit);
+              return setTimeout(function() {
+                return element.find('.image_connection').draggable({
+                  axis: "x",
+                  containment: "parent",
+                  cursor: "pointer",
+                  drag: function(event, ui) {
+                    var _k, _len2, _ref2;
+                    duration = element.find('.jp-duration').text();
+                    total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
+                    container_width = element.find('.points_position_holder').width() - 20;
+                    pixel_sec_weight = total_seconds / container_width;
+                    current_position = ui.position.left - 42;
+                    current_time = Math.round(current_position * pixel_sec_weight);
+                    image = scope.active_exhibit.mapped_images[ui.helper.data('image-index')];
+                    if (image.timestamp !== current_time) {
+                      image.timestamp = current_time;
+                      scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func);
+                      _ref2 = scope.active_exhibit.images;
+                      for (index = _k = 0, _len2 = _ref2.length; _k < _len2; index = ++_k) {
+                        item = _ref2[index];
+                        item.order = index;
+                      }
+                      scope.$digest();
+                    }
+                    return true;
+                  },
+                  stop: function(event, ui) {
+                    var _k, _len2, _ref2;
+                    console.log('drag_stop');
+                    scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func);
+                    _ref2 = scope.active_exhibit.images;
+                    for (index = _k = 0, _len2 = _ref2.length; _k < _len2; index = ++_k) {
+                      item = _ref2[index];
+                      item.order = index;
+                    }
+                    scope.$digest();
+                    return event.stopPropagation();
+                  }
+                });
+              }, 200);
+            }
           }
         });
         return true;
