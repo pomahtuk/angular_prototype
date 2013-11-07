@@ -52,7 +52,7 @@ tileGrid = (collection, tileWidth, tileSpace, tileListMargin) ->
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', ($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) ->
+.controller('IndexController', [ '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', ($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) ->
   
   window.sc = $scope
 
@@ -123,19 +123,25 @@ angular.module("Museum.controllers", [])
       for item in data
         if item?
           exhibit = item.exhibit
-          # exhibit.images = item.images
           exhibit.images = []
+          exhibit.mapped_images = []
           exhibit.cover  = {}
           for image in item.images
             exhibit.images.push image
-            if image.cover is true
-              exhibit.cover = image
+            if image.image.cover is true
+              exhibit.cover = image.image
+            # if image.timestamp >= 0
+            #   exhibit.mapped_images.push exhibit.images[exhibit.images.length - 1]
           exhibit.stories = {}
           for story in item.stories
             story.story.quiz = story.quiz.quiz
             story.story.audio = story.audio
             story.story.video = story.video
             story.story.quiz.answers = story.quiz.answers
+            story.story.mapped_images = []
+            for image in exhibit.images
+              if image.mappings[story.story.language]
+                story.story.mapped_images.push image
             exhibit.stories[story.story.language] = story.story
           exhibits.push exhibit
       ngProgress.complete()
@@ -225,11 +231,14 @@ angular.module("Museum.controllers", [])
         museum.package_status = "process"
         museum.stories = {}
         museum.images = []
+        museum.mapped_images = []
         museum.cover = {}
         for image in item.images
           museum.images.push image
-          if image.cover is true
-            museum.cover = image
+          if image.image.cover is true
+            museum.cover = image.image
+          # if image.timestamp >= 0
+          #   museum.mapped_images.push image
         for story in item.stories
           story.story.city = "Saint-Petersburg"
           story.story.quiz = story.quiz.quiz
@@ -829,22 +838,31 @@ angular.module("Museum.controllers", [])
   $scope.set_hover = (image, sign) ->
     image.hovered = sign
 
-  $scope.recalculate_marker_positions = (item) ->
-    duration          = $('.jp-duration:visible').text()
-    total_seconds     = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
-    container_width   = $('.points_position_holder:visible').width() - 20
-    pixel_sec_weight  = total_seconds / container_width
+  $scope.check_mapped = (item, event) ->
+    console.log event
+    target = $ event.target
+    selector = target.parents('.description').find('.timline_container')
+    if $scope.active_exhibit.mapped_images.length > 0
+      setTimeout ->
+        $scope.recalculate_marker_positions(item, selector)
+      , 100
+
+  $scope.recalculate_marker_positions = (item, selector) ->
+    seek_bar   = selector.find('.jp-seek-bar')
+    jp_durat   = selector.find('.jp-duration')
+    jp_play    = selector.find('.jp-play')
+    correction = jp_play.width()
+
+    container_width  = seek_bar.width() - 15
+    duration         = jp_durat.text()
+    total_seconds    = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
+    pixel_sec_weight = total_seconds / container_width
 
     for marker in $('.image_connection:visible')
       marker = $ marker
       image  = item.mapped_images[marker.data('image-index')]
-      left   = image.timestamp / pixel_sec_weight
-      marker.css({'left':"#{left}px"})
-
-
-    # current_position = ui.offset.left * 0.89 - 42
-    # console.log current_position
-    # current_time = Math.round current_position * pixel_sec_weight
+      left   = image.mappings[$scope.current_museum.language].timestamp / pixel_sec_weight
+      marker.css({'left':"#{left + correction}px"})
 
   $scope.create_dummy_story = (id) ->
     dummy_story = {
@@ -1272,6 +1290,7 @@ angular.module("Museum.controllers", [])
 
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
     console.log newValue
+    $rootScope.lang = newValue
     if newValue
       if newValue isnt 'dummy'
         console.log 'not dummy'

@@ -457,7 +457,7 @@ html lang="en" ng-app="Museum"
                       i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"
                       i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"
                 li ng-class="{'active': story_tab == 'images' }"
-                  a href="#" ng-click="story_tab = 'images'" 
+                  a href="#" ng-click="story_tab = 'images'; check_mapped(active_exhibit, $event)" 
                     | {{ 'Images' | i18next }}
                     span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"
                       i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"
@@ -474,9 +474,9 @@ html lang="en" ng-app="Museum"
 
                 .tab-pane.row  ng-class="{'active': story_tab == 'images' }" plumb=""
                   .timline_container_holder
-                    button.btn.btn-default.timeline_toggler ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened}"
+                    button.btn.btn-default.timeline_toggler ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.mapped_images.length > 0}"
                       | {{ 'Sync images and audio' | i18next }}
-                    .timline_container ng-class="{'opened':exhibit_timline_opened}" droppable=""
+                    .timline_container ng-class="{'opened': exhibit_timline_opened || active_exhibit.mapped_images.length > 0}" id="{{active_exhibit._id}}" droppable=""
                       .col-xs-1.control-label 
                         | {{ 'Audio' | i18next }}
                       player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
@@ -484,19 +484,19 @@ html lang="en" ng-app="Museum"
                     | {{ 'Images' | i18next }}
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
                   ul class="images col-xs-11 {{active_exhibit.has_hovered}}"
-                    li.dragable_image draggable-revert="" ng-repeat="image in active_exhibit.images" data-array-index="{{$index}}" ng-class="{'hovered': image.hovered}"
+                    li.dragable_image draggable-revert="" ng-repeat="image in active_exhibit.images" data-lang="{{current_museum.language}}" data-array-index="{{$index}}" ng-class="{'hovered': image.image.hovered}"
                       a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)"
-                        .label_timestamp ng-show="image.timestamp >= 0"
+                        .label_timestamp ng-show="image.mappings[current_museum.language].timestamp >= 0"
                           span.letter_label
-                            | {{ image.order | numstring }} 
+                            | {{ image.image.order | numstring }} 
                           span.time 
-                            | {{ image.timestamp | timerepr }}
-                        span class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.cover"
+                            | {{ image.mappings[current_museum.language].timestamp | timerepr }}
+                        span class="cover" ng-class="{'active':image.image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 
                             |  {{ "Cover" | i18next }}
-                        img src="{{image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
-                      a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image" parent="$parent.$parent.active_exhibit" rel="nofollow" ×
+                        img src="{{image.image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
+                      a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" ×
 
                     li.upload_item
                       .drag_here

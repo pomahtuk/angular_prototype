@@ -319,7 +319,6 @@ angular.module("Museum.directives", [])
           elem.val scope.oldValue
           scope.item[scope.field] = scope.oldValue
           scope.empty_name_error = true
-          console.log scope.empty_name_error
           scope.$digest()
           setTimeout ->
             scope.empty_name_error = false
@@ -695,7 +694,6 @@ angular.module("Museum.directives", [])
         scope.edit_mode = 'processing'
       else
         scope.edit_mode = 'value'
-        # console.log newValue
         $("#jquery_jplayer_#{scope.id}").jPlayer
           cssSelectorAncestor: "#jp_container_#{scope.id}"
           swfPath: "/js"
@@ -718,8 +716,7 @@ angular.module("Museum.directives", [])
     help: '@ngHelp'
     id: '@ngId'
     title: '@ngTitle'
-    field: '@ngField'
-    parent: '=parent'
+    field: '@ngField'    
   template: """
     <div class="player">
       <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
@@ -757,8 +754,8 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="points_position_holder">
-        <div class="image_connection" connection-draggable ng-class="{'hovered': image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
-          {{ charFromNum(image.order) }}
+        <div class="image_connection" connection-draggable ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
+          {{ charFromNum(image.image.order) }}
         </div>
       </div>
     </div>
@@ -768,11 +765,10 @@ angular.module("Museum.directives", [])
       String.fromCharCode(num + 97).toUpperCase()
 
     $scope.set_hover = (image, sign) ->
-      image.hovered = sign
+      image.image.hovered = sign
       $scope.$parent.active_exhibit.has_hovered = sign
 
   link: (scope, element, attrs) ->
-    # console.log scope.$parent.active_exhibit
     scope.$watch 'item[field]', (newValue, oldValue) ->
       if newValue
         $("#jquery_jplayer_#{scope.id}").jPlayer
@@ -903,20 +899,20 @@ angular.module("Museum.directives", [])
           errorProcessing.addError $i18next 'Unsupported file type'
           hide_drop_area()
       success: (result) ->
-        console.log result, scope.model
         for file in result
           if file.type is 'image'
             scope.model.images = [] unless scope.model.images?
+            new_image = {}
+            new_image.image = file
             if file.cover is true
               scope.$apply scope.model.cover = file
-            scope.$apply scope.model.images.push file
+            scope.$apply scope.model.images.push new_image
           else if file.type is 'audio'
             scope.$apply scope.model.stories[scope.$parent.current_museum.language].audio = file
           else if file.type is 'video'
             scope.$apply scope.model.stories[scope.$parent.current_museum.language].video = file
           scope.$digest()
       error: (result, status, errorThrown) ->
-        console.log status, result, errorThrown
         if errorThrown == 'abort'
           errorProcessing.addError $i18next 'Uploading aborted'
         else
@@ -944,7 +940,6 @@ angular.module("Museum.directives", [])
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
     scope.$watch 'url', (newValue, oldValue) ->
-      # console.log newValue
       if newValue
         element.fileupload "option", "url", newValue
 
@@ -1042,7 +1037,6 @@ angular.module("Museum.directives", [])
     answers_watcher  = null
     qr_code_watcher  = null
 
-    # console.log scope
     scope.$watch 'active_exhibit.stories[current_museum.language]', (newValue, oldValue) ->
       quiz_watcher() if quiz_watcher?
       question_watcher() if question_watcher?
@@ -1155,12 +1149,12 @@ angular.module("Museum.directives", [])
           {{ "PREVIEW" | i18next }}
           <div class="mobile">
             <div class="image">
-              <img src="{{model.images[active_image_index].url}}">
+              <img src="{{model.images[active_image_index].image.url}}">
             </div>
           </div>
         </div>
         <div class="cropping_area">
-          <img src="{{model.images[active_image_index].url}}">
+          <img src="{{model.images[active_image_index].image.url}}">
         </div>
       </div>
       <div class="slider">
@@ -1168,9 +1162,9 @@ angular.module("Museum.directives", [])
           <i class="icon-angle-left"></i>
         </a>
         <ul class="images_sortable" sortable="model.images">
-          <li class="thumb item_{{$index}} " ng-class="{'active':image.active, 'timestamp': image.timestamp >= 0}" ng-repeat="image in images">
-            <img ng-click="set_index($index)" src="{{image.thumbnailUrl}}" />
-            <a class="cover" ng-class="{'active':image.cover}" ng-click="make_cover($index)" ng-switch on="image.cover">
+          <li class="thumb item_{{$index}} " ng-class="{'active':image.image.active, 'timestamp': image.mappings[model.language] >= 0}" ng-repeat="image in images">
+            <img ng-click="set_index($index)" src="{{image.image.thumbnailUrl}}" />
+            <a class="cover" ng-class="{'active':image.image.cover}" ng-click="make_cover($index)" ng-switch on="image.image.cover">
               <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
               <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
             </a>
@@ -1187,27 +1181,25 @@ angular.module("Museum.directives", [])
     $scope.set_index = (index) ->
       $scope.update_media $scope.active_image_index, ->
         $scope.active_image_index = index
-        console.log $scope.active_image_index, index
 
     $scope.make_cover = (index) ->
       $scope.model.cover = $scope.model.images[index]
       for image in $scope.model.images
-        if image._id isnt $scope.model.cover._id
-          image.cover = false
+        if image.image._id isnt $scope.model.cover.image._id
+          image.image.cover = false
         else
-          image.cover = true
+          image.image.cover = true
           setTimeout (->
-            console.log @
-            @.order = 0).bind(image)()
+            @.order = 0).bind(image.image)()
           , 500
-        $http.put("#{$scope.$parent.backend_url}/media/#{image._id}", image).success (data) ->
+        $http.put("#{$scope.$parent.backend_url}/media/#{image.image._id}", image.image).success (data) ->
           console.log 'ok'
         .error ->
           errorProcessing.addError $i18next 'Failed to set cover' 
 
     $scope.check_active_image = ->
       for image, index in $scope.model.images
-        image.active = if index is $scope.active_image_index
+        image.image.active = if index is $scope.active_image_index
           true
         else
           false
@@ -1237,9 +1229,9 @@ angular.module("Museum.directives", [])
       false
 
     scope.update_media = (index, callback) ->
-      $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index]._id}", selected).success (data) ->
+      $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
         console.log  data
-        angular.extend(scope.model.images[index], data)
+        angular.extend(scope.model.images[index].image, data)
         callback() if callback
         return true
       .error ->
@@ -1270,8 +1262,8 @@ angular.module("Museum.directives", [])
 
       preview.attr 'style', ""
 
-      if scope.model.images[scope.active_image_index].selection
-        selected = JSON.parse scope.model.images[scope.active_image_index].selection 
+      if scope.model.images[scope.active_image_index].image.selection
+        selected = JSON.parse scope.model.images[scope.active_image_index].image.selection 
       else
         selected = {
           x: 0
@@ -1307,7 +1299,7 @@ angular.module("Museum.directives", [])
       if newValue?
         if newValue.length > 0
           for image in newValue
-            image.active = false
+            image.image.active = false
           newValue[0].active = true
           left.css({'opacity': 0})
           scope.active_image_index = 0
@@ -1345,7 +1337,6 @@ angular.module("Museum.directives", [])
         start    = ui.item.data('start')
         end      = ui.item.index()
         scope.images.splice(end, 0, scope.images.splice(start, 1)[0])
-        console.log scope.images[end]
         if scope.images[end].order isnt end
           for image, index in scope.images
             image.order = index
@@ -1355,17 +1346,37 @@ angular.module("Museum.directives", [])
               errorProcessing.addError $i18next 'Failed to update order' 
           scope.$apply()
 
-.directive 'draggable', ->
+.directive 'draggable', ($rootScope, $i18next, imageMappingHelpers) ->
   restrict: 'A'
   link: (scope, element, attrs) ->
-    console.log 'inited draggable'
+    console.log scope
     element  = $ element
+
+    weight_calc = imageMappingHelpers.weight_calc
+
     element.draggable
       axis: "x"
       containment: "parent"
       cursor: "pointer"
+      drag: (event, ui) ->
+        current_time = imageMappingHelpers.calc_timestamp(ui, false)
+        image = scope.$parent.$parent.active_exhibit.mapped_images[ui.helper.data('image-index')]
+        if image.mappings[$rootScope.lang].timestamp isnt current_time
+          image.mappings[$rootScope.lang].timestamp = current_time
+          scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+          for item, index in scope.$parent.$parent.active_exhibit.images
+            item.image.order = index
+          scope.$parent.$parent.$digest()
+        true
       stop: ( event, ui ) ->
-        console.log event, ui
+        console.log 'drag_stop'
+        scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+        for item, index in scope.$parent.$parent.active_exhibit.images
+          item.image.order = index
+          imageMappingHelpers.update_image(item.image, scope.$parent.$parent.backend_url)
+
+        scope.$parent.$parent.$digest()
+        event.stopPropagation()
 
 .directive 'draggableRevert', ->
   restrict: 'A'
@@ -1379,37 +1390,10 @@ angular.module("Museum.directives", [])
       stop: ( event, ui ) ->
         event.stopPropagation()
 
-.directive 'droppable', ->
+.directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->
   restrict: 'A'
   link: (scope, element, attrs) ->
-
-    sort_weight_func = (a, b) ->
-      if weight_calc(a) > weight_calc(b)
-        return 1
-      else if weight_calc(a) < weight_calc(b)
-        return -1
-      else
-        return 0
-
-    sort_time_func = (a, b) ->
-      if a.timestamp >= 0
-        if a.timestamp > b.timestamp
-          return 1
-        else if a.timestamp < b.timestamp
-          return -1
-        else
-          return 0
-      else
-        return 0
-
-    weight_calc = (item) ->
-      weight = 0
-      weight += item.order
-      weight -= 100 if item.timestamp >= 0
-      return weight
-
     element  = $ element
-    console.log scope, element
     element.droppable
       accept: '.dragable_image'
       out: ( event, ui ) ->
@@ -1423,59 +1407,29 @@ angular.module("Museum.directives", [])
         dropped   = ui.draggable
         droppedOn = $ @
         dropped.attr('style', '')
+        seek_bar = element.find('.jp-seek-bar')
+        jp_durat = element.find('.jp-duration')
+        jp_play  = element.find('.jp-play')
         target_image =  scope.active_exhibit.images[dropped.data('array-index')]
         scope.active_exhibit.mapped_images = [] unless scope.active_exhibit.mapped_images?
         for image in scope.active_exhibit.mapped_images
-          if image._id is target_image._id
+          if image.image._id is target_image.image._id
             found = true
-            break
-       
+            break       
         unless found
           scope.active_exhibit.mapped_images.push target_image 
-
-          duration = element.find('.jp-duration').text()
-          total_seconds     = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
-          container_width   = element.find('.points_position_holder').width() - 20
-          pixel_sec_weight  = total_seconds / container_width
-          current_position = ui.offset.left * 0.89 - 42
-          current_time = Math.round current_position * pixel_sec_weight
-
-          target_image.timestamp = current_time
-          scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func)
+          target_image.mappings[dropped.data('lang')] = {}
+          target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true)
+          target_image.mappings[dropped.data('lang')].language  = dropped.data('lang')
+          target_image.mappings[dropped.data('lang')].image     = target_image._id
+          scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
           for item, index in scope.active_exhibit.images
-            item.order = index
+            item.image.order = index
+            imageMappingHelpers.create_mapping(item.image, scope.backend_url)
+
           scope.$digest()
 
-          scope.recalculate_marker_positions(scope.active_exhibit)
-
-          setTimeout ->
-            element.find('.image_connection').draggable
-              axis: "x"
-              containment: "parent"
-              cursor: "pointer"
-              drag: (event, ui) ->
-                duration = element.find('.jp-duration').text()
-                total_seconds     = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60
-                container_width   = element.find('.points_position_holder').width() - 20
-                pixel_sec_weight  = total_seconds / container_width
-                current_position = ui.position.left - 42
-                current_time = Math.round current_position * pixel_sec_weight
-                image = scope.active_exhibit.mapped_images[ui.helper.data('image-index')]
-                if image.timestamp isnt current_time
-                  image.timestamp = current_time
-                  scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func)
-                  for item, index in scope.active_exhibit.images
-                    item.order = index
-                  scope.$digest()
-                true
-              stop: ( event, ui ) ->
-                console.log 'drag_stop'
-                scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func)
-                for item, index in scope.active_exhibit.images
-                  item.order = index
-                scope.$digest()
-                event.stopPropagation()
-          , 200
+          scope.recalculate_marker_positions(scope.active_exhibit, element)
 
     true
 

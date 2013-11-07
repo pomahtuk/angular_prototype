@@ -91,6 +91,7 @@
   "Failed to update a thumbnail": "Не удалось обновить превью",
   "Failed to save quiz state": "Не удалось сохранить статус квиза",
   "Failed to update order": "Не удалось обновить порядок",
+  "Failed to set timestamp": "Не удалось установить метку времени",
 
   "Publish": "Опубликовать",
   "Published": "Опубликовано",

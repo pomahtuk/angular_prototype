@@ -278,7 +278,6 @@
               elem.val(scope.oldValue);
               scope.item[scope.field] = scope.oldValue;
               scope.empty_name_error = true;
-              console.log(scope.empty_name_error);
               scope.$digest();
               setTimeout(function() {
                 scope.empty_name_error = false;
@@ -605,16 +604,15 @@
         help: '@ngHelp',
         id: '@ngId',
         title: '@ngTitle',
-        field: '@ngField',
-        parent: '=parent'
+        field: '@ngField'
       },
-      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" connection-draggable ng-class=\"{'hovered': image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.order) }}\n    </div>\n  </div>\n</div>",
+      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" connection-draggable ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.charFromNum = function(num) {
           return String.fromCharCode(num + 97).toUpperCase();
         };
         return $scope.set_hover = function(image, sign) {
-          image.hovered = sign;
+          image.image.hovered = sign;
           return $scope.$parent.active_exhibit.has_hovered = sign;
         };
       },
@@ -766,8 +764,7 @@
             }
           },
           success: function(result) {
-            var file, _i, _len, _results;
-            console.log(result, scope.model);
+            var file, new_image, _i, _len, _results;
             _results = [];
             for (_i = 0, _len = result.length; _i < _len; _i++) {
               file = result[_i];
@@ -775,10 +772,12 @@
                 if (scope.model.images == null) {
                   scope.model.images = [];
                 }
+                new_image = {};
+                new_image.image = file;
                 if (file.cover === true) {
                   scope.$apply(scope.model.cover = file);
                 }
-                scope.$apply(scope.model.images.push(file));
+                scope.$apply(scope.model.images.push(new_image));
               } else if (file.type === 'audio') {
                 scope.$apply(scope.model.stories[scope.$parent.current_museum.language].audio = file);
               } else if (file.type === 'video') {
@@ -790,7 +789,6 @@
           },
           error: function(result, status, errorThrown) {
             var response, responseText;
-            console.log(status, result, errorThrown);
             if (errorThrown === 'abort') {
               errorProcessing.addError($i18next('Uploading aborted'));
             } else {
@@ -1104,12 +1102,11 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.active, 'timestamp': image.timestamp >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.thumbnailUrl}}\" />\n        <a class=\"cover\" ng-class=\"{'active':image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].image.url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].image.url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[model.language] >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n        <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
-            $scope.active_image_index = index;
-            return console.log($scope.active_image_index, index);
+            return $scope.active_image_index = index;
           });
         };
         $scope.make_cover = function(index) {
@@ -1119,16 +1116,15 @@
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             image = _ref[_i];
-            if (image._id !== $scope.model.cover._id) {
-              image.cover = false;
+            if (image.image._id !== $scope.model.cover.image._id) {
+              image.image.cover = false;
             } else {
-              image.cover = true;
+              image.image.cover = true;
               setTimeout((function() {
-                console.log(this);
                 return this.order = 0;
-              }).bind(image)(), 500);
+              }).bind(image.image)(), 500);
             }
-            _results.push($http.put("" + $scope.$parent.backend_url + "/media/" + image._id, image).success(function(data) {
+            _results.push($http.put("" + $scope.$parent.backend_url + "/media/" + image.image._id, image.image).success(function(data) {
               return console.log('ok');
             }).error(function() {
               return errorProcessing.addError($i18next('Failed to set cover'));
@@ -1142,7 +1138,7 @@
           _results = [];
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             image = _ref[index];
-            _results.push(image.active = index === $scope.active_image_index ? true : false);
+            _results.push(image.image.active = index === $scope.active_image_index ? true : false);
           }
           return _results;
         };
@@ -1170,9 +1166,9 @@
           return false;
         });
         scope.update_media = function(index, callback) {
-          return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index]._id, selected).success(function(data) {
+          return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
             console.log(data);
-            angular.extend(scope.model.images[index], data);
+            angular.extend(scope.model.images[index].image, data);
             if (callback) {
               callback();
             }
@@ -1206,8 +1202,8 @@
           cropper.height(max_height);
           cropper.width(imageWidth * (max_height / imageHeight));
           preview.attr('style', "");
-          if (scope.model.images[scope.active_image_index].selection) {
-            selected = JSON.parse(scope.model.images[scope.active_image_index].selection);
+          if (scope.model.images[scope.active_image_index].image.selection) {
+            selected = JSON.parse(scope.model.images[scope.active_image_index].image.selection);
           } else {
             selected = {
               x: 0,
@@ -1244,7 +1240,7 @@
             if (newValue.length > 0) {
               for (_i = 0, _len = newValue.length; _i < _len; _i++) {
                 image = newValue[_i];
-                image.active = false;
+                image.image.active = false;
               }
               newValue[0].active = true;
               left.css({
@@ -1305,7 +1301,6 @@
             start = ui.item.data('start');
             end = ui.item.index();
             scope.images.splice(end, 0, scope.images.splice(start, 1)[0]);
-            console.log(scope.images[end]);
             if (scope.images[end].order !== end) {
               _ref = scope.images;
               for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
@@ -1323,18 +1318,46 @@
         });
       }
     };
-  }).directive('draggable', function() {
+  }).directive('draggable', function($rootScope, $i18next, imageMappingHelpers) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        console.log('inited draggable');
+        var weight_calc;
+        console.log(scope);
         element = $(element);
+        weight_calc = imageMappingHelpers.weight_calc;
         return element.draggable({
           axis: "x",
           containment: "parent",
           cursor: "pointer",
+          drag: function(event, ui) {
+            var current_time, image, index, item, _i, _len, _ref;
+            current_time = imageMappingHelpers.calc_timestamp(ui, false);
+            image = scope.$parent.$parent.active_exhibit.mapped_images[ui.helper.data('image-index')];
+            if (image.mappings[$rootScope.lang].timestamp !== current_time) {
+              image.mappings[$rootScope.lang].timestamp = current_time;
+              scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+              _ref = scope.$parent.$parent.active_exhibit.images;
+              for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                item = _ref[index];
+                item.image.order = index;
+              }
+              scope.$parent.$parent.$digest();
+            }
+            return true;
+          },
           stop: function(event, ui) {
-            return console.log(event, ui);
+            var index, item, _i, _len, _ref;
+            console.log('drag_stop');
+            scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+            _ref = scope.$parent.$parent.active_exhibit.images;
+            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+              item = _ref[index];
+              item.image.order = index;
+              imageMappingHelpers.update_image(item.image, scope.$parent.$parent.backend_url);
+            }
+            scope.$parent.$parent.$digest();
+            return event.stopPropagation();
           }
         });
       }
@@ -1356,44 +1379,11 @@
         });
       }
     };
-  }).directive('droppable', function() {
+  }).directive('droppable', function($http, errorProcessing, $i18next, imageMappingHelpers) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var sort_time_func, sort_weight_func, weight_calc;
-        sort_weight_func = function(a, b) {
-          if (weight_calc(a) > weight_calc(b)) {
-            return 1;
-          } else if (weight_calc(a) < weight_calc(b)) {
-            return -1;
-          } else {
-            return 0;
-          }
-        };
-        sort_time_func = function(a, b) {
-          if (a.timestamp >= 0) {
-            if (a.timestamp > b.timestamp) {
-              return 1;
-            } else if (a.timestamp < b.timestamp) {
-              return -1;
-            } else {
-              return 0;
-            }
-          } else {
-            return 0;
-          }
-        };
-        weight_calc = function(item) {
-          var weight;
-          weight = 0;
-          weight += item.order;
-          if (item.timestamp >= 0) {
-            weight -= 100;
-          }
-          return weight;
-        };
         element = $(element);
-        console.log(scope, element);
         element.droppable({
           accept: '.dragable_image',
           out: function(event, ui) {
@@ -1403,13 +1393,16 @@
             return element.addClass('can_drop');
           },
           drop: function(event, ui) {
-            var container_width, current_position, current_time, dropped, droppedOn, duration, found, image, index, item, pixel_sec_weight, target_image, total_seconds, _i, _j, _len, _len1, _ref, _ref1;
+            var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, seek_bar, target_image, _i, _j, _len, _len1, _ref, _ref1;
             console.log('dropped');
             element.removeClass('can_drop');
             found = false;
             dropped = ui.draggable;
             droppedOn = $(this);
             dropped.attr('style', '');
+            seek_bar = element.find('.jp-seek-bar');
+            jp_durat = element.find('.jp-duration');
+            jp_play = element.find('.jp-play');
             target_image = scope.active_exhibit.images[dropped.data('array-index')];
             if (scope.active_exhibit.mapped_images == null) {
               scope.active_exhibit.mapped_images = [];
@@ -1417,68 +1410,26 @@
             _ref = scope.active_exhibit.mapped_images;
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               image = _ref[_i];
-              if (image._id === target_image._id) {
+              if (image.image._id === target_image.image._id) {
                 found = true;
                 break;
               }
             }
             if (!found) {
               scope.active_exhibit.mapped_images.push(target_image);
-              duration = element.find('.jp-duration').text();
-              total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
-              container_width = element.find('.points_position_holder').width() - 20;
-              pixel_sec_weight = total_seconds / container_width;
-              current_position = ui.offset.left * 0.89 - 42;
-              current_time = Math.round(current_position * pixel_sec_weight);
-              target_image.timestamp = current_time;
-              scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func);
+              target_image.mappings[dropped.data('lang')] = {};
+              target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true);
+              target_image.mappings[dropped.data('lang')].language = dropped.data('lang');
+              target_image.mappings[dropped.data('lang')].image = target_image._id;
+              scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
               _ref1 = scope.active_exhibit.images;
               for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
                 item = _ref1[index];
-                item.order = index;
+                item.image.order = index;
+                imageMappingHelpers.create_mapping(item.image, scope.backend_url);
               }
               scope.$digest();
-              scope.recalculate_marker_positions(scope.active_exhibit);
-              return setTimeout(function() {
-                return element.find('.image_connection').draggable({
-                  axis: "x",
-                  containment: "parent",
-                  cursor: "pointer",
-                  drag: function(event, ui) {
-                    var _k, _len2, _ref2;
-                    duration = element.find('.jp-duration').text();
-                    total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
-                    container_width = element.find('.points_position_holder').width() - 20;
-                    pixel_sec_weight = total_seconds / container_width;
-                    current_position = ui.position.left - 42;
-                    current_time = Math.round(current_position * pixel_sec_weight);
-                    image = scope.active_exhibit.mapped_images[ui.helper.data('image-index')];
-                    if (image.timestamp !== current_time) {
-                      image.timestamp = current_time;
-                      scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func);
-                      _ref2 = scope.active_exhibit.images;
-                      for (index = _k = 0, _len2 = _ref2.length; _k < _len2; index = ++_k) {
-                        item = _ref2[index];
-                        item.order = index;
-                      }
-                      scope.$digest();
-                    }
-                    return true;
-                  },
-                  stop: function(event, ui) {
-                    var _k, _len2, _ref2;
-                    console.log('drag_stop');
-                    scope.active_exhibit.images.sort(sort_weight_func).sort(sort_time_func);
-                    _ref2 = scope.active_exhibit.images;
-                    for (index = _k = 0, _len2 = _ref2.length; _k < _len2; index = ++_k) {
-                      item = _ref2[index];
-                      item.order = index;
-                    }
-                    scope.$digest();
-                    return event.stopPropagation();
-                  }
-                });
-              }, 200);
+              return scope.recalculate_marker_positions(scope.active_exhibit, element);
             }
           }
         });

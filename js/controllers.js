@@ -76,7 +76,7 @@
   };
 
   angular.module("Museum.controllers", []).controller('IndexController', [
-    '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', function($scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) {
+    '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', function($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) {
       var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
       window.sc = $scope;
       $scope.exhibit_search = '';
@@ -141,20 +141,21 @@
           sort_direction = $scope.sort_direction;
         }
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
-          var exhibit, exhibits, image, item, story, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+          var exhibit, exhibits, image, item, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
           exhibits = [];
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             item = data[_i];
             if (item != null) {
               exhibit = item.exhibit;
               exhibit.images = [];
+              exhibit.mapped_images = [];
               exhibit.cover = {};
               _ref = item.images;
               for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
                 image = _ref[_j];
                 exhibit.images.push(image);
-                if (image.cover === true) {
-                  exhibit.cover = image;
+                if (image.image.cover === true) {
+                  exhibit.cover = image.image;
                 }
               }
               exhibit.stories = {};
@@ -165,6 +166,14 @@
                 story.story.audio = story.audio;
                 story.story.video = story.video;
                 story.story.quiz.answers = story.quiz.answers;
+                story.story.mapped_images = [];
+                _ref2 = exhibit.images;
+                for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
+                  image = _ref2[_l];
+                  if (image.mappings[story.story.language]) {
+                    story.story.mapped_images.push(image);
+                  }
+                }
                 exhibit.stories[story.story.language] = story.story;
               }
               exhibits.push(exhibit);
@@ -257,13 +266,14 @@
             museum.package_status = "process";
             museum.stories = {};
             museum.images = [];
+            museum.mapped_images = [];
             museum.cover = {};
             _ref = item.images;
             for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
               image = _ref[_j];
               museum.images.push(image);
-              if (image.cover === true) {
-                museum.cover = image;
+              if (image.image.cover === true) {
+                museum.cover = image.image;
               }
             }
             _ref1 = item.stories;
@@ -862,11 +872,26 @@
       $scope.set_hover = function(image, sign) {
         return image.hovered = sign;
       };
-      $scope.recalculate_marker_positions = function(item) {
-        var container_width, duration, image, left, marker, pixel_sec_weight, total_seconds, _i, _len, _ref, _results;
-        duration = $('.jp-duration:visible').text();
+      $scope.check_mapped = function(item, event) {
+        var selector, target;
+        console.log(event);
+        target = $(event.target);
+        selector = target.parents('.description').find('.timline_container');
+        if ($scope.active_exhibit.mapped_images.length > 0) {
+          return setTimeout(function() {
+            return $scope.recalculate_marker_positions(item, selector);
+          }, 100);
+        }
+      };
+      $scope.recalculate_marker_positions = function(item, selector) {
+        var container_width, correction, duration, image, jp_durat, jp_play, left, marker, pixel_sec_weight, seek_bar, total_seconds, _i, _len, _ref, _results;
+        seek_bar = selector.find('.jp-seek-bar');
+        jp_durat = selector.find('.jp-duration');
+        jp_play = selector.find('.jp-play');
+        correction = jp_play.width();
+        container_width = seek_bar.width() - 15;
+        duration = jp_durat.text();
         total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
-        container_width = $('.points_position_holder:visible').width() - 20;
         pixel_sec_weight = total_seconds / container_width;
         _ref = $('.image_connection:visible');
         _results = [];
@@ -874,9 +899,9 @@
           marker = _ref[_i];
           marker = $(marker);
           image = item.mapped_images[marker.data('image-index')];
-          left = image.timestamp / pixel_sec_weight;
+          left = image.mappings[$scope.current_museum.language].timestamp / pixel_sec_weight;
           _results.push(marker.css({
-            'left': "" + left + "px"
+            'left': "" + (left + correction) + "px"
           }));
         }
         return _results;
@@ -1409,6 +1434,7 @@
       };
       $scope.$watch('current_museum.language', function(newValue, oldValue) {
         console.log(newValue);
+        $rootScope.lang = newValue;
         if (newValue) {
           if (newValue !== 'dummy') {
             console.log('not dummy');
