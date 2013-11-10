@@ -55,15 +55,13 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
       return 0
 
   sort_time_func: (a, b) ->
-    if a.timestamp >= 0
-      if a.timestamp > b.timestamp
-        return 1
-      else if a.timestamp < b.timestamp
-        return -1
-      else
-        return 0
-    else
-      return 0
+    if a.mappings[$rootScope.lang]? and b.mappings[$rootScope.lang]?
+      if a.mappings[$rootScope.lang].timestamp >= 0
+        if a.mappings[$rootScope.lang].timestamp > b.mappings[$rootScope.lang].timestamp
+          return 1
+        else if a.mappings[$rootScope.lang].timestamp < b.mappings[$rootScope.lang].timestamp
+          return -1
+    return 0
 
   calc_timestamp: (ui, initial = false) ->
     seek_bar = $('.jp-seek-bar:visible')
@@ -94,9 +92,11 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
     true
 
   create_mapping: (image, backend_url) ->
+    console.log 'creating'
+    # image.mappings[$rootScope.lang].media = image.image._id
     $http.post("#{backend_url}/media_mapping/", image.mappings[$rootScope.lang]).success (data) ->
       image.mappings[$rootScope.lang] = data
-      console.log 'ok'
+      console.log 'ok', data
     .error ->
       errorProcessing.addError $i18next 'Failed to set timestamp'
     true

@@ -92,6 +92,7 @@
   "Failed to save quiz state": "Не удалось сохранить статус квиза",
   "Failed to update order": "Не удалось обновить порядок",
   "Failed to set timestamp": "Не удалось установить метку времени",
+  "Failed to delete timestamp": "Не удалось удалить метку времени",
 
   "Publish": "Опубликовать",
   "Published": "Опубликовано",

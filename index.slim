@@ -474,9 +474,9 @@ html lang="en" ng-app="Museum"
 
                 .tab-pane.row  ng-class="{'active': story_tab == 'images' }" plumb=""
                   .timline_container_holder
-                    button.btn.btn-default.timeline_toggler ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.mapped_images.length > 0}"
+                    button.btn.btn-default.timeline_toggler ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
                       | {{ 'Sync images and audio' | i18next }}
-                    .timline_container ng-class="{'opened': exhibit_timline_opened || active_exhibit.mapped_images.length > 0}" id="{{active_exhibit._id}}" droppable=""
+                    .timline_container ng-class="{'opened': exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0}" id="{{active_exhibit._id}}" droppable=""
                       .col-xs-1.control-label 
                         | {{ 'Audio' | i18next }}
                       player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
@@ -491,6 +491,7 @@ html lang="en" ng-app="Museum"
                             | {{ image.image.order | numstring }} 
                           span.time 
                             | {{ image.mappings[current_museum.language].timestamp | timerepr }}
+                          span.delete_maping ng-click="delete_mapping($index, $event)" ×
                         span class="cover" ng-class="{'active':image.image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 

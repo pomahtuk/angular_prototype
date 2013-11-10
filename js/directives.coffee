@@ -754,7 +754,7 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="points_position_holder">
-        <div class="image_connection" connection-draggable ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
+        <div class="image_connection" connection-draggable ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
           {{ charFromNum(image.image.order) }}
         </div>
       </div>
@@ -1360,20 +1360,21 @@ angular.module("Museum.directives", [])
       cursor: "pointer"
       drag: (event, ui) ->
         current_time = imageMappingHelpers.calc_timestamp(ui, false)
-        image = scope.$parent.$parent.active_exhibit.mapped_images[ui.helper.data('image-index')]
-        if image.mappings[$rootScope.lang].timestamp isnt current_time
-          image.mappings[$rootScope.lang].timestamp = current_time
-          scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
-          for item, index in scope.$parent.$parent.active_exhibit.images
-            item.image.order = index
-          scope.$parent.$parent.$digest()
+        image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        if image?
+          if image.mappings[$rootScope.lang].timestamp isnt current_time
+            image.mappings[$rootScope.lang].timestamp = current_time
+            scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+            for item, index in scope.$parent.$parent.active_exhibit.images
+              item.image.order = index
+            scope.$parent.$parent.$digest()
         true
       stop: ( event, ui ) ->
         console.log 'drag_stop'
         scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
         for item, index in scope.$parent.$parent.active_exhibit.images
           item.image.order = index
-          imageMappingHelpers.update_image(item.image, scope.$parent.$parent.backend_url)
+          imageMappingHelpers.update_image(item, scope.$parent.$parent.backend_url)
 
         scope.$parent.$parent.$digest()
         event.stopPropagation()
@@ -1387,7 +1388,9 @@ angular.module("Museum.directives", [])
       cursor: "pointer"
       start: ( event, ui ) ->
         ui.helper.addClass('dragged')
+        element.parents('.description').find('.timline_container').addClass('highlite')
       stop: ( event, ui ) ->
+        element.parents('.description').find('.timline_container').removeClass('highlite')
         event.stopPropagation()
 
 .directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->
@@ -1400,6 +1403,7 @@ angular.module("Museum.directives", [])
         element.removeClass 'can_drop'
       over: ( event, ui ) ->
         element.addClass 'can_drop'
+        element.removeClass 'highlite'
       drop: ( event, ui ) -> 
         console.log 'dropped'
         element.removeClass 'can_drop'
@@ -1411,25 +1415,27 @@ angular.module("Museum.directives", [])
         jp_durat = element.find('.jp-duration')
         jp_play  = element.find('.jp-play')
         target_image =  scope.active_exhibit.images[dropped.data('array-index')]
-        scope.active_exhibit.mapped_images = [] unless scope.active_exhibit.mapped_images?
-        for image in scope.active_exhibit.mapped_images
+        scope.active_exhibit.stories[scope.current_museum.language].mapped_images = [] unless scope.active_exhibit.stories[scope.current_museum.language].mapped_images?
+        for image in scope.active_exhibit.stories[scope.current_museum.language].mapped_images
           if image.image._id is target_image.image._id
             found = true
             break       
         unless found
-          scope.active_exhibit.mapped_images.push target_image 
+          scope.active_exhibit.stories[scope.current_museum.language].mapped_images.push target_image 
           target_image.mappings[dropped.data('lang')] = {}
           target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true)
           target_image.mappings[dropped.data('lang')].language  = dropped.data('lang')
-          target_image.mappings[dropped.data('lang')].image     = target_image._id
+          target_image.mappings[dropped.data('lang')].media     = target_image.image._id
           scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
           for item, index in scope.active_exhibit.images
             item.image.order = index
-            imageMappingHelpers.create_mapping(item.image, scope.backend_url)
+            imageMappingHelpers.update_image(item, scope.backend_url)
+
+          imageMappingHelpers.create_mapping(target_image, scope.backend_url)
 
           scope.$digest()
 
-          scope.recalculate_marker_positions(scope.active_exhibit, element)
+          scope.recalculate_marker_positions(scope.active_exhibit.stories[scope.current_museum.language], element)
 
     true
 

@@ -606,7 +606,7 @@
         title: '@ngTitle',
         field: '@ngField'
       },
-      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" connection-draggable ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
+      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" connection-draggable ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.charFromNum = function(num) {
           return String.fromCharCode(num + 97).toUpperCase();
@@ -1333,16 +1333,18 @@
           drag: function(event, ui) {
             var current_time, image, index, item, _i, _len, _ref;
             current_time = imageMappingHelpers.calc_timestamp(ui, false);
-            image = scope.$parent.$parent.active_exhibit.mapped_images[ui.helper.data('image-index')];
-            if (image.mappings[$rootScope.lang].timestamp !== current_time) {
-              image.mappings[$rootScope.lang].timestamp = current_time;
-              scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-              _ref = scope.$parent.$parent.active_exhibit.images;
-              for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-                item = _ref[index];
-                item.image.order = index;
+            image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
+            if (image != null) {
+              if (image.mappings[$rootScope.lang].timestamp !== current_time) {
+                image.mappings[$rootScope.lang].timestamp = current_time;
+                scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+                _ref = scope.$parent.$parent.active_exhibit.images;
+                for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                  item = _ref[index];
+                  item.image.order = index;
+                }
+                scope.$parent.$parent.$digest();
               }
-              scope.$parent.$parent.$digest();
             }
             return true;
           },
@@ -1354,7 +1356,7 @@
             for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
               item = _ref[index];
               item.image.order = index;
-              imageMappingHelpers.update_image(item.image, scope.$parent.$parent.backend_url);
+              imageMappingHelpers.update_image(item, scope.$parent.$parent.backend_url);
             }
             scope.$parent.$parent.$digest();
             return event.stopPropagation();
@@ -1371,9 +1373,11 @@
           revert: true,
           cursor: "pointer",
           start: function(event, ui) {
-            return ui.helper.addClass('dragged');
+            ui.helper.addClass('dragged');
+            return element.parents('.description').find('.timline_container').addClass('highlite');
           },
           stop: function(event, ui) {
+            element.parents('.description').find('.timline_container').removeClass('highlite');
             return event.stopPropagation();
           }
         });
@@ -1390,7 +1394,8 @@
             return element.removeClass('can_drop');
           },
           over: function(event, ui) {
-            return element.addClass('can_drop');
+            element.addClass('can_drop');
+            return element.removeClass('highlite');
           },
           drop: function(event, ui) {
             var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, seek_bar, target_image, _i, _j, _len, _len1, _ref, _ref1;
@@ -1404,10 +1409,10 @@
             jp_durat = element.find('.jp-duration');
             jp_play = element.find('.jp-play');
             target_image = scope.active_exhibit.images[dropped.data('array-index')];
-            if (scope.active_exhibit.mapped_images == null) {
-              scope.active_exhibit.mapped_images = [];
+            if (scope.active_exhibit.stories[scope.current_museum.language].mapped_images == null) {
+              scope.active_exhibit.stories[scope.current_museum.language].mapped_images = [];
             }
-            _ref = scope.active_exhibit.mapped_images;
+            _ref = scope.active_exhibit.stories[scope.current_museum.language].mapped_images;
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               image = _ref[_i];
               if (image.image._id === target_image.image._id) {
@@ -1416,20 +1421,21 @@
               }
             }
             if (!found) {
-              scope.active_exhibit.mapped_images.push(target_image);
+              scope.active_exhibit.stories[scope.current_museum.language].mapped_images.push(target_image);
               target_image.mappings[dropped.data('lang')] = {};
               target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true);
               target_image.mappings[dropped.data('lang')].language = dropped.data('lang');
-              target_image.mappings[dropped.data('lang')].image = target_image._id;
+              target_image.mappings[dropped.data('lang')].media = target_image.image._id;
               scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
               _ref1 = scope.active_exhibit.images;
               for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
                 item = _ref1[index];
                 item.image.order = index;
-                imageMappingHelpers.create_mapping(item.image, scope.backend_url);
+                imageMappingHelpers.update_image(item, scope.backend_url);
               }
+              imageMappingHelpers.create_mapping(target_image, scope.backend_url);
               scope.$digest();
-              return scope.recalculate_marker_positions(scope.active_exhibit, element);
+              return scope.recalculate_marker_positions(scope.active_exhibit.stories[scope.current_museum.language], element);
             }
           }
         });

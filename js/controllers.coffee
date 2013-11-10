@@ -52,7 +52,7 @@ tileGrid = (collection, tileWidth, tileSpace, tileListMargin) ->
 #
 angular.module("Museum.controllers", [])
 # Main controller
-.controller('IndexController', [ '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', ($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) ->
+.controller('IndexController', [ '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', 'imageMappingHelpers', ($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next, imageMappingHelpers) ->
   
   window.sc = $scope
 
@@ -96,17 +96,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $location.$$path?
     $location.$$path.split('/')[1]
   else
-    "526a0a26a15cfbe815000002"
-    # "526e1baa0439f8b01a000002"
+    # "526a0a26a15cfbe815000002"
+    "526e1baa0439f8b01a000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    "526a0a26a15cfbe815000001"
-    # "526e1baa0439f8b01a000001"
+    # "526a0a26a15cfbe815000001"
+    "526e1baa0439f8b01a000001"
 
-  $scope.backend_url = "http://192.168.158.128:3000/api"
-  # $scope.backend_url = "http://prototype.izi.travel/api"
+  # $scope.backend_url = "http://192.168.158.128:3000/api"
+  $scope.backend_url = "http://prototype.izi.travel/api"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -120,6 +120,7 @@ angular.module("Museum.controllers", [])
   $scope.reload_exhibits = (sort_field = $scope.sort_field, sort_direction = $scope.sort_direction) ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
       exhibits = []
+      $scope.raw_data = data
       for item in data
         if item?
           exhibit = item.exhibit
@@ -842,10 +843,30 @@ angular.module("Museum.controllers", [])
     console.log event
     target = $ event.target
     selector = target.parents('.description').find('.timline_container')
-    if $scope.active_exhibit.mapped_images.length > 0
+    if $scope.active_exhibit.stories[$scope.current_museum.language].mapped_images.length > 0
+      item = $scope.active_exhibit.stories[$scope.current_museum.language]
       setTimeout ->
         $scope.recalculate_marker_positions(item, selector)
       , 100
+
+  $scope.delete_mapping = (index, event) ->
+    image = $scope.active_exhibit.images[index]
+    lang  = $scope.current_museum.language
+    $http.delete("#{$scope.backend_url}/media_mapping/#{image.mappings[lang]._id}").success (data) ->
+      console.log 'ok', data
+      for mapped_image, index in $scope.active_exhibit.stories[lang].mapped_images
+        if mapped_image._id is image._id
+          $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1)
+          break
+      delete image.mappings[lang]
+      $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+      for item, index in $scope.active_exhibit.images
+        item.image.order = index
+        imageMappingHelpers.update_image(item, $scope.backend_url)
+    .error ->
+      errorProcessing.addError $i18next 'Failed to delete timestamp'
+
+    event.stopPropagation()
 
   $scope.recalculate_marker_positions = (item, selector) ->
     seek_bar   = selector.find('.jp-seek-bar')

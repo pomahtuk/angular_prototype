@@ -1123,6 +1123,7 @@ textarea
       color: #010101
       padding: 0px 5px
       border-radius: 5px
+      padding-right: 15px
       // word-spacing: 5px
 
   a
@@ -1131,7 +1132,7 @@ textarea
   img, .picture
     z-index: 1
 
-  .remove
+  .remove, .delete_maping
     color: white
     font-size: 20px
     font-weight: bold
@@ -1145,6 +1146,11 @@ textarea
     &:hover
       color: #000
       text-shadow: white 0 0 10px, white 0 0 5px
+
+  .delete_maping
+    line-height: 14px
+    top: 3px
+    right: 3px
 
   li
     display: inline-block
@@ -1897,11 +1903,14 @@ a
     height: 60px
     margin: -20px 0px 10px 0px
 
-  &.can_drop
+  &.can_drop, &.highlite
     border: 2px solid $exhibitTextColorHover
     margin-top: -22px
     padding: 0px
     margin-bottom: 12px
+
+  &.highlite
+    border: 2px dashed #666
 
   .points_position_holder
     position: relative

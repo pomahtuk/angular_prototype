@@ -76,7 +76,7 @@
   };
 
   angular.module("Museum.controllers", []).controller('IndexController', [
-    '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', function($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next) {
+    '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', 'imageMappingHelpers', function($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next, imageMappingHelpers) {
       var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
       window.sc = $scope;
       $scope.exhibit_search = '';
@@ -122,9 +122,9 @@
       };
       $scope.museum_change_progress = true;
       ngProgress.color('#fd6e3b');
-      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526a0a26a15cfbe815000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526a0a26a15cfbe815000001";
-      $scope.backend_url = "http://192.168.158.128:3000/api";
+      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526e1baa0439f8b01a000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526e1baa0439f8b01a000001";
+      $scope.backend_url = "http://prototype.izi.travel/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -143,6 +143,7 @@
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, image, item, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
           exhibits = [];
+          $scope.raw_data = data;
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             item = data[_i];
             if (item != null) {
@@ -877,11 +878,42 @@
         console.log(event);
         target = $(event.target);
         selector = target.parents('.description').find('.timline_container');
-        if ($scope.active_exhibit.mapped_images.length > 0) {
+        if ($scope.active_exhibit.stories[$scope.current_museum.language].mapped_images.length > 0) {
+          item = $scope.active_exhibit.stories[$scope.current_museum.language];
           return setTimeout(function() {
             return $scope.recalculate_marker_positions(item, selector);
           }, 100);
         }
+      };
+      $scope.delete_mapping = function(index, event) {
+        var image, lang;
+        image = $scope.active_exhibit.images[index];
+        lang = $scope.current_museum.language;
+        $http["delete"]("" + $scope.backend_url + "/media_mapping/" + image.mappings[lang]._id).success(function(data) {
+          var item, mapped_image, _i, _j, _len, _len1, _ref, _ref1, _results;
+          console.log('ok', data);
+          _ref = $scope.active_exhibit.stories[lang].mapped_images;
+          for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+            mapped_image = _ref[index];
+            if (mapped_image._id === image._id) {
+              $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1);
+              break;
+            }
+          }
+          delete image.mappings[lang];
+          $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+          _ref1 = $scope.active_exhibit.images;
+          _results = [];
+          for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
+            item = _ref1[index];
+            item.image.order = index;
+            _results.push(imageMappingHelpers.update_image(item, $scope.backend_url));
+          }
+          return _results;
+        }).error(function() {
+          return errorProcessing.addError($i18next('Failed to delete timestamp'));
+        });
+        return event.stopPropagation();
       };
       $scope.recalculate_marker_positions = function(item, selector) {
         var container_width, correction, duration, image, jp_durat, jp_play, left, marker, pixel_sec_weight, seek_bar, total_seconds, _i, _len, _ref, _results;

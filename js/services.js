@@ -70,17 +70,16 @@
         }
       },
       sort_time_func: function(a, b) {
-        if (a.timestamp >= 0) {
-          if (a.timestamp > b.timestamp) {
-            return 1;
-          } else if (a.timestamp < b.timestamp) {
-            return -1;
-          } else {
-            return 0;
+        if ((a.mappings[$rootScope.lang] != null) && (b.mappings[$rootScope.lang] != null)) {
+          if (a.mappings[$rootScope.lang].timestamp >= 0) {
+            if (a.mappings[$rootScope.lang].timestamp > b.mappings[$rootScope.lang].timestamp) {
+              return 1;
+            } else if (a.mappings[$rootScope.lang].timestamp < b.mappings[$rootScope.lang].timestamp) {
+              return -1;
+            }
           }
-        } else {
-          return 0;
         }
+        return 0;
       },
       calc_timestamp: function(ui, initial) {
         var container_width, current_position, current_time, duration, jp_durat, jp_play, pixel_sec_weight, seek_bar, total_seconds;
@@ -120,9 +119,10 @@
         return true;
       },
       create_mapping: function(image, backend_url) {
+        console.log('creating');
         $http.post("" + backend_url + "/media_mapping/", image.mappings[$rootScope.lang]).success(function(data) {
           image.mappings[$rootScope.lang] = data;
-          return console.log('ok');
+          return console.log('ok', data);
         }).error(function() {
           return errorProcessing.addError($i18next('Failed to set timestamp'));
         });
