@@ -754,7 +754,7 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="points_position_holder">
-        <div class="image_connection" connection-draggable ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
+        <div class="image_connection" ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
           {{ charFromNum(image.image.order) }}
         </div>
       </div>
@@ -765,8 +765,15 @@ angular.module("Museum.directives", [])
       String.fromCharCode(num + 97).toUpperCase()
 
     $scope.set_hover = (image, sign) ->
-      image.image.hovered = sign
-      $scope.$parent.active_exhibit.has_hovered = sign
+      sub_sign = if sign
+        sign
+      else
+        if image.dragging
+          true
+        else
+          sign
+      image.image.hovered = sub_sign
+      $scope.$parent.active_exhibit.has_hovered = sub_sign
 
   link: (scope, element, attrs) ->
     scope.$watch 'item[field]', (newValue, oldValue) ->
@@ -905,7 +912,8 @@ angular.module("Museum.directives", [])
           if file.type is 'image'
             scope.model.images = [] unless scope.model.images?
             new_image = {}
-            new_image.image = file
+            new_image.image    = file
+            new_image.mappings = {}
             if file.cover is true
               scope.$apply scope.model.cover = file
             scope.$apply scope.model.images.push new_image
@@ -1374,6 +1382,9 @@ angular.module("Museum.directives", [])
       axis: "x"
       containment: "parent"
       cursor: "pointer"
+      start: (event, ui) ->
+        image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        image.dragging = true
       drag: (event, ui) ->
         current_time = imageMappingHelpers.calc_timestamp(ui, false)
         image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
@@ -1387,6 +1398,9 @@ angular.module("Museum.directives", [])
         true
       stop: ( event, ui ) ->
         console.log 'drag_stop'
+        image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        image.dragging = false
+        scope.$parent.set_hover( image, false )
         scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
         for item, index in scope.$parent.$parent.active_exhibit.images
           item.image.order = index
@@ -1432,7 +1446,6 @@ angular.module("Museum.directives", [])
         target_image  = scope.active_exhibit.images[dropped.data('array-index')]
         mapped_images = scope.active_exhibit.stories[scope.current_museum.language].mapped_images
         mapped_images = [] unless mapped_images?
-        console.log mapped_images   
         for image in mapped_images
           if image.image._id is target_image.image._id
             found = true

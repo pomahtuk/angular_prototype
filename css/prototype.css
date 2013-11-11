@@ -2561,8 +2561,8 @@ a:hover {
   padding: 0px 2px;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031907}}
-.timline_container label {
-  text-align: left;
+.timline_container .control-label {
+  text-align: left !important;
   padding-left: 0px;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031911}}

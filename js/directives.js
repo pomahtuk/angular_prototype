@@ -606,14 +606,16 @@
         title: '@ngTitle',
         field: '@ngField'
       },
-      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" connection-draggable ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
+      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.charFromNum = function(num) {
           return String.fromCharCode(num + 97).toUpperCase();
         };
         return $scope.set_hover = function(image, sign) {
-          image.image.hovered = sign;
-          return $scope.$parent.active_exhibit.has_hovered = sign;
+          var sub_sign;
+          sub_sign = sign ? sign : image.dragging ? true : sign;
+          image.image.hovered = sub_sign;
+          return $scope.$parent.active_exhibit.has_hovered = sub_sign;
         };
       },
       link: function(scope, element, attrs) {
@@ -776,6 +778,7 @@
                 }
                 new_image = {};
                 new_image.image = file;
+                new_image.mappings = {};
                 if (file.cover === true) {
                   scope.$apply(scope.model.cover = file);
                 }
@@ -1349,6 +1352,11 @@
           axis: "x",
           containment: "parent",
           cursor: "pointer",
+          start: function(event, ui) {
+            var image;
+            image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
+            return image.dragging = true;
+          },
           drag: function(event, ui) {
             var current_time, image, index, item, _i, _len, _ref;
             current_time = imageMappingHelpers.calc_timestamp(ui, false);
@@ -1368,8 +1376,11 @@
             return true;
           },
           stop: function(event, ui) {
-            var index, item, _i, _len, _ref;
+            var image, index, item, _i, _len, _ref;
             console.log('drag_stop');
+            image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
+            image.dragging = false;
+            scope.$parent.set_hover(image, false);
             scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
             _ref = scope.$parent.$parent.active_exhibit.images;
             for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
@@ -1431,7 +1442,6 @@
             if (mapped_images == null) {
               mapped_images = [];
             }
-            console.log(mapped_images);
             for (_i = 0, _len = mapped_images.length; _i < _len; _i++) {
               image = mapped_images[_i];
               if (image.image._id === target_image.image._id) {
