@@ -1416,7 +1416,7 @@
             return element.addClass('can_drop');
           },
           drop: function(event, ui) {
-            var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, seek_bar, target_image, _i, _j, _len, _len1, _ref, _ref1;
+            var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, mapped_images, seek_bar, target_image, _i, _j, _len, _len1, _ref;
             console.log('dropped');
             element.removeClass('can_drop');
             found = false;
@@ -1427,27 +1427,28 @@
             jp_durat = element.find('.jp-duration');
             jp_play = element.find('.jp-play');
             target_image = scope.active_exhibit.images[dropped.data('array-index')];
-            if (scope.active_exhibit.stories[scope.current_museum.language].mapped_images == null) {
-              scope.active_exhibit.stories[scope.current_museum.language].mapped_images = [];
+            mapped_images = scope.active_exhibit.stories[scope.current_museum.language].mapped_images;
+            if (mapped_images == null) {
+              mapped_images = [];
             }
-            _ref = scope.active_exhibit.stories[scope.current_museum.language].mapped_images;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              image = _ref[_i];
+            console.log(mapped_images);
+            for (_i = 0, _len = mapped_images.length; _i < _len; _i++) {
+              image = mapped_images[_i];
               if (image.image._id === target_image.image._id) {
                 found = true;
                 break;
               }
             }
             if (!found) {
-              scope.active_exhibit.stories[scope.current_museum.language].mapped_images.push(target_image);
+              mapped_images.push(target_image);
               target_image.mappings[dropped.data('lang')] = {};
               target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true);
               target_image.mappings[dropped.data('lang')].language = dropped.data('lang');
               target_image.mappings[dropped.data('lang')].media = target_image.image._id;
               scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-              _ref1 = scope.active_exhibit.images;
-              for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
-                item = _ref1[index];
+              _ref = scope.active_exhibit.images;
+              for (index = _j = 0, _len1 = _ref.length; _j < _len1; index = ++_j) {
+                item = _ref[index];
                 item.image.order = index;
                 imageMappingHelpers.update_image(item, scope.backend_url);
               }

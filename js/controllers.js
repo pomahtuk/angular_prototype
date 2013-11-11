@@ -890,13 +890,13 @@
         image = $scope.active_exhibit.images[index];
         lang = $scope.current_museum.language;
         $http["delete"]("" + $scope.backend_url + "/media_mapping/" + image.mappings[lang]._id).success(function(data) {
-          var item, mapped_image, _i, _j, _len, _len1, _ref, _ref1, _results;
+          var item, mapped_image, sub_index, _i, _j, _len, _len1, _ref, _ref1, _results;
           console.log('ok', data);
           _ref = $scope.active_exhibit.stories[lang].mapped_images;
-          for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-            mapped_image = _ref[index];
-            if (mapped_image._id === image._id) {
-              $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1);
+          for (sub_index = _i = 0, _len = _ref.length; _i < _len; sub_index = ++_i) {
+            mapped_image = _ref[sub_index];
+            if (mapped_image.image._id === image.image._id) {
+              $scope.active_exhibit.stories[lang].mapped_images.splice(sub_index, 1);
               break;
             }
           }
@@ -913,6 +913,7 @@
         }).error(function() {
           return errorProcessing.addError($i18next('Failed to delete timestamp'));
         });
+        event.preventDefault();
         return event.stopPropagation();
       };
       $scope.recalculate_marker_positions = function(item, selector) {

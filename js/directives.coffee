@@ -1429,14 +1429,16 @@ angular.module("Museum.directives", [])
         seek_bar = element.find('.jp-seek-bar')
         jp_durat = element.find('.jp-duration')
         jp_play  = element.find('.jp-play')
-        target_image =  scope.active_exhibit.images[dropped.data('array-index')]
-        scope.active_exhibit.stories[scope.current_museum.language].mapped_images = [] unless scope.active_exhibit.stories[scope.current_museum.language].mapped_images?
-        for image in scope.active_exhibit.stories[scope.current_museum.language].mapped_images
+        target_image  = scope.active_exhibit.images[dropped.data('array-index')]
+        mapped_images = scope.active_exhibit.stories[scope.current_museum.language].mapped_images
+        mapped_images = [] unless mapped_images?
+        console.log mapped_images   
+        for image in mapped_images
           if image.image._id is target_image.image._id
             found = true
             break
         unless found
-          scope.active_exhibit.stories[scope.current_museum.language].mapped_images.push target_image 
+          mapped_images.push target_image 
           target_image.mappings[dropped.data('lang')] = {}
           target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true)
           target_image.mappings[dropped.data('lang')].language  = dropped.data('lang')
