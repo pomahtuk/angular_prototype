@@ -1404,10 +1404,10 @@
           cursor: "pointer",
           start: function(event, ui) {
             ui.helper.addClass('dragged');
-            return element.parents('.description').find('.points_position_holder').addClass('highlite');
+            return element.parents('.description').find('.timline_container').addClass('highlite');
           },
           stop: function(event, ui) {
-            element.parents('.description').find('.points_position_holder').removeClass('highlite');
+            element.parents('.description').find('.timline_container').removeClass('highlite');
             return event.stopPropagation();
           }
         });

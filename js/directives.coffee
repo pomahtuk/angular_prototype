@@ -1418,9 +1418,9 @@ angular.module("Museum.directives", [])
       cursor: "pointer"
       start: ( event, ui ) ->
         ui.helper.addClass('dragged')
-        element.parents('.description').find('.points_position_holder').addClass('highlite')
+        element.parents('.description').find('.timline_container').addClass('highlite')
       stop: ( event, ui ) ->
-        element.parents('.description').find('.points_position_holder').removeClass('highlite')
+        element.parents('.description').find('.timline_container').removeClass('highlite')
         event.stopPropagation()
 
 .directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->

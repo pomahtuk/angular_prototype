@@ -84,10 +84,11 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
       console.log 'ok'
       if image.mappings[$rootScope.lang]?
         mapping = image.mappings[$rootScope.lang]
-        $http.put("#{backend_url}/media_mapping/#{mapping._id}", mapping).success (data) ->
-          console.log 'ok'
-        .error ->
-          errorProcessing.addError $i18next 'Failed to set timestamp'
+        if mapping._id?
+          $http.put("#{backend_url}/media_mapping/#{mapping._id}", mapping).success (data) ->
+            console.log 'ok'
+          .error ->
+            errorProcessing.addError $i18next 'Failed to set timestamp'
     .error ->
       errorProcessing.addError $i18next 'Failed to set timestamp'
     true

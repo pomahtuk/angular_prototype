@@ -110,11 +110,13 @@
           console.log('ok');
           if (image.mappings[$rootScope.lang] != null) {
             mapping = image.mappings[$rootScope.lang];
-            return $http.put("" + backend_url + "/media_mapping/" + mapping._id, mapping).success(function(data) {
-              return console.log('ok');
-            }).error(function() {
-              return errorProcessing.addError($i18next('Failed to set timestamp'));
-            });
+            if (mapping._id != null) {
+              return $http.put("" + backend_url + "/media_mapping/" + mapping._id, mapping).success(function(data) {
+                return console.log('ok');
+              }).error(function() {
+                return errorProcessing.addError($i18next('Failed to set timestamp'));
+              });
+            }
           }
         }).error(function() {
           return errorProcessing.addError($i18next('Failed to set timestamp'));
