@@ -856,7 +856,7 @@ angular.module("Museum.controllers", [])
       console.log 'ok', data
       for mapped_image, index in $scope.active_exhibit.stories[lang].mapped_images
         if mapped_image._id is image._id
-          $scope.active_exhibit.stories[lang].mapped_images.splice(index-1, 1)
+          $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1)
           break
       delete image.mappings[lang]
       $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
@@ -869,9 +869,10 @@ angular.module("Museum.controllers", [])
     event.stopPropagation()
 
   $scope.recalculate_marker_positions = (item, selector) ->
-    seek_bar   = selector.find('.jp-seek-bar')
-    jp_durat   = selector.find('.jp-duration')
-    jp_play    = selector.find('.jp-play')
+    console.log item, selector
+    seek_bar   = $('.jp-seek-bar:visible')
+    jp_durat   = $('.jp-duration:visible')
+    jp_play    = $('.jp-play:visible')
     correction = jp_play.width()
 
     container_width  = seek_bar.width() - 15

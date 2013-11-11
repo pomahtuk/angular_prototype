@@ -1404,9 +1404,9 @@ angular.module("Museum.directives", [])
       cursor: "pointer"
       start: ( event, ui ) ->
         ui.helper.addClass('dragged')
-        element.parents('.description').find('.timline_container').addClass('highlite')
+        element.parents('.description').find('.points_position_holder').addClass('highlite')
       stop: ( event, ui ) ->
-        element.parents('.description').find('.timline_container').removeClass('highlite')
+        element.parents('.description').find('.points_position_holder').removeClass('highlite')
         event.stopPropagation()
 
 .directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->
@@ -1434,7 +1434,7 @@ angular.module("Museum.directives", [])
         for image in scope.active_exhibit.stories[scope.current_museum.language].mapped_images
           if image.image._id is target_image.image._id
             found = true
-            break       
+            break
         unless found
           scope.active_exhibit.stories[scope.current_museum.language].mapped_images.push target_image 
           target_image.mappings[dropped.data('lang')] = {}

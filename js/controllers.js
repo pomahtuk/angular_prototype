@@ -896,7 +896,7 @@
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             mapped_image = _ref[index];
             if (mapped_image._id === image._id) {
-              $scope.active_exhibit.stories[lang].mapped_images.splice(index - 1, 1);
+              $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1);
               break;
             }
           }
@@ -917,9 +917,10 @@
       };
       $scope.recalculate_marker_positions = function(item, selector) {
         var container_width, correction, duration, image, jp_durat, jp_play, left, marker, pixel_sec_weight, seek_bar, total_seconds, _i, _len, _ref, _results;
-        seek_bar = selector.find('.jp-seek-bar');
-        jp_durat = selector.find('.jp-duration');
-        jp_play = selector.find('.jp-play');
+        console.log(item, selector);
+        seek_bar = $('.jp-seek-bar:visible');
+        jp_durat = $('.jp-duration:visible');
+        jp_play = $('.jp-play:visible');
         correction = jp_play.width();
         container_width = seek_bar.width() - 15;
         duration = jp_durat.text();

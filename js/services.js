@@ -99,6 +99,9 @@
         total_seconds = parseInt(duration.split(':')[1], 10) + parseInt(duration.split(':')[0], 10) * 60;
         pixel_sec_weight = total_seconds / container_width;
         current_time = Math.round(current_position * pixel_sec_weight);
+        if (current_time <= 0) {
+          current_time = 0;
+        }
         return current_time;
       },
       update_image: function(image, backend_url) {
