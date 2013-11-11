@@ -1428,7 +1428,6 @@
           },
           drop: function(event, ui) {
             var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, mapped_images, seek_bar, target_image, _i, _j, _len, _len1, _ref;
-            console.log('dropped');
             element.removeClass('can_drop');
             found = false;
             dropped = ui.draggable;

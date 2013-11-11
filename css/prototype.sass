@@ -1896,6 +1896,18 @@ a
   .placeholder
     height: 20px
 
+.drag_images
+  // margin-bottom: 10px
+  +inline-block
+  margin: 0 auto 10px auto
+  position: relative
+  margin-left: -130px
+  left: 50%
+
+  img
+    margin-right: 10px
+
+
 .timline_container
   height: 0px
   +transition-property(height)
@@ -1910,7 +1922,8 @@ a
 
   &.opened
     height: 60px
-    margin: -20px 0px 10px 0px
+    margin: -20px 0px 0px 0px
+    position: relative
 
   &.can_drop, &.highlite
     margin-top: -22px

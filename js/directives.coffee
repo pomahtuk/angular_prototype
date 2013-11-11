@@ -1434,7 +1434,6 @@ angular.module("Museum.directives", [])
       over: ( event, ui ) ->
         element.addClass 'can_drop'
       drop: ( event, ui ) -> 
-        console.log 'dropped'
         element.removeClass 'can_drop'
         found     = false
         dropped   = ui.draggable

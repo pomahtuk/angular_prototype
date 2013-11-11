@@ -451,6 +451,9 @@
                       </div>
                       <player ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="active_exhibit.stories[current_museum.language]" type="media"></player>
                     </div>
+                    <div class="drag_images" id="{{active_exhibit._id}}" ng-show="exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0">
+                      <img src="./img/drag_images_to_timeline.png"><span>{{ 'Drag images to audio timeline to sync it' | i18next }}</span>
+                    </div>
                   </div>
                   <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
                   <ul class="images col-xs-11 {{active_exhibit.has_hovered}}">

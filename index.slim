@@ -481,6 +481,10 @@ html lang="en" ng-app="Museum"
                       .col-xs-1.control-label 
                         | {{ 'Audio' | i18next }}
                       player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
+                    .drag_images ng-show="exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0" id="{{active_exhibit._id}}"
+                      img src="./img/drag_images_to_timeline.png"
+                      span
+                        | {{ 'Drag images to audio timeline to sync it' | i18next }}
                   label.col-xs-1.control-label 
                     | {{ 'Images' | i18next }}
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
