@@ -837,7 +837,7 @@ angular.module("Museum.controllers", [])
       ''
 
   $scope.set_hover = (image, sign) ->
-    image.hovered = sign
+    image.image.hovered = sign
 
   $scope.check_mapped = (item, event) ->
     console.log event

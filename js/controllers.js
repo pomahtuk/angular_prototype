@@ -871,7 +871,7 @@
         }
       };
       $scope.set_hover = function(image, sign) {
-        return image.hovered = sign;
+        return image.image.hovered = sign;
       };
       $scope.check_mapped = function(item, event) {
         var selector, target;

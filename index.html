@@ -443,7 +443,8 @@
                 </div>
                 <div class="tab-pane row" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }" plumb="">
                   <div class="timline_container_holder">
-                    <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}" ng-click="exhibit_timline_opened = !exhibit_timline_opened">{{ 'Sync images and audio' | i18next }}</button>
+                    <div class="placeholder" ng-show="!active_exhibit.stories[current_museum.language].audio"></div>
+                    <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-hide="!active_exhibit.stories[current_museum.language].audio">{{ 'Sync images and audio' | i18next }}</button>
                     <div class="timline_container" droppable="" id="{{active_exhibit._id}}" ng-class="{&#39;opened&#39;: exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}">
                       <div class="col-xs-1 control-label">
                         {{ 'Audio' | i18next }}

@@ -631,6 +631,8 @@
               mp3: newValue.url,
               ogg: newValue.thumbnailUrl
             });
+          } else {
+            return console.log('no audio');
           }
         });
         return true;
@@ -843,7 +845,7 @@
         });
       }
     };
-  }).directive('deleteMedia', function(storySetValidation) {
+  }).directive('deleteMedia', function(storySetValidation, $http) {
     return {
       restrict: 'A',
       scope: {
@@ -862,7 +864,7 @@
               url: elem.data('link'),
               type: elem.data('method'),
               success: function(data) {
-                var image, index, _i, _len, _ref;
+                var image, index, lang, mapping, parent, _i, _j, _len, _len1, _ref, _ref1;
                 if (scope.media.type === 'image') {
                   _ref = scope.model.images;
                   for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
@@ -885,12 +887,29 @@
                     });
                   }
                 } else if (scope.media.type === 'audio') {
+                  parent = scope.$parent.$parent.active_exhibit;
+                  lang = scope.$parent.$parent.current_museum.language;
                   scope.model.audio = void 0;
+                  scope.model.mapped_images = [];
+                  scope.$parent.$parent.exhibit_timline_opened = false;
+                  _ref1 = parent.images;
+                  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                    image = _ref1[_j];
+                    mapping = image.mappings[lang];
+                    if (mapping != null) {
+                      delete image.mappings[lang];
+                      $http["delete"]("" + scope.$parent.$parent.backend_url + "/media_mapping/" + mapping._id).success(function(data) {
+                        return console.log(data);
+                      }).error(function() {
+                        return errorProcessing.addError($i18next('Failed to delete timestamp'));
+                      });
+                    }
+                  }
                   scope.$digest();
                   if (scope.model.status === 'published') {
                     storySetValidation.checkValidity({
                       item: scope.model,
-                      root: scope.$parent.$parent.active_exhibit,
+                      root: parent,
                       field_type: 'story'
                     });
                   }

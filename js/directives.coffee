@@ -782,6 +782,8 @@ angular.module("Museum.directives", [])
         $("#jquery_jplayer_#{scope.id}").jPlayer "setMedia",
           mp3: newValue.url
           ogg: newValue.thumbnailUrl
+      else
+        console.log 'no audio'
 
     true
 
@@ -955,7 +957,7 @@ angular.module("Museum.directives", [])
       parent = elem.parents('#drop_down, #museum_edit_dropdown')
       parent.find(':file').click()
 
-.directive 'deleteMedia', (storySetValidation) ->
+.directive 'deleteMedia', (storySetValidation, $http) ->
   restrict : 'A'
   scope:
     model: '=parent'
@@ -983,11 +985,24 @@ angular.module("Museum.directives", [])
               if scope.model.images.length is 0 && scope.model.stories[scope.$parent.$parent.current_museum.language].status is 'published'
                 storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
             else if scope.media.type is 'audio'
-              scope.model.audio = undefined
-              #should
+              parent = scope.$parent.$parent.active_exhibit
+              lang   = scope.$parent.$parent.current_museum.language
+              # client-side removal
+              scope.model.audio         = undefined
+              scope.model.mapped_images = []
+              scope.$parent.$parent.exhibit_timline_opened = false
+              for image in parent.images
+                mapping = image.mappings[lang]
+                if mapping?
+                  delete image.mappings[lang]
+                  # server-side removal
+                  $http.delete("#{scope.$parent.$parent.backend_url}/media_mapping/#{mapping._id}").success (data) ->
+                    console.log data
+                  .error ->
+                    errorProcessing.addError $i18next 'Failed to delete timestamp'
               scope.$digest()
               if scope.model.status is 'published'
-                storySetValidation.checkValidity {item: scope.model, root: scope.$parent.$parent.active_exhibit, field_type: 'story'}
+                storySetValidation.checkValidity {item: scope.model, root: parent, field_type: 'story'}
             scope.$parent.last_save_time = new Date()
 
 .directive 'dragAndDropInit', ->
