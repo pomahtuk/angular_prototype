@@ -1148,6 +1148,8 @@ textarea
       text-shadow: white 0 0 10px, white 0 0 5px
 
   .delete_maping
+    color: #000000
+    text-shadow: none
     line-height: 14px
     top: 3px
     right: 3px
@@ -1904,13 +1906,15 @@ a
     margin: -20px 0px 10px 0px
 
   &.can_drop, &.highlite
-    border: 2px solid $exhibitTextColorHover
     margin-top: -22px
     padding: 0px
     margin-bottom: 12px
 
   &.highlite
     border: 2px dashed #666
+
+  &.can_drop
+    border: 2px solid $exhibitTextColorHover
 
   .points_position_holder
     position: relative

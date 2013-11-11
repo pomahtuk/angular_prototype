@@ -1394,8 +1394,7 @@
             return element.removeClass('can_drop');
           },
           over: function(event, ui) {
-            element.addClass('can_drop');
-            return element.removeClass('highlite');
+            return element.addClass('can_drop');
           },
           drop: function(event, ui) {
             var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, seek_bar, target_image, _i, _j, _len, _len1, _ref, _ref1;

@@ -491,7 +491,7 @@ html lang="en" ng-app="Museum"
                             | {{ image.image.order | numstring }} 
                           span.time 
                             | {{ image.mappings[current_museum.language].timestamp | timerepr }}
-                          span.delete_maping ng-click="delete_mapping($index, $event)" ×
+                          span.delete_maping.close ng-click="delete_mapping($index, $event)" ×
                         span class="cover" ng-class="{'active':image.image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 

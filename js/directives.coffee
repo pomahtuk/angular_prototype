@@ -984,6 +984,7 @@ angular.module("Museum.directives", [])
                 storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
             else if scope.media.type is 'audio'
               scope.model.audio = undefined
+              #should
               scope.$digest()
               if scope.model.status is 'published'
                 storySetValidation.checkValidity {item: scope.model, root: scope.$parent.$parent.active_exhibit, field_type: 'story'}
@@ -1403,7 +1404,6 @@ angular.module("Museum.directives", [])
         element.removeClass 'can_drop'
       over: ( event, ui ) ->
         element.addClass 'can_drop'
-        element.removeClass 'highlite'
       drop: ( event, ui ) -> 
         console.log 'dropped'
         element.removeClass 'can_drop'

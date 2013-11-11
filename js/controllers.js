@@ -896,7 +896,7 @@
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             mapped_image = _ref[index];
             if (mapped_image._id === image._id) {
-              $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1);
+              $scope.active_exhibit.stories[lang].mapped_images.splice(index - 1, 1);
               break;
             }
           }

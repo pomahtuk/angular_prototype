@@ -856,7 +856,7 @@ angular.module("Museum.controllers", [])
       console.log 'ok', data
       for mapped_image, index in $scope.active_exhibit.stories[lang].mapped_images
         if mapped_image._id is image._id
-          $scope.active_exhibit.stories[lang].mapped_images.splice(index, 1)
+          $scope.active_exhibit.stories[lang].mapped_images.splice(index-1, 1)
           break
       delete image.mappings[lang]
       $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
