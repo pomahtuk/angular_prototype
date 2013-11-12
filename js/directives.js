@@ -121,7 +121,7 @@
         field_type: '@type',
         root: '=root'
       },
-      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>{{ 'Publish' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Published' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-primary': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">{{ 'Private' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Make private' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'opas_invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>{{ 'Invisible' | i18next }}</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> {{ 'Make invisible' | i18next }}\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'  || item.status == 'published'\">\n      <a href=\"#\" ng-click=\"item.status = 'passcode'; status_process()\">\n        <i class=\"icon-lock\"></i> {{ 'Make private' | i18next }}\n      </a>\n    </li>\n  </ul>\n</div>",
+      template: "<div class=\"btn-group pull-right item_publish_settings\" ng-hide=\"item.status == 'draft'\">\n  <button class=\"btn btn-default\" ng-class=\"{'active btn-success': item.status == 'published'}\" ng-click=\"item.status = 'published'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-globe\"></i>\n    </div>\n    <span ng-switch-default>{{ 'Publish' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Published' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-hide=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-warning': item.status == 'passcode' }\" ng-click=\"item.status = 'passcode'; status_process()\" type=\"button\" ng-switch on=\"item[field]\">\n    <div class=\"extra\">\n      <i class=\"icon-lock\"></i>\n    </div>\n    <span ng-switch-when=\"passcode\">{{ 'Private' | i18next }}</span>\n    <span ng-switch-when=\"published\">{{ 'Make private' | i18next }}</span>\n  </button>\n\n\n  <button class=\"btn btn-default\" ng-show=\"item.status == 'opas_invisible'\" ng-class=\"{'active btn-danger': item.status == 'opas_invisible' }\" ng-click=\"item.status = 'opas_invisible'; status_process()\" type=\"button\">\n    <div class=\"extra\">\n      <i class=\"icon-eye-close\"></i>\n    </div>\n    <span>{{ 'Invisible' | i18next }}</span>\n    <!--<span>Make private</span>-->\n  </button>\n\n\n  <button class=\"btn btn-default dropdown-toggle\">\n    <span>\n      <i class=\"icon-caret-down\"></i>\n    </span>\n  </button>\n  <ul class=\"dropdown-menu\">\n    <li ng-hide=\"item.status == 'opas_invisible'\">\n      <a href=\"#\" ng-click=\"item.status = 'opas_invisible'; status_process()\">\n        <i class=\"icon-eye-close\"></i> {{ 'Make invisible' | i18next }}\n      </a>\n    </li>\n    <li ng-hide=\"item.status == 'passcode'  || item.status == 'published'\">\n      <a href=\"#\" ng-click=\"item.status = 'passcode'; status_process()\">\n        <i class=\"icon-lock\"></i> {{ 'Make private' | i18next }}\n      </a>\n    </li>\n  </ul>\n</div>",
       controller: function($scope, $rootScope, $element, $attrs, storySetValidation) {
         return $scope.status_process = function() {
           return storySetValidation.checkValidity($scope);
@@ -1345,7 +1345,6 @@
       restrict: 'A',
       link: function(scope, element, attrs) {
         var weight_calc;
-        console.log(scope);
         element = $(element);
         weight_calc = imageMappingHelpers.weight_calc;
         return element.draggable({
@@ -1596,6 +1595,47 @@
             element.find('.arrow i').addClass("icon-long-arrow-down").removeClass("icon-long-arrow-up");
             return $.scrollTo(0, 0);
           }
+        });
+      }
+    };
+  }).directive("langList", function($timeout) {
+    return {
+      restrict: "E",
+      replace: true,
+      transclude: true,
+      template: "<ul class=\"nav nav-tabs lang_list\">\n  <li ng-class=\"{'active': $index == '0'}\" ng-repeat=\"story in first_display\">\n    <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n  </li>\n  <li>\n    <a href=\"#\" class=\"dropdown-toggle\">\n      More\n      <i class=\"icon-caret-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in last_display\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"last_display.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
+      link: function(scope, element, attrs) {
+        var lang_sort, weight_calc;
+        scope.first_display = [];
+        scope.last_display = [];
+        weight_calc = function(item) {
+          var weight;
+          weight = 0;
+          if (item.language === scope.current_museum.language) {
+            weight -= 100;
+          }
+          return weight;
+        };
+        lang_sort = function(a, b) {
+          if (weight_calc(a) > weight_calc(b)) {
+            return 1;
+          } else if (weight_calc(a) < weight_calc(b)) {
+            return -1;
+          } else {
+            return 0;
+          }
+        };
+        return scope.$watch('current_museum.language', function(newValue, oldValue) {
+          var key, value, _ref;
+          scope.lang_arr = [];
+          _ref = scope.current_museum.stories;
+          for (key in _ref) {
+            value = _ref[key];
+            scope.lang_arr.push(value);
+          }
+          scope.lang_arr.sort(lang_sort);
+          scope.first_display = scope.lang_arr.splice(0, 2);
+          return scope.last_display = scope.lang_arr;
         });
       }
     };

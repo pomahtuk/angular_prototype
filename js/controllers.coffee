@@ -96,17 +96,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $location.$$path?
     $location.$$path.split('/')[1]
   else
-    # "526a0a26a15cfbe815000002"
-    "526e1baa0439f8b01a000002"
+    "526a0a26a15cfbe815000002"
+    # "526e1baa0439f8b01a000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    # "526a0a26a15cfbe815000001"
-    "526e1baa0439f8b01a000001"
+    "526a0a26a15cfbe815000001"
+    # "526e1baa0439f8b01a000001"
 
-  # $scope.backend_url = "http://192.168.158.128:3000/api"
-  $scope.backend_url = "http://prototype.izi.travel/api"
+  $scope.backend_url = "http://192.168.158.128:3000/api"
+  # $scope.backend_url = "http://prototype.izi.travel/api"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -1205,7 +1205,7 @@ angular.module("Museum.controllers", [])
     elem = $ event.target
     unless museum_anim_in_progress
       museum_anim_in_progress = true
-      elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
+      # elem.find('i').toggleClass "icon-chevron-down icon-chevron-up"
       $('.navigation .museum_edit').slideToggle(1000, "easeOutQuint")
       $scope.museum_edit_dropdown_opened = !$scope.museum_edit_dropdown_opened
     false

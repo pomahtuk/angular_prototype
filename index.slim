@@ -11,6 +11,7 @@ html lang="en" ng-app="Museum"
     link rel="stylesheet" href="css/prototype.css"
     link rel="stylesheet" href="css/jquery.Jcrop.css"
     link rel="stylesheet" href="css/jquery.fileupload-ui.css"
+    link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700,300italic,400italic,700italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'
     / link href="http://fonts.googleapis.com/css?family=Open+Sans&subset=latin,cyrillic-ext,greek-ext,greek,cyrillic,latin-ext" rel="stylesheet" type="text/css"
 
   body.fixed_navbar ng-controller="IndexController" drag-and-drop-init="" scrollspy-init=""
@@ -78,14 +79,12 @@ html lang="en" ng-app="Museum"
         .left_content
           a.menu_opener href="#" toggle-menu=""
             i.icon-reorder
-          span.cms_text_logo
-            | izi.cms
           h1.museum_title ng-class="{'opened':museum_edit_dropdown_opened}"
             | {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
-          .btn-group.language
-            button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
+          .btn-group.lang.top_space
+            a.dropdown-toggle data-toggle="dropdown" href="javascript:void(0)"
               | {{ current_museum.language | i18next }}  
-              span.caret
+              i.icon-chevron-down
             ul.dropdown-menu role="menu"
               li ng-repeat="story in current_museum.stories"
                 a href="#" ng-click="current_museum.language = story.language"
@@ -93,8 +92,11 @@ html lang="en" ng-app="Museum"
               li.divider
               li
                 a href="#" ng-click="new_museum_language()" {{ 'newLanguage' | i18next }}
+          .button.btn.btn-default.top_space.edit ng-click="show_museum_edit($event)"
+            i.icon-pencil  
+            |   {{ 'Edit' | i18next}}
         .right_content
-          span.autosaved_info ng-show="last_save_time" {{ 'Changes autosaved at' | i18next }} {{ last_save_time | date:'HH:mm'}}
+          / span.autosaved_info ng-show="last_save_time" {{ 'Changes autosaved at' | i18next }} {{ last_save_time | date:'HH:mm'}}
           .hider ng-hide="museum_edit_dropdown_opened"
             switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
 
@@ -218,74 +220,75 @@ html lang="en" ng-app="Museum"
                   .tab-pane ng-class="{'active': museum_subtab == 'settings' }" 
                     |44444
 
-      .museum_edit_opener ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened"
-        | {{ 'Museum properties' | i18next }}
-        i.icon-chevron-down
+      / .museum_edit_opener ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened"
+      /   | {{ 'Museum properties' | i18next }}
+      /   i.icon-chevron-down
 
     .float_menu
       .actions_bar
         error-notification
         .left_content ng-mouseover="show_museum_edit_dropdown=false"
-          button.btn.btn-warning.spacer#create_new_item type="button" ng-click="create_new_item()" ng-class="{'disabled':new_item_creation}" 
-            | {{ 'New item' | i18next }}
-          .btn-group.spacer.lang_switch
-            button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
-              |  {{ current_museum.language | i18next }}   
-              span.caret
-            ul.dropdown-menu role="menu"
-              li ng-repeat="story in current_museum.stories"
-                a href="#" ng-click="current_museum.language = story.language"
-                  | {{ story.language | i18next}}
-              li.divider
-              li
-                a href="#" ng-click="new_museum_language()" {{ 'newLanguage' | i18next }}
-          .btn-group
-            button.btn.btn-default.dropdown-toggle.spacer data-toggle="dropdown" type="button"
-              | {{ 'Actions' | i18next }}  
-              span.caret
-            ul.dropdown-menu role="menu"
-              li ng-switch="" on="all_selected" ng-click="select_all_exhibits()" 
-                a href="#" ng-switch-when="false" {{ 'Select all' | i18next }}
-                a href="#" ng-switch-when="true" {{ 'Cancel selection' | i18next }}
-              li.dropdown-submenu
-                a href="#" {{ 'addSelectedCollection' | i18next }}
-                ul.dropdown-menu role="menu"
-                  li
-                    a href="#" Collection 1
-                  li
-                    a href="#" Collection 2
-                  li
-                    a href="#" Collection 3
-              li.dropdown-submenu
-                a href="#" {{ 'setItemVisibility' | i18next }}
-                ul.dropdown-menu role="menu"
-                  li
-                    a href="#" ng-click="mass_switch_pub('published')"
-                      i class="icon-globe"  
-                      |   {{ 'Publish' | i18next }}
-                  li
-                    a href="#" ng-click="mass_switch_pub('passcode')"
-                      i class="icon-lock"  
-                      |   {{ 'Make private' | i18next }}
-                  li
-                    a href="#" ng-click="mass_switch_pub('opas_invisible')"
-                      i class="icon-eye-close"  
-                      |   {{ 'Make invisible' | i18next }}
-              li
-                a href="#" ng-click="delete_selected_exhibits()" {{ 'Delete selected items' | i18next }}
+          .left_buttons
+            button.btn.btn-warning.btn-sm.spacer#create_new_item type="button" ng-click="create_new_item()" ng-class="{'disabled':new_item_creation}" 
+              | {{ 'New item' | i18next }}
+            / .btn-group.spacer.lang_switch
+            /   button.btn.btn-default.dropdown-toggle data-toggle="dropdown" type="button"
+            /     |  {{ current_museum.language | i18next }}   
+            /     span.caret
+            /   ul.dropdown-menu role="menu"
+            /     li ng-repeat="story in current_museum.stories"
+            /       a href="#" ng-click="current_museum.language = story.language"
+            /         | {{ story.language | i18next}}
+            /     li.divider
+            /     li
+            /       a href="#" ng-click="new_museum_language()" {{ 'newLanguage' | i18next }}
+            .btn-group
+              button.btn.btn-default.btn-sm.dropdown-toggle.spacer data-toggle="dropdown" type="button"
+                | {{ 'Actions' | i18next }}  
+                span.caret
+              ul.dropdown-menu role="menu"
+                li ng-switch="" on="all_selected" ng-click="select_all_exhibits()" 
+                  a href="#" ng-switch-when="false" {{ 'Select all' | i18next }}
+                  a href="#" ng-switch-when="true" {{ 'Cancel selection' | i18next }}
+                li.dropdown-submenu
+                  a href="#" {{ 'addSelectedCollection' | i18next }}
+                  ul.dropdown-menu role="menu"
+                    li
+                      a href="#" Collection 1
+                    li
+                      a href="#" Collection 2
+                    li
+                      a href="#" Collection 3
+                li.dropdown-submenu
+                  a href="#" {{ 'setItemVisibility' | i18next }}
+                  ul.dropdown-menu role="menu"
+                    li
+                      a href="#" ng-click="mass_switch_pub('published')"
+                        i class="icon-globe"  
+                        |   {{ 'Publish' | i18next }}
+                    li
+                      a href="#" ng-click="mass_switch_pub('passcode')"
+                        i class="icon-lock"  
+                        |   {{ 'Make private' | i18next }}
+                    li
+                      a href="#" ng-click="mass_switch_pub('opas_invisible')"
+                        i class="icon-eye-close"  
+                        |   {{ 'Make invisible' | i18next }}
+                li
+                  a href="#" ng-click="delete_selected_exhibits()" {{ 'Delete selected items' | i18next }}
 
-          / .btn-group.spacer
-          /   button.btn.btn-default.undo type="button" 
-          /     i.icon-undo
-          /   button.btn.btn-default.redo type="button" 
-          /     i.icon-repeat
+            / .btn-group.spacer
+            /   button.btn.btn-default.undo type="button" 
+            /     i.icon-undo
+            /   button.btn.btn-default.redo type="button" 
+            /     i.icon-repeat
 
-          a.spacer href="#" ng-click="select_all_exhibits('select')" ng-show="select_all_enabled"
-            span 
+            button.btn.btn-default.btn-sm.spacer ng-click="select_all_exhibits('select')" ng-show="select_all_enabled"
               | {{ 'Select all' | i18next }}
-          a.spacer href="#" ng-click="select_all_exhibits('cancel')" ng-show="select_all_enabled"
-            span 
+            button.btn.btn-default.btn-sm.spacer ng-click="select_all_exhibits('cancel')" ng-show="select_all_enabled"
               | {{ 'Cancel selection' | i18next }}
+
+          lang-list
 
         .right_content ng-mouseover="show_museum_edit_dropdown=false"
           / span.limits.spacer
@@ -298,9 +301,11 @@ html lang="en" ng-app="Museum"
           /     i.icon-chevron-left
           /   button.btn.btn-default.next type="button" 
           /     i.icon-chevron-right
-          input.form-control.search.spacer type="text" placeholder="{{ 'Search' | i18next }}" ng-model="exhibit_search" resizer=""
-          button.btn.btn-default.filter_opener ng-class="{'active': filters_opened || exhibits_visibility_filter}" type="button" toggle-filters="" 
+          input.form-control.input-sm.search.spacer type="text" placeholder="{{ 'Search' | i18next }}" ng-model="exhibit_search" resizer=""
+          button.btn.btn-default.btn-sm.filter_opener.spacer ng-class="{'active': filters_opened || exhibits_visibility_filter}" type="button" toggle-filters="" 
             | {{ 'Filters and sorts' | i18next }}
+          button.btn.btn-default.btn-sm.help_opener
+            i.icon-question-sign
 
       .filters_bar
         a.clear_fiters.spacer ng-show="exhibits_visibility_filter" ng-click="exhibits_visibility_filter = false" href="#" {{ 'Clear filters' | i18next }}

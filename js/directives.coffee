@@ -100,7 +100,7 @@ angular.module("Museum.directives", [])
       </button>
 
 
-      <button class="btn btn-default" ng-hide="item.status == 'opas_invisible'" ng-class="{'active btn-primary': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
+      <button class="btn btn-default" ng-hide="item.status == 'opas_invisible'" ng-class="{'active btn-warning': item.status == 'passcode' }" ng-click="item.status = 'passcode'; status_process()" type="button" ng-switch on="item[field]">
         <div class="extra">
           <i class="icon-lock"></i>
         </div>
@@ -1373,7 +1373,6 @@ angular.module("Museum.directives", [])
 .directive 'draggable', ($rootScope, $i18next, imageMappingHelpers) ->
   restrict: 'A'
   link: (scope, element, attrs) ->
-    console.log scope
     element  = $ element
 
     weight_calc = imageMappingHelpers.weight_calc
@@ -1583,3 +1582,63 @@ angular.module("Museum.directives", [])
         element.data('scrollPosition', pos)
         element.find('.arrow i').addClass("icon-long-arrow-down").removeClass("icon-long-arrow-up")
         $.scrollTo 0, 0
+
+.directive "langList", ($timeout) ->
+  restrict: "E"
+  replace: true
+  transclude: true
+  template: """
+    <ul class="nav nav-tabs lang_list">
+      <li ng-class="{'active': $index == '0'}" ng-repeat="story in first_display">
+        <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
+      </li>
+      <li>
+        <a href="#" class="dropdown-toggle">
+          More
+          <i class="icon-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li ng-repeat="story in last_display">
+            <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
+          </li>
+          <li class="divider" ng-hide="last_display.length == 0"></li>
+          <li>
+            <a href="#" ng-click="new_museum_language()"> {{ 'newLanguage' | i18next }} </a>
+          </li>
+        </ul>        
+      </li>
+    </ul>
+  """  
+  link: (scope, element, attrs) ->
+
+    scope.first_display = []
+    scope.last_display  = []
+
+
+    weight_calc = (item) ->
+      weight = 0
+      weight -= 100 if item.language is scope.current_museum.language
+      return weight
+
+    lang_sort = (a, b) ->
+      if weight_calc(a) > weight_calc(b)
+        return 1
+      else if weight_calc(a) < weight_calc(b)
+        return -1
+      else
+        return 0
+
+    scope.$watch 'current_museum.language', ( newValue, oldValue ) ->
+
+      scope.lang_arr = []
+
+      for key, value of scope.current_museum.stories
+        scope.lang_arr.push value
+
+      scope.lang_arr.sort(lang_sort)
+      scope.first_display = scope.lang_arr.splice(0, 2)
+      scope.last_display  = scope.lang_arr
+
+      # scope.$digest()
+
+

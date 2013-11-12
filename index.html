@@ -12,6 +12,7 @@
     <link href="css/prototype.css" rel="stylesheet">
     <link href="css/jquery.Jcrop.css" rel="stylesheet">
     <link href="css/jquery.fileupload-ui.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Roboto:400,300,700,300italic,400italic,700italic&amp;subset=latin,cyrillic" rel="stylesheet" type="text/css">
   </head>
   <body class="fixed_navbar" drag-and-drop-init="" ng-controller="IndexController" scrollspy-init="">
     <div class="navigation">
@@ -58,12 +59,12 @@
       </div>
       <div class="navbar navbar-default" ng-mouseover="show_museum_edit_dropdown=true">
         <div class="left_content">
-          <a class="menu_opener" href="#" toggle-menu=""><i class="icon-reorder"></i></a><span class="cms_text_logo">izi.cms</span>
+          <a class="menu_opener" href="#" toggle-menu=""><i class="icon-reorder"></i></a>
           <h1 class="museum_title" ng-class="{&#39;opened&#39;:museum_edit_dropdown_opened}">
             {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
           </h1>
-          <div class="btn-group language">
-            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{{ current_museum.language | i18next }}  <span class="caret"></span></button>
+          <div class="btn-group lang top_space">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">{{ current_museum.language | i18next }}  <i class="icon-chevron-down"></i></a>
             <ul class="dropdown-menu" role="menu">
               <li ng-repeat="story in current_museum.stories">
                 <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next }}</a>
@@ -74,9 +75,11 @@
               </li>
             </ul>
           </div>
+          <div class="button btn btn-default top_space edit" ng-click="show_museum_edit($event)">
+            <i class="icon-pencil"></i>  {{ 'Edit' | i18next}}
+          </div>
         </div>
         <div class="right_content">
-          <span class="autosaved_info" ng-show="last_save_time">{{ 'Changes autosaved at' | i18next }} {{ last_save_time | date:'HH:mm'}}</span>
           <div class="hider" ng-hide="museum_edit_dropdown_opened">
             <switchpubitem field="status" ng-item="current_museum.stories[current_museum.language]" ng-museum="current_museum" ng-provider="provider" root="current_museum" translations="translations" type="story"></switchpubitem>
           </div>
@@ -208,70 +211,58 @@
           </div>
         </div>
       </div>
-      <div class="museum_edit_opener" ng-click="show_museum_edit($event)" ng-show="show_museum_edit_dropdown || museum_edit_dropdown_opened">
-        {{ 'Museum properties' | i18next }}<i class="icon-chevron-down"></i>
-      </div>
     </div>
     <div class="float_menu">
       <div class="actions_bar">
         <error-notification></error-notification>
         <div class="left_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <button class="btn btn-warning spacer" id="create_new_item" ng-class="{&#39;disabled&#39;:new_item_creation}" ng-click="create_new_item()" type="button">{{ 'New item' | i18next }}</button>
-          <div class="btn-group spacer lang_switch">
-            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button"> {{ current_museum.language | i18next }}   <span class="caret"></span></button>
-            <ul class="dropdown-menu" role="menu">
-              <li ng-repeat="story in current_museum.stories">
-                <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
-              </li>
-              <li class="divider"></li>
-              <li>
-                <a href="#" ng-click="new_museum_language()">{{ 'newLanguage' | i18next }}</a>
-              </li>
-            </ul>
+          <div class="left_buttons">
+            <button class="btn btn-warning btn-sm spacer" id="create_new_item" ng-class="{&#39;disabled&#39;:new_item_creation}" ng-click="create_new_item()" type="button">{{ 'New item' | i18next }}</button>
+            <div class="btn-group">
+              <button class="btn btn-default btn-sm dropdown-toggle spacer" data-toggle="dropdown" type="button">{{ 'Actions' | i18next }}  <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu">
+                <li ng-click="select_all_exhibits()" ng-switch="" on="all_selected">
+                  <a href="#" ng-switch-when="false">{{ 'Select all' | i18next }}</a><a href="#" ng-switch-when="true">{{ 'Cancel selection' | i18next }}</a>
+                </li>
+                <li class="dropdown-submenu">
+                  <a href="#">{{ 'addSelectedCollection' | i18next }}</a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                      <a href="#">Collection 1</a>
+                    </li>
+                    <li>
+                      <a href="#">Collection 2</a>
+                    </li>
+                    <li>
+                      <a href="#">Collection 3</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="dropdown-submenu">
+                  <a href="#">{{ 'setItemVisibility' | i18next }}</a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                      <a href="#" ng-click="mass_switch_pub(&#39;published&#39;)"><i class="icon-globe"></i>  {{ 'Publish' | i18next }}</a>
+                    </li>
+                    <li>
+                      <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  {{ 'Make private' | i18next }}</a>
+                    </li>
+                    <li>
+                      <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  {{ 'Make invisible' | i18next }}</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="#" ng-click="delete_selected_exhibits()">{{ 'Delete selected items' | i18next }}</a>
+                </li>
+              </ul>
+            </div>
+            <button class="btn btn-default btn-sm spacer" ng-click="select_all_exhibits(&#39;select&#39;)" ng-show="select_all_enabled">{{ 'Select all' | i18next }}</button><button class="btn btn-default btn-sm spacer" ng-click="select_all_exhibits(&#39;cancel&#39;)" ng-show="select_all_enabled">{{ 'Cancel selection' | i18next }}</button>
           </div>
-          <div class="btn-group">
-            <button class="btn btn-default dropdown-toggle spacer" data-toggle="dropdown" type="button">{{ 'Actions' | i18next }}  <span class="caret"></span></button>
-            <ul class="dropdown-menu" role="menu">
-              <li ng-click="select_all_exhibits()" ng-switch="" on="all_selected">
-                <a href="#" ng-switch-when="false">{{ 'Select all' | i18next }}</a><a href="#" ng-switch-when="true">{{ 'Cancel selection' | i18next }}</a>
-              </li>
-              <li class="dropdown-submenu">
-                <a href="#">{{ 'addSelectedCollection' | i18next }}</a>
-                <ul class="dropdown-menu" role="menu">
-                  <li>
-                    <a href="#">Collection 1</a>
-                  </li>
-                  <li>
-                    <a href="#">Collection 2</a>
-                  </li>
-                  <li>
-                    <a href="#">Collection 3</a>
-                  </li>
-                </ul>
-              </li>
-              <li class="dropdown-submenu">
-                <a href="#">{{ 'setItemVisibility' | i18next }}</a>
-                <ul class="dropdown-menu" role="menu">
-                  <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;published&#39;)"><i class="icon-globe"></i>  {{ 'Publish' | i18next }}</a>
-                  </li>
-                  <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;passcode&#39;)"><i class="icon-lock"></i>  {{ 'Make private' | i18next }}</a>
-                  </li>
-                  <li>
-                    <a href="#" ng-click="mass_switch_pub(&#39;opas_invisible&#39;)"><i class="icon-eye-close"></i>  {{ 'Make invisible' | i18next }}</a>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <a href="#" ng-click="delete_selected_exhibits()">{{ 'Delete selected items' | i18next }}</a>
-              </li>
-            </ul>
-          </div>
-          <a class="spacer" href="#" ng-click="select_all_exhibits(&#39;select&#39;)" ng-show="select_all_enabled"><span>{{ 'Select all' | i18next }}</span></a><a class="spacer" href="#" ng-click="select_all_exhibits(&#39;cancel&#39;)" ng-show="select_all_enabled"><span>{{ 'Cancel selection' | i18next }}</span></a>
+          <lang-list></lang-list>
         </div>
         <div class="right_content" ng-mouseover="show_museum_edit_dropdown=false">
-          <input class="form-control search spacer" ng-model="exhibit_search" placeholder="{{ &#39;Search&#39; | i18next }}" resizer="" type="text"><button class="btn btn-default filter_opener" ng-class="{&#39;active&#39;: filters_opened || exhibits_visibility_filter}" toggle-filters="" type="button">{{ 'Filters and sorts' | i18next }}</button>
+          <input class="form-control input-sm search spacer" ng-model="exhibit_search" placeholder="{{ &#39;Search&#39; | i18next }}" resizer="" type="text"><button class="btn btn-default btn-sm filter_opener spacer" ng-class="{&#39;active&#39;: filters_opened || exhibits_visibility_filter}" toggle-filters="" type="button">{{ 'Filters and sorts' | i18next }}</button><button class="btn btn-default btn-sm help_opener"><i class="icon-question-sign"></i></button>
         </div>
       </div>
       <div class="filters_bar">
