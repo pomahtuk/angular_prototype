@@ -1185,10 +1185,18 @@ angular.module("Museum.directives", [])
         <a class="left" href="#" ng-click="set_index(active_image_index - 1)">
           <i class="icon-angle-left"></i>
         </a>
-        <ul class="images_sortable" sortable="model.images">
-          <li class="thumb item_{{$index}} " ng-class="{'active':image.image.active, 'timestamp': image.mappings[model.language] >= 0}" ng-repeat="image in images">
+        <ul class="images_sortable" sortable="model.images" lang="$parent.current_museum.language">
+          <li class="thumb item_{{$index}} " ng-class="{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}" ng-repeat="image in images">
             <img ng-click="set_index($index)" src="{{image.image.thumbnailUrl}}" />
-            <a class="cover" ng-class="{'active':image.image.cover}" ng-click="make_cover($index)" ng-switch on="image.image.cover">
+            <div class="label_timestamp" ng-show="image.mappings[lang].timestamp >= 0">
+              <span class="letter_label">
+                {{ image.image.order | numstring }}
+              </span>
+              <span class="time">
+                {{ image.mappings[lang].timestamp | timerepr }}
+              </span>
+            </div>
+            <a class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.$parent.make_cover($index)" ng-switch on="image.image.cover">
               <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
               <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
             </a>
@@ -1207,9 +1215,9 @@ angular.module("Museum.directives", [])
         $scope.active_image_index = index
 
     $scope.make_cover = (index) ->
-      $scope.model.cover = $scope.model.images[index]
+      $scope.model.cover = $scope.model.images[index].image
       for image in $scope.model.images
-        if image.image._id isnt $scope.model.cover.image._id
+        if image.image._id isnt $scope.model.cover._id
           image.image.cover = false
         else
           image.image.cover = true
@@ -1346,25 +1354,35 @@ angular.module("Museum.directives", [])
   restrict: 'A'
   scope:
     images: "=sortable"
+    lang: "=lang"
   link: (scope, element, attrs) ->
     element  = $ element
     backend  = scope.$parent.backend_url || scope.$parent.$parent.backend_url
     element.disableSelection()
+    console.log scope.lang
     element.sortable
       placeholder: "ui-state-highlight"
-      cancel: ".timestamp"
-      items: "li:not(.timestamp)"
+      tolerance: 'pointer'
+      helper: 'clone'
+      cancel: ".timestamp, .upload_item"
+      items: "li:not(.timestamp):not(.upload_item)"
+      revert: true
+      scroll: false
       start: (event, ui) ->
         ui.item.data 'start', ui.item.index()
-      update: ( event, ui ) ->
+        ui.helper.addClass 'dragged'
+        element.parents('.description').find('.timline_container').addClass('highlite')
+      stop: ( event, ui ) ->
+        console.log 'stoped'
         elements = element.find('li')
         start    = ui.item.data('start')
         end      = ui.item.index()
         scope.images.splice(end, 0, scope.images.splice(start, 1)[0])
-        if scope.images[end].order isnt end
+        element.parents('.description').find('.timline_container').removeClass('highlite')
+        if scope.images[end].image.order isnt end
           for image, index in scope.images
-            image.order = index
-            $http.put("#{backend}/media/#{image._id}", image).success (data) ->
+            image.image.order = index
+            $http.put("#{backend}/media/#{image.image._id}", image.image).success (data) ->
               console.log 'ok'
             .error ->
               errorProcessing.addError $i18next 'Failed to update order' 
@@ -1415,6 +1433,7 @@ angular.module("Museum.directives", [])
     element.draggable
       revert: true
       cursor: "pointer"
+      scroll: false
       start: ( event, ui ) ->
         ui.helper.addClass('dragged')
         element.parents('.description').find('.timline_container').addClass('highlite')
@@ -1595,7 +1614,7 @@ angular.module("Museum.directives", [])
       <li>
         <a href="#" class="dropdown-toggle">
           More
-          <i class="icon-caret-down"></i>
+          <i class="icon-chevron-down"></i>
         </a>
         <ul class="dropdown-menu">
           <li ng-repeat="story in last_display">
@@ -1640,5 +1659,3 @@ angular.module("Museum.directives", [])
       scope.last_display  = scope.lang_arr
 
       # scope.$digest()
-
-

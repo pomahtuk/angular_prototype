@@ -493,16 +493,16 @@ html lang="en" ng-app="Museum"
                   label.col-xs-1.control-label 
                     | {{ 'Images' | i18next }}
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
-                  ul class="images col-xs-11 {{active_exhibit.has_hovered}}"
-                    li.dragable_image draggable-revert="" ng-repeat="image in active_exhibit.images" data-lang="{{current_museum.language}}" data-array-index="{{$index}}" ng-class="{'hovered': image.image.hovered}"
-                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)"
-                        .label_timestamp ng-show="image.mappings[current_museum.language].timestamp >= 0"
+                  ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images" lang="current_museum.language"
+                    li.dragable_image ng-repeat="image in $parent.active_exhibit.images" data-lang="{{lang}}" data-array-index="{{$index}}" ng-class="{'hovered': image.image.hovered, 'timestamp': image.mappings[lang].timestamp >= 0 }"
+                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="$parent.set_hover(image, true)" ng-mouseout="$parent.set_hover(image, false)"
+                        .label_timestamp ng-show="image.mappings[lang].timestamp >= 0"
                           span.letter_label
                             | {{ image.image.order | numstring }} 
                           span.time 
-                            | {{ image.mappings[current_museum.language].timestamp | timerepr }}
-                          span.delete_maping.close ng-click="delete_mapping($index, $event)" ×
-                        span class="cover" ng-class="{'active':image.image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.image.cover"
+                            | {{ image.mappings[lang].timestamp | timerepr }}
+                          span.delete_maping.close ng-click="$parent.delete_mapping($index, $event)" ×
+                        span class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 
                             |  {{ "Cover" | i18next }}

@@ -1124,7 +1124,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].image.url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].image.url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[model.language] >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n        <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"make_cover($index)\" ng-switch on=\"image.image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].image.url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].image.url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n        <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n          <span class=\"letter_label\">\n            {{ image.image.order | numstring }}\n          </span>\n          <span class=\"time\">\n            {{ image.mappings[lang].timestamp | timerepr }}\n          </span>\n        </div>\n        <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1133,12 +1133,12 @@
         };
         $scope.make_cover = function(index) {
           var image, _i, _len, _ref, _results;
-          $scope.model.cover = $scope.model.images[index];
+          $scope.model.cover = $scope.model.images[index].image;
           _ref = $scope.model.images;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             image = _ref[_i];
-            if (image.image._id !== $scope.model.cover.image._id) {
+            if (image.image._id !== $scope.model.cover._id) {
               image.image.cover = false;
             } else {
               image.image.cover = true;
@@ -1303,32 +1303,42 @@
     return {
       restrict: 'A',
       scope: {
-        images: "=sortable"
+        images: "=sortable",
+        lang: "=lang"
       },
       link: function(scope, element, attrs) {
         var backend;
         element = $(element);
         backend = scope.$parent.backend_url || scope.$parent.$parent.backend_url;
         element.disableSelection();
+        console.log(scope.lang);
         return element.sortable({
           placeholder: "ui-state-highlight",
-          cancel: ".timestamp",
-          items: "li:not(.timestamp)",
+          tolerance: 'pointer',
+          helper: 'clone',
+          cancel: ".timestamp, .upload_item",
+          items: "li:not(.timestamp):not(.upload_item)",
+          revert: true,
+          scroll: false,
           start: function(event, ui) {
-            return ui.item.data('start', ui.item.index());
+            ui.item.data('start', ui.item.index());
+            ui.helper.addClass('dragged');
+            return element.parents('.description').find('.timline_container').addClass('highlite');
           },
-          update: function(event, ui) {
+          stop: function(event, ui) {
             var elements, end, image, index, start, _i, _len, _ref;
+            console.log('stoped');
             elements = element.find('li');
             start = ui.item.data('start');
             end = ui.item.index();
             scope.images.splice(end, 0, scope.images.splice(start, 1)[0]);
-            if (scope.images[end].order !== end) {
+            element.parents('.description').find('.timline_container').removeClass('highlite');
+            if (scope.images[end].image.order !== end) {
               _ref = scope.images;
               for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
                 image = _ref[index];
-                image.order = index;
-                $http.put("" + backend + "/media/" + image._id, image).success(function(data) {
+                image.image.order = index;
+                $http.put("" + backend + "/media/" + image.image._id, image.image).success(function(data) {
                   return console.log('ok');
                 }).error(function() {
                   return errorProcessing.addError($i18next('Failed to update order'));
@@ -1401,6 +1411,7 @@
         return element.draggable({
           revert: true,
           cursor: "pointer",
+          scroll: false,
           start: function(event, ui) {
             ui.helper.addClass('dragged');
             return element.parents('.description').find('.timline_container').addClass('highlite');
@@ -1603,7 +1614,7 @@
       restrict: "E",
       replace: true,
       transclude: true,
-      template: "<ul class=\"nav nav-tabs lang_list\">\n  <li ng-class=\"{'active': $index == '0'}\" ng-repeat=\"story in first_display\">\n    <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n  </li>\n  <li>\n    <a href=\"#\" class=\"dropdown-toggle\">\n      More\n      <i class=\"icon-caret-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in last_display\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"last_display.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
+      template: "<ul class=\"nav nav-tabs lang_list\">\n  <li ng-class=\"{'active': $index == '0'}\" ng-repeat=\"story in first_display\">\n    <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n  </li>\n  <li>\n    <a href=\"#\" class=\"dropdown-toggle\">\n      More\n      <i class=\"icon-chevron-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in last_display\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"last_display.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
       link: function(scope, element, attrs) {
         var lang_sort, weight_calc;
         scope.first_display = [];

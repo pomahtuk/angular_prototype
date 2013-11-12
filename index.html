@@ -447,13 +447,13 @@
                     </div>
                   </div>
                   <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
-                  <ul class="images col-xs-11 {{active_exhibit.has_hovered}}">
-                    <li class="dragable_image" data-array-index="{{$index}}" data-lang="{{current_museum.language}}" draggable-revert="" ng-class="{&#39;hovered&#39;: image.image.hovered}" ng-repeat="image in active_exhibit.images">
-                      <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)" open-lightbox="{{$index}}">
-                        <div class="label_timestamp" ng-show="image.mappings[current_museum.language].timestamp &gt;= 0">
-                          <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[current_museum.language].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="delete_mapping($index, $event)">×</span>
+                  <ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" lang="current_museum.language" sortable="active_exhibit.images">
+                    <li class="dragable_image" data-array-index="{{$index}}" data-lang="{{lang}}" ng-class="{&#39;hovered&#39;: image.image.hovered, &#39;timestamp&#39;: image.mappings[lang].timestamp &gt;= 0 }" ng-repeat="image in $parent.active_exhibit.images">
+                      <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="$parent.set_hover(image, true)" ng-mouseout="$parent.set_hover(image, false)" open-lightbox="{{$index}}">
+                        <div class="label_timestamp" ng-show="image.mappings[lang].timestamp &gt;= 0">
+                          <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.delete_mapping($index, $event)">×</span>
                         </div>
-                        <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                        <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                     </li>
                     <li class="upload_item">
                       <div class="drag_here">
