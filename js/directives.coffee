@@ -852,11 +852,16 @@ angular.module("Museum.directives", [])
     dropzone = $("##{scope.selector_dropzone}")
 
     checkExtension = (object) ->
-      extension = object.files[0].name.split('.').pop().toLowerCase()
-      type = 'unsupported'
-      type = 'image' if $.inArray(extension, gon.acceptable_extensions.image) != -1
-      type = 'audio' if $.inArray(extension, gon.acceptable_extensions.audio) != -1
-      type = 'video' if $.inArray(extension, gon.acceptable_extensions.video) != -1
+      if object.files[0].name?
+        extension = object.files[0].name.split('.').pop().toLowerCase()
+        type = 'unsupported'
+        type = 'image' if $.inArray(extension, gon.acceptable_extensions.image) != -1
+        type = 'audio' if $.inArray(extension, gon.acceptable_extensions.audio) != -1
+        type = 'video' if $.inArray(extension, gon.acceptable_extensions.video) != -1
+      else
+        type = object.files[0].type.split('/')[0]
+        object.files[0].subtype = object.files[0].type.split('/')[1]
+      console.log type
       type
 
     correctFileSize = (object) ->
@@ -886,6 +891,7 @@ angular.module("Museum.directives", [])
         initiate_progress()
       drop: (e, data) ->
         initiate_progress()
+        console.log data
         $.each data.files, (index, file) ->
           console.log "Dropped file: " + file.name
       add: (e, data) ->
@@ -978,14 +984,18 @@ angular.module("Museum.directives", [])
       elem   = $ @
 
       if confirm elem.data('confirm')
+        # console.log elem.data('link'), elem.data('method'), scope.model
         $.ajax
           url: elem.data('link')
           type: elem.data('method')
           success: (data) ->
             if scope.media.type is 'image'
               for image, index in scope.model.images
+                console.log image.image._id, data
                 if image?
-                  if image._id is data
+                  console.log 'image present'
+                  if image.image._id is data
+                    console.log 'id is same'
                     if image.cover is true
                       scope.model.cover = {}
                     scope.model.images.splice index, 1
@@ -1050,6 +1060,34 @@ angular.module("Museum.directives", [])
             dropZone.removeClass "in hover"
             doc.removeClass "in"
         , 300
+
+    $(document).bind "drop", (e) ->
+      url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src")
+
+      console.log url
+
+      $.getImageData
+        url: url
+        server: "#{scope.backend_url}/imagedata"
+        success: (img) ->
+          canvas = document.createElement("canvas")
+          canvas.width = img.width
+          canvas.height = img.height
+          if canvas.getContext and canvas.toBlob
+            canvas.getContext("2d").drawImage img, 0, 0, img.width, img.height
+            canvas.toBlob ((blob) ->
+              $("#fileupload").fileupload "add",
+                files: [blob]
+            ), "image/jpeg"
+      # img = document.createElement("img")
+      # img.onload = (e) ->
+      #   ctx.drawImage img, 0, 0, canvas.width, canvas.height
+      #   url  = canvas.toDataURL() # Succeeds. Canvas won't be dirty.
+      #   console.log url
+      #   # canvas.toBlob (blob) ->
+      #   #   $("#fileupload").fileupload "add", { files: [blob] }
+      # img.crossOrigin = "anonymous"
+      # img.src = url
 
 .directive 'dropDownEdit', ($timeout, $http) ->
   restrict: 'A'

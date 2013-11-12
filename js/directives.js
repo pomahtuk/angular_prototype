@@ -696,17 +696,23 @@
         dropzone = $("#" + scope.selector_dropzone);
         checkExtension = function(object) {
           var extension, type;
-          extension = object.files[0].name.split('.').pop().toLowerCase();
-          type = 'unsupported';
-          if ($.inArray(extension, gon.acceptable_extensions.image) !== -1) {
-            type = 'image';
+          if (object.files[0].name != null) {
+            extension = object.files[0].name.split('.').pop().toLowerCase();
+            type = 'unsupported';
+            if ($.inArray(extension, gon.acceptable_extensions.image) !== -1) {
+              type = 'image';
+            }
+            if ($.inArray(extension, gon.acceptable_extensions.audio) !== -1) {
+              type = 'audio';
+            }
+            if ($.inArray(extension, gon.acceptable_extensions.video) !== -1) {
+              type = 'video';
+            }
+          } else {
+            type = object.files[0].type.split('/')[0];
+            object.files[0].subtype = object.files[0].type.split('/')[1];
           }
-          if ($.inArray(extension, gon.acceptable_extensions.audio) !== -1) {
-            type = 'audio';
-          }
-          if ($.inArray(extension, gon.acceptable_extensions.video) !== -1) {
-            type = 'video';
-          }
+          console.log(type);
           return type;
         };
         correctFileSize = function(object) {
@@ -737,6 +743,7 @@
           },
           drop: function(e, data) {
             initiate_progress();
+            console.log(data);
             return $.each(data.files, function(index, file) {
               return console.log("Dropped file: " + file.name);
             });
@@ -872,8 +879,11 @@
                   _ref = scope.model.images;
                   for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
                     image = _ref[index];
+                    console.log(image.image._id, data);
                     if (image != null) {
-                      if (image._id === data) {
+                      console.log('image present');
+                      if (image.image._id === data) {
+                        console.log('id is same');
                         if (image.cover === true) {
                           scope.model.cover = {};
                         }
@@ -930,7 +940,7 @@
         $(document).bind('drop dragover', function(e) {
           return e.preventDefault();
         });
-        return $(document).bind("dragover", function(e) {
+        $(document).bind("dragover", function(e) {
           var doc, dropZone, found, found_index, node, timeout;
           dropZone = $(".dropzone");
           doc = $("body");
@@ -969,6 +979,29 @@
               }
             }, 300);
           }
+        });
+        return $(document).bind("drop", function(e) {
+          var url;
+          url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src");
+          console.log(url);
+          return $.getImageData({
+            url: url,
+            server: "" + scope.backend_url + "/imagedata",
+            success: function(img) {
+              var canvas;
+              canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              if (canvas.getContext && canvas.toBlob) {
+                canvas.getContext("2d").drawImage(img, 0, 0, img.width, img.height);
+                return canvas.toBlob((function(blob) {
+                  return $("#fileupload").fileupload("add", {
+                    files: [blob]
+                  });
+                }), "image/jpeg");
+              }
+            }
+          });
         });
       }
     };
