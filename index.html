@@ -419,7 +419,7 @@
                 <li ng-class="{&#39;active&#39;: story_tab == &#39;main&#39;}">
                   <a href="#" ng-click="story_tab = &#39;main&#39;">{{ 'Main' | i18next }}<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"></i><i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"></i></span></a>
                 </li>
-                <li ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
+                <li class="images_tab" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
                   <a href="#" ng-click="story_tab = &#39;images&#39;; check_mapped(active_exhibit, $event)">{{ 'Images' | i18next }}<span class="media_types story" ng-class="{&#39;invalid&#39;: active_exhibit.invalid}"><i class="icon-picture empty" ng-show="active_exhibit.images.length == 0"></i></span></a>
                 </li>
                 <li ng-class="{&#39;active&#39;: story_tab == &#39;more&#39; }">

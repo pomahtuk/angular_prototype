@@ -461,7 +461,7 @@ html lang="en" ng-app="Museum"
                     span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"
                       i class="icon-music empty" ng-hide="active_exhibit.stories[current_museum.language].audio"
                       i class="icon-align-left empty" ng-hide="active_exhibit.stories[current_museum.language].long_description"
-                li ng-class="{'active': story_tab == 'images' }"
+                li.images_tab ng-class="{'active': story_tab == 'images' }"
                   a href="#" ng-click="story_tab = 'images'; check_mapped(active_exhibit, $event)" 
                     | {{ 'Images' | i18next }}
                     span.media_types.story ng-class="{'invalid': active_exhibit.invalid}"

@@ -122,9 +122,9 @@
       };
       $scope.museum_change_progress = true;
       ngProgress.color('#fd6e3b');
-      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526a0a26a15cfbe815000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526a0a26a15cfbe815000001";
-      $scope.backend_url = "http://192.168.158.128:3000/api";
+      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526e1baa0439f8b01a000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526e1baa0439f8b01a000001";
+      $scope.backend_url = "http://prototype.izi.travel/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -790,6 +790,13 @@
         }
         item_publish_settings = dropDown.find('.item_publish_settings');
         delete_story = dropDown.find('.delete_story');
+        if ($scope.story_tab === 'images') {
+          console.log('ololo!');
+          console.log(dropDown.find('li.images_tab'));
+          setTimeout(function() {
+            return $scope.recalculate_marker_positions($scope.active_exhibit.stories[$scope.current_museum.language], dropDown.find('li.images_tab'));
+          }, 400);
+        }
         if (clicked.hasClass('dummy')) {
           number = clicked.data('number');
           $('#opas_number').val(number).blur();
@@ -875,7 +882,6 @@
       };
       $scope.check_mapped = function(item, event) {
         var selector, target;
-        console.log(event);
         target = $(event.target);
         selector = target.parents('.description').find('.timline_container');
         if ($scope.active_exhibit.stories[$scope.current_museum.language].mapped_images.length > 0) {
@@ -918,7 +924,6 @@
       };
       $scope.recalculate_marker_positions = function(item, selector) {
         var container_width, correction, duration, image, jp_durat, jp_play, left, marker, pixel_sec_weight, seek_bar, total_seconds, _i, _len, _ref, _results;
-        console.log(item, selector);
         seek_bar = $('.jp-seek-bar:visible');
         jp_durat = $('.jp-duration:visible');
         jp_play = $('.jp-play:visible');

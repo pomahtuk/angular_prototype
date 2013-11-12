@@ -96,17 +96,17 @@ angular.module("Museum.controllers", [])
   museum_id = if $location.$$path?
     $location.$$path.split('/')[1]
   else
-    "526a0a26a15cfbe815000002"
-    # "526e1baa0439f8b01a000002"
+    # "526a0a26a15cfbe815000002"
+    "526e1baa0439f8b01a000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
-    "526a0a26a15cfbe815000001"
-    # "526e1baa0439f8b01a000001"
+    # "526a0a26a15cfbe815000001"
+    "526e1baa0439f8b01a000001"
 
-  $scope.backend_url = "http://192.168.158.128:3000/api"
-  # $scope.backend_url = "http://prototype.izi.travel/api"
+  # $scope.backend_url = "http://192.168.158.128:3000/api"
+  $scope.backend_url = "http://prototype.izi.travel/api"
 
   $scope.sort_field     = 'number'
   $scope.sort_direction = 1
@@ -756,6 +756,13 @@ angular.module("Museum.controllers", [])
     item_publish_settings = dropDown.find('.item_publish_settings')
     delete_story = dropDown.find('.delete_story')
 
+    if $scope.story_tab is 'images'
+      console.log 'ololo!'
+      console.log dropDown.find('li.images_tab')
+      setTimeout ->
+        $scope.recalculate_marker_positions($scope.active_exhibit.stories[$scope.current_museum.language], dropDown.find('li.images_tab'))
+      , 400
+
     if clicked.hasClass 'dummy'
       number = clicked.data('number')
       $('#opas_number').val(number).blur()
@@ -840,7 +847,6 @@ angular.module("Museum.controllers", [])
     image.image.hovered = sign
 
   $scope.check_mapped = (item, event) ->
-    console.log event
     target = $ event.target
     selector = target.parents('.description').find('.timline_container')
     if $scope.active_exhibit.stories[$scope.current_museum.language].mapped_images.length > 0
@@ -871,7 +877,6 @@ angular.module("Museum.controllers", [])
     event.stopPropagation()
 
   $scope.recalculate_marker_positions = (item, selector) ->
-    console.log item, selector
     seek_bar   = $('.jp-seek-bar:visible')
     jp_durat   = $('.jp-duration:visible')
     jp_play    = $('.jp-play:visible')
