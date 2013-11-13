@@ -901,7 +901,7 @@
         image = $scope.active_exhibit.images[index];
         lang = $scope.current_museum.language;
         $http["delete"]("" + $scope.backend_url + "/media_mapping/" + image.mappings[lang]._id).success(function(data) {
-          var item, mapped_image, sub_index, _i, _j, _len, _len1, _ref, _ref1, _results;
+          var item, mapped_image, orders, sub_index, _i, _j, _len, _len1, _ref, _ref1;
           console.log('ok', data);
           _ref = $scope.active_exhibit.stories[lang].mapped_images;
           for (sub_index = _i = 0, _len = _ref.length; _i < _len; sub_index = ++_i) {
@@ -913,14 +913,14 @@
           }
           delete image.mappings[lang];
           $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+          orders = {};
           _ref1 = $scope.active_exhibit.images;
-          _results = [];
           for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
             item = _ref1[index];
             item.image.order = index;
-            _results.push(imageMappingHelpers.update_image(item, $scope.backend_url));
+            orders[item.image._id] = index;
           }
-          return _results;
+          return imageMappingHelpers.update_images($scope.active_exhibit.images[0].image.parent, orders, $scope.backend_url);
         }).error(function() {
           return errorProcessing.addError($i18next('Failed to delete timestamp'));
         });

@@ -93,12 +93,16 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
       errorProcessing.addError $i18next 'Failed to set timestamp'
     true
 
+  update_images: (parent, orders, backend_url) ->
+    $http.post("#{backend_url}/media_for/#{parent}/reorder", orders).success (data) ->
+      console.log 'ok'
+    .error ->
+      errorProcessing.addError $i18next 'Failed to update order'
+    true
+
   create_mapping: (image, backend_url) ->
-    console.log 'creating'
-    # image.mappings[$rootScope.lang].media = image.image._id
     $http.post("#{backend_url}/media_mapping/", image.mappings[$rootScope.lang]).success (data) ->
       image.mappings[$rootScope.lang] = data
-      console.log 'ok', data
     .error ->
       errorProcessing.addError $i18next 'Failed to set timestamp'
     true

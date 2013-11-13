@@ -1184,9 +1184,10 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].image.url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].image.url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n        <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n          <span class=\"letter_label\">\n            {{ image.image.order | numstring }}\n          </span>\n          <span class=\"time\">\n            {{ image.mappings[lang].timestamp | timerepr }}\n          </span>\n        </div>\n        <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <div class=\"explain_text\">\n    {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n  </div>\n  <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n  <div class=\"content\">\n    <div class=\"preview\">\n      {{ \"PREVIEW\" | i18next }}\n      <div class=\"mobile\">\n        <div class=\"image\">\n          <img src=\"{{model.images[active_image_index].image.url}}\">\n        </div>\n      </div>\n    </div>\n    <div class=\"cropping_area\">\n      <img src=\"{{model.images[active_image_index].image.url}}\">\n    </div>\n  </div>\n  <div class=\"slider\">\n    <a class=\"left\" href=\"#\" ng-click=\"set_index(active_image_index - 1)\">\n      <i class=\"icon-angle-left\"></i>\n    </a>\n    <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n      <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n        <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n        <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n          <span class=\"letter_label\">\n            {{ image.image.order | numstring }}\n          </span>\n          <span class=\"time\">\n            {{ image.mappings[lang].timestamp | timerepr }}\n          </span>\n        </div>\n        <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n          <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n          <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n        </a>\n      </li>\n    </ul>\n    <a class=\"right\" href=\"#\" ng-click=\"set_index(active_image_index + 1)\">\n      <i class=\"icon-angle-right\"></i>\n    </a>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index) {
+          console.log('called set_index with index', index);
           return $scope.update_media($scope.active_image_index, function() {
             return $scope.active_image_index = index;
           });
@@ -1359,7 +1360,7 @@
         return true;
       }
     };
-  }).directive('sortable', function($http, errorProcessing, $i18next) {
+  }).directive('sortable', function($http, errorProcessing, imageMappingHelpers, $i18next) {
     return {
       restrict: 'A',
       scope: {
@@ -1378,7 +1379,6 @@
           helper: 'clone',
           cancel: ".timestamp, .upload_item",
           items: "li:not(.timestamp):not(.upload_item)",
-          revert: true,
           scroll: false,
           delay: 100,
           start: function(event, ui) {
@@ -1387,24 +1387,21 @@
             return element.parents('.description').find('.timline_container').addClass('highlite');
           },
           stop: function(event, ui) {
-            var elements, end, image, index, start, _i, _len, _ref;
-            console.log('stoped');
+            var elements, end, image, index, orders, start, _i, _len, _ref;
             elements = element.find('li');
             start = ui.item.data('start');
             end = ui.item.index();
             scope.images.splice(end, 0, scope.images.splice(start, 1)[0]);
             element.parents('.description').find('.timline_container').removeClass('highlite');
             if (scope.images[end].image.order !== end) {
+              orders = {};
               _ref = scope.images;
               for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
                 image = _ref[index];
                 image.image.order = index;
-                $http.put("" + backend + "/media/" + image.image._id, image.image).success(function(data) {
-                  return console.log('ok');
-                }).error(function() {
-                  return errorProcessing.addError($i18next('Failed to update order'));
-                });
+                orders[image.image._id] = index;
               }
+              imageMappingHelpers.update_images(scope.images[0].image.parent, orders, backend);
               return scope.$apply();
             }
           }
@@ -1428,36 +1425,40 @@
             return image.dragging = true;
           },
           drag: function(event, ui) {
-            var current_time, image, index, item, _i, _len, _ref;
+            var current_time, image;
             current_time = imageMappingHelpers.calc_timestamp(ui, false);
             image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
             if (image != null) {
               if (image.mappings[$rootScope.lang].timestamp !== current_time) {
                 image.mappings[$rootScope.lang].timestamp = current_time;
-                scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-                _ref = scope.$parent.container.images;
-                for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-                  item = _ref[index];
-                  item.image.order = index;
-                }
-                scope.$parent.$parent.$digest();
               }
             }
             return true;
           },
           stop: function(event, ui) {
-            var image, index, item, _i, _len, _ref;
+            var current_time, image, index, item, orders, _i, _len, _ref;
             console.log('drag_stop');
+            current_time = imageMappingHelpers.calc_timestamp(ui, false);
             image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
             image.dragging = false;
             scope.$parent.set_hover(image, false);
+            if (image != null) {
+              if (image.mappings[$rootScope.lang].timestamp !== current_time) {
+                image.mappings[$rootScope.lang].timestamp = current_time;
+              }
+            }
             scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+            orders = {};
             _ref = scope.$parent.container.images;
             for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
               item = _ref[index];
               item.image.order = index;
-              imageMappingHelpers.update_image(item, scope.$parent.$parent.backend_url);
+              orders[item.image._id] = index;
+              if (item.image._id === image.image._id) {
+                imageMappingHelpers.update_image(item, scope.$parent.$parent.backend_url);
+              }
             }
+            imageMappingHelpers.update_images(image.image.parent, orders, scope.$parent.$parent.backend_url);
             scope.$parent.$parent.$digest();
             return event.stopPropagation();
           }
@@ -1478,7 +1479,7 @@
             return element.addClass('can_drop');
           },
           drop: function(event, ui) {
-            var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, mapped_images, seek_bar, target_image, target_storyset, _i, _j, _len, _len1, _ref;
+            var dropped, droppedOn, found, index, item, jp_durat, jp_play, mapped_images, orders, seek_bar, target_image, target_storyset, _i, _len, _ref;
             target_storyset = element.hasClass('active_exhibit') ? scope.active_exhibit : element.hasClass('current_museum') ? scope.current_museum : void 0;
             element.removeClass('can_drop');
             found = false;
@@ -1489,35 +1490,27 @@
             jp_durat = element.find('.jp-duration');
             jp_play = element.find('.jp-play');
             target_image = target_storyset.images[dropped.data('array-index')];
-            console.log(target_image, target_storyset);
             mapped_images = target_storyset.stories[scope.current_museum.language].mapped_images;
             if (mapped_images == null) {
               mapped_images = [];
             }
-            for (_i = 0, _len = mapped_images.length; _i < _len; _i++) {
-              image = mapped_images[_i];
-              if (image.image._id === target_image.image._id) {
-                found = true;
-                break;
-              }
+            mapped_images.push(target_image);
+            target_image.mappings[dropped.data('lang')] = {};
+            target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true);
+            target_image.mappings[dropped.data('lang')].language = dropped.data('lang');
+            target_image.mappings[dropped.data('lang')].media = target_image.image._id;
+            target_storyset.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+            orders = {};
+            _ref = target_storyset.images;
+            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+              item = _ref[index];
+              item.image.order = index;
+              orders[item.image._id] = index;
             }
-            if (!found) {
-              mapped_images.push(target_image);
-              target_image.mappings[dropped.data('lang')] = {};
-              target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true);
-              target_image.mappings[dropped.data('lang')].language = dropped.data('lang');
-              target_image.mappings[dropped.data('lang')].media = target_image.image._id;
-              target_storyset.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-              _ref = target_storyset.images;
-              for (index = _j = 0, _len1 = _ref.length; _j < _len1; index = ++_j) {
-                item = _ref[index];
-                item.image.order = index;
-                imageMappingHelpers.update_image(item, scope.backend_url);
-              }
-              imageMappingHelpers.create_mapping(target_image, scope.backend_url);
-              scope.$digest();
-              return scope.recalculate_marker_positions(target_storyset.stories[scope.current_museum.language], element);
-            }
+            imageMappingHelpers.update_images(target_image.image.parent, orders, scope.backend_url);
+            imageMappingHelpers.create_mapping(target_image, scope.backend_url);
+            scope.$digest();
+            return scope.recalculate_marker_positions(target_storyset.stories[scope.current_museum.language], element);
           }
         });
         return true;

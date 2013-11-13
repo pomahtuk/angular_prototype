@@ -1236,7 +1236,7 @@ angular.module("Museum.directives", [])
         </a>
         <ul class="images_sortable" sortable="model.images" lang="$parent.current_museum.language">
           <li class="thumb item_{{$index}} " ng-class="{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}" ng-repeat="image in images">
-            <img ng-click="set_index($index)" src="{{image.image.thumbnailUrl}}" />
+            <img ng-click="$parent.$parent.set_index($index)" src="{{image.image.thumbnailUrl}}" />
             <div class="label_timestamp" ng-show="image.mappings[lang].timestamp >= 0">
               <span class="letter_label">
                 {{ image.image.order | numstring }}
@@ -1260,6 +1260,7 @@ angular.module("Museum.directives", [])
   controller: ($scope, $element, $attrs) ->
 
     $scope.set_index = (index) ->
+      console.log 'called set_index with index', index
       $scope.update_media $scope.active_image_index, ->
         $scope.active_image_index = index
 
@@ -1399,7 +1400,7 @@ angular.module("Museum.directives", [])
 
     true
 
-.directive 'sortable', ($http, errorProcessing, $i18next) ->
+.directive 'sortable', ($http, errorProcessing, imageMappingHelpers, $i18next) ->
   restrict: 'A'
   scope:
     images: "=sortable"
@@ -1415,7 +1416,7 @@ angular.module("Museum.directives", [])
       helper: 'clone'
       cancel: ".timestamp, .upload_item"
       items: "li:not(.timestamp):not(.upload_item)"
-      revert: true
+      # revert: true
       scroll: false
       delay: 100
       start: (event, ui) ->
@@ -1423,19 +1424,17 @@ angular.module("Museum.directives", [])
         ui.helper.addClass 'dragged'
         element.parents('.description').find('.timline_container').addClass('highlite')
       stop: ( event, ui ) ->
-        console.log 'stoped'
         elements = element.find('li')
         start    = ui.item.data('start')
         end      = ui.item.index()
         scope.images.splice(end, 0, scope.images.splice(start, 1)[0])
         element.parents('.description').find('.timline_container').removeClass('highlite')
         if scope.images[end].image.order isnt end
+          orders = {}
           for image, index in scope.images
             image.image.order = index
-            $http.put("#{backend}/media/#{image.image._id}", image.image).success (data) ->
-              console.log 'ok'
-            .error ->
-              errorProcessing.addError $i18next 'Failed to update order' 
+            orders[image.image._id] = index
+          imageMappingHelpers.update_images scope.images[0].image.parent, orders, backend
           scope.$apply()
 
 .directive 'jsDraggable', ($rootScope, $i18next, imageMappingHelpers) ->
@@ -1454,24 +1453,31 @@ angular.module("Museum.directives", [])
         image.dragging = true
       drag: (event, ui) ->
         current_time = imageMappingHelpers.calc_timestamp(ui, false)
-        image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        image        = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
         if image?
           if image.mappings[$rootScope.lang].timestamp isnt current_time
             image.mappings[$rootScope.lang].timestamp = current_time
-            scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
-            for item, index in scope.$parent.container.images
-              item.image.order = index
-            scope.$parent.$parent.$digest()
         true
       stop: ( event, ui ) ->
         console.log 'drag_stop'
-        image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        current_time   = imageMappingHelpers.calc_timestamp(ui, false)
+        image          = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
         image.dragging = false
         scope.$parent.set_hover( image, false )
+        if image?
+          if image.mappings[$rootScope.lang].timestamp isnt current_time
+            image.mappings[$rootScope.lang].timestamp = current_time
+
         scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+
+        orders = {}
         for item, index in scope.$parent.container.images
           item.image.order = index
-          imageMappingHelpers.update_image(item, scope.$parent.$parent.backend_url)
+          orders[item.image._id] = index
+          if item.image._id is image.image._id
+            imageMappingHelpers.update_image item, scope.$parent.$parent.backend_url
+
+        imageMappingHelpers.update_images image.image.parent, orders, scope.$parent.$parent.backend_url
 
         scope.$parent.$parent.$digest()
         event.stopPropagation()
@@ -1507,9 +1513,6 @@ angular.module("Museum.directives", [])
   restrict: 'A'
   link: (scope, element, attrs) ->
     element  = $ element
-    # parent   = element.parents('.description')
-    # timeline = parent.find('.timline_container')
-    # sortable = parent.find('ul.images')
     element.droppable
       accept: '.dragable_image'
       out: ( event, ui ) ->
@@ -1535,30 +1538,31 @@ angular.module("Museum.directives", [])
         seek_bar = element.find('.jp-seek-bar')
         jp_durat = element.find('.jp-duration')
         jp_play  = element.find('.jp-play')
+
         target_image  = target_storyset.images[dropped.data('array-index')]
-        console.log target_image, target_storyset
+
         mapped_images = target_storyset.stories[scope.current_museum.language].mapped_images
-        mapped_images = [] unless mapped_images?
-        for image in mapped_images
-          if image.image._id is target_image.image._id
-            found = true
-            break
-        unless found
-          mapped_images.push target_image 
-          target_image.mappings[dropped.data('lang')] = {}
-          target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true)
-          target_image.mappings[dropped.data('lang')].language  = dropped.data('lang')
-          target_image.mappings[dropped.data('lang')].media     = target_image.image._id
-          target_storyset.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
-          for item, index in target_storyset.images
-            item.image.order = index
-            imageMappingHelpers.update_image(item, scope.backend_url)
+        mapped_images = [] unless mapped_images?        
+        mapped_images.push target_image
 
-          imageMappingHelpers.create_mapping(target_image, scope.backend_url)
+        target_image.mappings[dropped.data('lang')] = {}
+        target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true)
+        target_image.mappings[dropped.data('lang')].language  = dropped.data('lang')
+        target_image.mappings[dropped.data('lang')].media     = target_image.image._id
+        target_storyset.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
 
-          scope.$digest()
+        orders = {}
+        for item, index in target_storyset.images
+          item.image.order = index
+          orders[item.image._id] = index
 
-          scope.recalculate_marker_positions(target_storyset.stories[scope.current_museum.language], element)
+        imageMappingHelpers.update_images target_image.image.parent, orders, scope.backend_url
+
+        imageMappingHelpers.create_mapping target_image, scope.backend_url
+
+        scope.$digest()
+
+        scope.recalculate_marker_positions(target_storyset.stories[scope.current_museum.language], element)
 
     true
 

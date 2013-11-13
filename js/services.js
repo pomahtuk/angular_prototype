@@ -123,11 +123,17 @@
         });
         return true;
       },
+      update_images: function(parent, orders, backend_url) {
+        $http.post("" + backend_url + "/media_for/" + parent + "/reorder", orders).success(function(data) {
+          return console.log('ok');
+        }).error(function() {
+          return errorProcessing.addError($i18next('Failed to update order'));
+        });
+        return true;
+      },
       create_mapping: function(image, backend_url) {
-        console.log('creating');
         $http.post("" + backend_url + "/media_mapping/", image.mappings[$rootScope.lang]).success(function(data) {
-          image.mappings[$rootScope.lang] = data;
-          return console.log('ok', data);
+          return image.mappings[$rootScope.lang] = data;
         }).error(function() {
           return errorProcessing.addError($i18next('Failed to set timestamp'));
         });
