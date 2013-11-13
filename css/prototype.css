@@ -2751,19 +2751,6 @@ a:hover {
   background: #fd6e3b;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032053}}
-.visibility .icon-lock {
-  color: #fb8521 !important;
-}
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032056}}
-.visibility .icon-globe {
-  color: #1aa1e1 !important;
-}
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032059}}
-.visibility .icon-eye-close {
-  color: #d2322d !important;
-}
-
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032062}}
 img.do_not_drop {
   pointer-events: none;
