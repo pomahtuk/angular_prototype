@@ -847,6 +847,7 @@ angular.module("Museum.controllers", [])
     image.image.hovered = sign
 
   $scope.check_mapped = (event) ->
+    console.log 'checking mapping'
     target = $ event.target
     selector = target.parents('.description').find('.timline_container')
     target_storyset = if target.hasClass 'active_exhibit'

@@ -886,6 +886,7 @@
       };
       $scope.check_mapped = function(event) {
         var item, selector, target, target_storyset;
+        console.log('checking mapping');
         target = $(event.target);
         selector = target.parents('.description').find('.timline_container');
         target_storyset = target.hasClass('active_exhibit') ? $scope.active_exhibit : target.hasClass('current_museum') ? $scope.current_museum : void 0;

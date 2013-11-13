@@ -517,7 +517,7 @@ html lang="en" ng-app="Museum"
                     span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
                   ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images" lang="current_museum.language"
                     li.dragable_image ng-repeat="image in $parent.active_exhibit.images" data-lang="{{lang}}" data-array-index="{{$index}}" ng-class="{'hovered': image.image.hovered, 'timestamp': image.mappings[lang].timestamp >= 0 }"
-                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="$parent.set_hover(image, true)" ng-mouseout="$parent.set_hover(image, false)"
+                      a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="$parent.$parent.set_hover(image, true)" ng-mouseout="$parent.$parent.set_hover(image, false)"
                         .label_timestamp ng-show="image.mappings[lang].timestamp >= 0"
                           span.letter_label
                             | {{ image.image.order | numstring }} 

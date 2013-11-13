@@ -466,7 +466,7 @@
                   <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
                   <ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" lang="current_museum.language" sortable="active_exhibit.images">
                     <li class="dragable_image" data-array-index="{{$index}}" data-lang="{{lang}}" ng-class="{&#39;hovered&#39;: image.image.hovered, &#39;timestamp&#39;: image.mappings[lang].timestamp &gt;= 0 }" ng-repeat="image in $parent.active_exhibit.images">
-                      <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="$parent.set_hover(image, true)" ng-mouseout="$parent.set_hover(image, false)" open-lightbox="{{$index}}">
+                      <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="$parent.$parent.set_hover(image, true)" ng-mouseout="$parent.$parent.set_hover(image, false)" open-lightbox="{{$index}}">
                         <div class="label_timestamp" ng-show="image.mappings[lang].timestamp &gt;= 0">
                           <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.$parent.delete_mapping($index, $event)">×</span>
                         </div>
