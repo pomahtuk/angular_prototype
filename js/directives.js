@@ -1464,46 +1464,11 @@
         });
       }
     };
-  }).directive('jsDraggableRevert', function() {
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs) {
-        var parent, sortable, timeline;
-        console.log('initef revert');
-        element = $(element);
-        parent = element.parents('.description');
-        timeline = parent.find('.timline_container');
-        sortable = parent.find('ul.images');
-        return element.draggable({
-          revert: true,
-          cursor: "pointer",
-          scroll: false,
-          start: function(event, ui) {
-            ui.helper.addClass('dragged');
-            return timeline.addClass('highlite');
-          },
-          stop: function(event, ui) {
-            timeline.removeClass('highlite');
-            parent.find('ul.images').sortable("option", "disabled", true);
-            setTimeout(function() {
-              sortable.sortable("option", "disabled", false);
-              sortable.sortable("refresh");
-              return sortable.sortable("refreshPositions");
-            }, 300);
-            return event.stopPropagation();
-          }
-        });
-      }
-    };
   }).directive('droppable', function($http, errorProcessing, $i18next, imageMappingHelpers) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var parent, sortable, timeline;
         element = $(element);
-        parent = element.parents('.description');
-        timeline = parent.find('.timline_container');
-        sortable = parent.find('ul.images');
         element.droppable({
           accept: '.dragable_image',
           out: function(event, ui) {
@@ -1514,14 +1479,8 @@
           },
           drop: function(event, ui) {
             var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, mapped_images, seek_bar, target_image, target_storyset, _i, _j, _len, _len1, _ref;
-            target_storyset = element.hasClass('active_exhibit') ? (console.log('exhibit'), scope.active_exhibit) : element.hasClass('current_museum') ? (console.log('current_museum'), scope.current_museum) : void 0;
+            target_storyset = element.hasClass('active_exhibit') ? scope.active_exhibit : element.hasClass('current_museum') ? scope.current_museum : void 0;
             element.removeClass('can_drop');
-            sortable.sortable("option", "disabled", true);
-            setTimeout(function() {
-              sortable.sortable("option", "disabled", false);
-              sortable.sortable("refresh");
-              return sortable.sortable("refreshPositions");
-            }, 300);
             found = false;
             dropped = ui.draggable;
             droppedOn = $(this);

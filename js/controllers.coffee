@@ -681,7 +681,7 @@ angular.module("Museum.controllers", [])
 
       dropDown.addClass 'inited'
 
-      dropDown.find('a.done, .close').unbind('click').bind 'click', (e) ->
+      dropDown.find('a.done, .close').not('.delete_maping').unbind('click').bind 'click', (e) ->
         e.preventDefault()
         $scope.closeDropDown()
 
@@ -761,11 +761,7 @@ angular.module("Museum.controllers", [])
     delete_story = dropDown.find('.delete_story')
 
     if $scope.story_tab is 'images'
-      console.log 'ololo!'
-      console.log dropDown.find('li.images_tab')
-      setTimeout ->
-        $scope.recalculate_marker_positions($scope.active_exhibit.stories[$scope.current_museum.language], dropDown.find('li.images_tab'))
-      , 400
+      $scope.story_tab = 'main'
 
     if clicked.hasClass 'dummy'
       number = clicked.data('number')
@@ -850,11 +846,15 @@ angular.module("Museum.controllers", [])
   $scope.set_hover = (image, sign) ->
     image.image.hovered = sign
 
-  $scope.check_mapped = (item, event) ->
+  $scope.check_mapped = (event) ->
     target = $ event.target
     selector = target.parents('.description').find('.timline_container')
-    if $scope.active_exhibit.stories[$scope.current_museum.language].mapped_images.length > 0
-      item = $scope.active_exhibit.stories[$scope.current_museum.language]
+    target_storyset = if target.hasClass 'active_exhibit'
+      $scope.active_exhibit
+    else if target.hasClass 'current_museum'
+      $scope.current_museum
+    if target_storyset.stories[$scope.current_museum.language].mapped_images.length > 0
+      item = target_storyset.stories[$scope.current_museum.language]
       setTimeout ->
         $scope.recalculate_marker_positions(item, selector)
       , 100

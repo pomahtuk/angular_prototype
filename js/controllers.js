@@ -711,7 +711,7 @@
         dropDown.show().insertAfter(lastOfLine(li));
         if (!hasParent) {
           dropDown.addClass('inited');
-          dropDown.find('a.done, .close').unbind('click').bind('click', function(e) {
+          dropDown.find('a.done, .close').not('.delete_maping').unbind('click').bind('click', function(e) {
             e.preventDefault();
             return $scope.closeDropDown();
           });
@@ -799,11 +799,7 @@
         item_publish_settings = dropDown.find('.item_publish_settings');
         delete_story = dropDown.find('.delete_story');
         if ($scope.story_tab === 'images') {
-          console.log('ololo!');
-          console.log(dropDown.find('li.images_tab'));
-          setTimeout(function() {
-            return $scope.recalculate_marker_positions($scope.active_exhibit.stories[$scope.current_museum.language], dropDown.find('li.images_tab'));
-          }, 400);
+          $scope.story_tab = 'main';
         }
         if (clicked.hasClass('dummy')) {
           number = clicked.data('number');
@@ -888,12 +884,13 @@
       $scope.set_hover = function(image, sign) {
         return image.image.hovered = sign;
       };
-      $scope.check_mapped = function(item, event) {
-        var selector, target;
+      $scope.check_mapped = function(event) {
+        var item, selector, target, target_storyset;
         target = $(event.target);
         selector = target.parents('.description').find('.timline_container');
-        if ($scope.active_exhibit.stories[$scope.current_museum.language].mapped_images.length > 0) {
-          item = $scope.active_exhibit.stories[$scope.current_museum.language];
+        target_storyset = target.hasClass('active_exhibit') ? $scope.active_exhibit : target.hasClass('current_museum') ? $scope.current_museum : void 0;
+        if (target_storyset.stories[$scope.current_museum.language].mapped_images.length > 0) {
+          item = target_storyset.stories[$scope.current_museum.language];
           return setTimeout(function() {
             return $scope.recalculate_marker_positions(item, selector);
           }, 100);

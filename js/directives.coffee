@@ -1476,40 +1476,40 @@ angular.module("Museum.directives", [])
         scope.$parent.$parent.$digest()
         event.stopPropagation()
 
-.directive 'jsDraggableRevert', ->
-  restrict: 'A'
-  link: (scope, element, attrs) ->
-    console.log 'initef revert'
-    element  = $ element
-    parent   = element.parents('.description')
-    timeline = parent.find('.timline_container')
-    sortable = parent.find('ul.images')
-    element.draggable
-      revert: true
-      cursor: "pointer"
-      scroll: false
-      # delay: 100
-      # handle: "li.timestamp"
-      start: ( event, ui ) ->
-        ui.helper.addClass('dragged')
-        timeline.addClass('highlite')
-      stop: ( event, ui ) ->
-        timeline.removeClass('highlite')
-        parent.find('ul.images').sortable( "option", "disabled", true )
-        setTimeout ->
-          sortable.sortable( "option", "disabled", false )
-          sortable.sortable( "refresh" )
-          sortable.sortable( "refreshPositions" )
-        , 300
-        event.stopPropagation()
+# .directive 'jsDraggableRevert', ->
+#   restrict: 'A'
+#   link: (scope, element, attrs) ->
+#     console.log 'initef revert'
+#     element  = $ element
+#     parent   = element.parents('.description')
+#     timeline = parent.find('.timline_container')
+#     sortable = parent.find('ul.images')
+#     element.draggable
+#       revert: true
+#       cursor: "pointer"
+#       scroll: false
+#       # delay: 100
+#       # handle: "li.timestamp"
+#       start: ( event, ui ) ->
+#         ui.helper.addClass('dragged')
+#         timeline.addClass('highlite')
+#       stop: ( event, ui ) ->
+#         timeline.removeClass('highlite')
+#         parent.find('ul.images').sortable( "option", "disabled", true )
+#         setTimeout ->
+#           sortable.sortable( "option", "disabled", false )
+#           sortable.sortable( "refresh" )
+#           sortable.sortable( "refreshPositions" )
+#         , 300
+#         event.stopPropagation()
 
 .directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->
   restrict: 'A'
   link: (scope, element, attrs) ->
     element  = $ element
-    parent   = element.parents('.description')
-    timeline = parent.find('.timline_container')
-    sortable = parent.find('ul.images')
+    # parent   = element.parents('.description')
+    # timeline = parent.find('.timline_container')
+    # sortable = parent.find('ul.images')
     element.droppable
       accept: '.dragable_image'
       out: ( event, ui ) ->
@@ -1518,18 +1518,16 @@ angular.module("Museum.directives", [])
         element.addClass 'can_drop'
       drop: ( event, ui ) -> 
         target_storyset = if element.hasClass 'active_exhibit'
-          console.log 'exhibit'
           scope.active_exhibit
         else if element.hasClass 'current_museum'
-          console.log 'current_museum'
           scope.current_museum
         element.removeClass 'can_drop'
-        sortable.sortable( "option", "disabled", true )
-        setTimeout ->
-          sortable.sortable( "option", "disabled", false )
-          sortable.sortable( "refresh" )
-          sortable.sortable( "refreshPositions" )
-        , 300
+        # sortable.sortable( "option", "disabled", true )
+        # setTimeout ->
+        #   sortable.sortable( "option", "disabled", false )
+        #   sortable.sortable( "refresh" )
+        #   sortable.sortable( "refreshPositions" )
+        # , 300
         found     = false
         dropped   = ui.draggable
         droppedOn = $ @
