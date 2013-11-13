@@ -2763,8 +2763,3 @@ a:hover {
 .visibility .icon-eye-close {
   color: #d2322d !important;
 }
-
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032062}}
-img {
-  pointer-events: none;
-}
