@@ -716,7 +716,8 @@ angular.module("Museum.directives", [])
     help: '@ngHelp'
     id: '@ngId'
     title: '@ngTitle'
-    field: '@ngField'    
+    field: '@ngField'
+    container: '=container'
   template: """
     <div class="player">
       <div class="jp-jplayer" id="jquery_jplayer_{{id}}">
@@ -754,7 +755,7 @@ angular.module("Museum.directives", [])
         </div>
       </div>
       <div class="points_position_holder">
-        <div class="image_connection" ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" draggable ng-repeat="image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
+        <div class="image_connection" ng-class="{'hovered': image.image.hovered}" data-image-index="{{$index}}" js-draggable ng-repeat="image in container.stories[$parent.current_museum.language].mapped_images" ng-mouseenter="set_hover(image, true)" ng-mouseout="set_hover(image, false)">
           {{ charFromNum(image.image.order) }}
         </div>
       </div>
@@ -773,7 +774,7 @@ angular.module("Museum.directives", [])
         else
           sign
       image.image.hovered = sub_sign
-      $scope.$parent.active_exhibit.has_hovered = sub_sign
+      $scope.container.has_hovered = sub_sign
 
   link: (scope, element, attrs) ->
     scope.$watch 'item[field]', (newValue, oldValue) ->
@@ -895,6 +896,7 @@ angular.module("Museum.directives", [])
         $.each data.files, (index, file) ->
           console.log "Dropped file: " + file.name
       add: (e, data) ->
+        console.log data
         type = checkExtension(data)
         if type is 'image' || type is 'audio' || type is 'video'
           if correctFileSize(data)
@@ -991,11 +993,8 @@ angular.module("Museum.directives", [])
           success: (data) ->
             if scope.media.type is 'image'
               for image, index in scope.model.images
-                console.log image.image._id, data
                 if image?
-                  console.log 'image present'
                   if image.image._id is data
-                    console.log 'id is same'
                     if image.cover is true
                       scope.model.cover = {}
                     scope.model.images.splice index, 1
@@ -1026,10 +1025,30 @@ angular.module("Museum.directives", [])
 .directive 'dragAndDropInit', ->
   link: (scope, element, attrs) ->
 
+    canvas = document.createElement("canvas")
+    fileupload = $("#fileupload")
+
+    cavas_processor = (img, type = "image/jpeg") ->
+      canvas.width = img.width
+      canvas.height = img.height
+      if canvas.getContext and canvas.toBlob
+        canvas.getContext("2d").drawImage img, 0, 0, img.width, img.height
+        canvas.toBlob ((blob) ->
+          fileupload.fileupload "add",
+            files: [blob]
+        ), type
+      true
+
     $(document).bind 'drop dragover', (e) ->
       e.preventDefault()
 
     $(document).bind "dragover", (e) ->
+
+      if $(e.originalEvent.srcElement).hasClass 'do_not_drop'
+        e.preventDefault()
+        e.stopPropagation()
+        return false 
+
       dropZone = $(".dropzone")
       doc      = $("body")
       timeout = scope.dropZoneTimeout
@@ -1062,32 +1081,24 @@ angular.module("Museum.directives", [])
         , 300
 
     $(document).bind "drop", (e) ->
-      url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src")
-
-      console.log url
-
-      $.getImageData
-        url: url
-        server: "#{scope.backend_url}/imagedata"
-        success: (img) ->
-          canvas = document.createElement("canvas")
-          canvas.width = img.width
-          canvas.height = img.height
-          if canvas.getContext and canvas.toBlob
-            canvas.getContext("2d").drawImage img, 0, 0, img.width, img.height
-            canvas.toBlob ((blob) ->
-              $("#fileupload").fileupload "add",
-                files: [blob]
-            ), "image/jpeg"
-      # img = document.createElement("img")
-      # img.onload = (e) ->
-      #   ctx.drawImage img, 0, 0, canvas.width, canvas.height
-      #   url  = canvas.toDataURL() # Succeeds. Canvas won't be dirty.
-      #   console.log url
-      #   # canvas.toBlob (blob) ->
-      #   #   $("#fileupload").fileupload "add", { files: [blob] }
-      # img.crossOrigin = "anonymous"
-      # img.src = url
+      fileupload = $(e.originalEvent.target).parents('li').find("input[type='file']")
+      if e.originalEvent.dataTransfer
+        if $(e.target).hasClass 'do_not_drop'
+          e.stopPropagation()
+          e.preventDefault()
+          return false 
+        url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src")
+        if url
+          if url.indexOf('data:image') >= 0
+            img = new Image()
+            img.src = url
+            img.onload = ->
+              cavas_processor img
+          else
+            $.getImageData
+              url: url
+              server: "#{scope.backend_url}/imagedata"
+              success: cavas_processor     
 
 .directive 'dropDownEdit', ($timeout, $http) ->
   restrict: 'A'
@@ -1406,6 +1417,7 @@ angular.module("Museum.directives", [])
       items: "li:not(.timestamp):not(.upload_item)"
       revert: true
       scroll: false
+      delay: 100
       start: (event, ui) ->
         ui.item.data 'start', ui.item.index()
         ui.helper.addClass 'dragged'
@@ -1426,7 +1438,7 @@ angular.module("Museum.directives", [])
               errorProcessing.addError $i18next 'Failed to update order' 
           scope.$apply()
 
-.directive 'draggable', ($rootScope, $i18next, imageMappingHelpers) ->
+.directive 'jsDraggable', ($rootScope, $i18next, imageMappingHelpers) ->
   restrict: 'A'
   link: (scope, element, attrs) ->
     element  = $ element
@@ -1438,51 +1450,66 @@ angular.module("Museum.directives", [])
       containment: "parent"
       cursor: "pointer"
       start: (event, ui) ->
-        image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
         image.dragging = true
       drag: (event, ui) ->
         current_time = imageMappingHelpers.calc_timestamp(ui, false)
-        image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
         if image?
           if image.mappings[$rootScope.lang].timestamp isnt current_time
             image.mappings[$rootScope.lang].timestamp = current_time
-            scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
-            for item, index in scope.$parent.$parent.active_exhibit.images
+            scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+            for item, index in scope.$parent.container.images
               item.image.order = index
             scope.$parent.$parent.$digest()
         true
       stop: ( event, ui ) ->
         console.log 'drag_stop'
-        image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
+        image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')]
         image.dragging = false
         scope.$parent.set_hover( image, false )
-        scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
-        for item, index in scope.$parent.$parent.active_exhibit.images
+        scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+        for item, index in scope.$parent.container.images
           item.image.order = index
           imageMappingHelpers.update_image(item, scope.$parent.$parent.backend_url)
 
         scope.$parent.$parent.$digest()
         event.stopPropagation()
 
-.directive 'draggableRevert', ->
+.directive 'jsDraggableRevert', ->
   restrict: 'A'
   link: (scope, element, attrs) ->
+    console.log 'initef revert'
     element  = $ element
+    parent   = element.parents('.description')
+    timeline = parent.find('.timline_container')
+    sortable = parent.find('ul.images')
     element.draggable
       revert: true
       cursor: "pointer"
       scroll: false
+      # delay: 100
+      # handle: "li.timestamp"
       start: ( event, ui ) ->
         ui.helper.addClass('dragged')
-        element.parents('.description').find('.timline_container').addClass('highlite')
+        timeline.addClass('highlite')
       stop: ( event, ui ) ->
-        element.parents('.description').find('.timline_container').removeClass('highlite')
+        timeline.removeClass('highlite')
+        parent.find('ul.images').sortable( "option", "disabled", true )
+        setTimeout ->
+          sortable.sortable( "option", "disabled", false )
+          sortable.sortable( "refresh" )
+          sortable.sortable( "refreshPositions" )
+        , 300
         event.stopPropagation()
 
 .directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->
   restrict: 'A'
   link: (scope, element, attrs) ->
     element  = $ element
+    parent   = element.parents('.description')
+    timeline = parent.find('.timline_container')
+    sortable = parent.find('ul.images')
     element.droppable
       accept: '.dragable_image'
       out: ( event, ui ) ->
@@ -1490,7 +1517,19 @@ angular.module("Museum.directives", [])
       over: ( event, ui ) ->
         element.addClass 'can_drop'
       drop: ( event, ui ) -> 
+        target_storyset = if element.hasClass 'active_exhibit'
+          console.log 'exhibit'
+          scope.active_exhibit
+        else if element.hasClass 'current_museum'
+          console.log 'current_museum'
+          scope.current_museum
         element.removeClass 'can_drop'
+        sortable.sortable( "option", "disabled", true )
+        setTimeout ->
+          sortable.sortable( "option", "disabled", false )
+          sortable.sortable( "refresh" )
+          sortable.sortable( "refreshPositions" )
+        , 300
         found     = false
         dropped   = ui.draggable
         droppedOn = $ @
@@ -1498,8 +1537,9 @@ angular.module("Museum.directives", [])
         seek_bar = element.find('.jp-seek-bar')
         jp_durat = element.find('.jp-duration')
         jp_play  = element.find('.jp-play')
-        target_image  = scope.active_exhibit.images[dropped.data('array-index')]
-        mapped_images = scope.active_exhibit.stories[scope.current_museum.language].mapped_images
+        target_image  = target_storyset.images[dropped.data('array-index')]
+        console.log target_image, target_storyset
+        mapped_images = target_storyset.stories[scope.current_museum.language].mapped_images
         mapped_images = [] unless mapped_images?
         for image in mapped_images
           if image.image._id is target_image.image._id
@@ -1511,8 +1551,8 @@ angular.module("Museum.directives", [])
           target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true)
           target_image.mappings[dropped.data('lang')].language  = dropped.data('lang')
           target_image.mappings[dropped.data('lang')].media     = target_image.image._id
-          scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
-          for item, index in scope.active_exhibit.images
+          target_storyset.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+          for item, index in target_storyset.images
             item.image.order = index
             imageMappingHelpers.update_image(item, scope.backend_url)
 
@@ -1520,7 +1560,7 @@ angular.module("Museum.directives", [])
 
           scope.$digest()
 
-          scope.recalculate_marker_positions(scope.active_exhibit.stories[scope.current_museum.language], element)
+          scope.recalculate_marker_positions(target_storyset.stories[scope.current_museum.language], element)
 
     true
 

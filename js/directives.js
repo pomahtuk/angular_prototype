@@ -604,9 +604,10 @@
         help: '@ngHelp',
         id: '@ngId',
         title: '@ngTitle',
-        field: '@ngField'
+        field: '@ngField',
+        container: '=container'
       },
-      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" draggable ng-repeat=\"image in $parent.active_exhibit.stories[$parent.current_museum.language].mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
+      template: "<div class=\"player\">\n  <div class=\"jp-jplayer\" id=\"jquery_jplayer_{{id}}\">\n  </div>\n  <div class=\"jp-audio\" id=\"jp_container_{{id}}\">\n    <div class=\"jp-type-single\">\n      <div class=\"jp-gui jp-interface\">\n        <ul class=\"jp-controls\">\n          <li>\n          <a class=\"jp-play\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n          <li>\n          <a class=\"jp-pause\" href=\"javascript:;\" tabindex=\"1\"></a>\n          </li>\n        </ul>\n      </div>\n      <div class=\"jp-timeline\">\n        <a class=\"dropdown-toggle\" href=\"#\">{{item[field].name}}</a>\n        <div class=\"jp-progress\">\n          <div class=\"jp-seek-bar\">\n            <div class=\"jp-play-bar\">\n            </div>\n          </div>\n        </div>\n        <div class=\"jp-time-holder\">\n          <div class=\"jp-current-time\">\n          </div>\n          <div class=\"jp-duration\">\n          </div>\n        </div>\n        <div class=\"jp-no-solution\">\n          <span>Update Required</span>To play the media you will need to either update your browser to a recent version or update your browser to a recent version or update your <a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"></a>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"points_position_holder\">\n    <div class=\"image_connection\" ng-class=\"{'hovered': image.image.hovered}\" data-image-index=\"{{$index}}\" js-draggable ng-repeat=\"image in container.stories[$parent.current_museum.language].mapped_images\" ng-mouseenter=\"set_hover(image, true)\" ng-mouseout=\"set_hover(image, false)\">\n      {{ charFromNum(image.image.order) }}\n    </div>\n  </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.charFromNum = function(num) {
           return String.fromCharCode(num + 97).toUpperCase();
@@ -615,7 +616,7 @@
           var sub_sign;
           sub_sign = sign ? sign : image.dragging ? true : sign;
           image.image.hovered = sub_sign;
-          return $scope.$parent.active_exhibit.has_hovered = sub_sign;
+          return $scope.container.has_hovered = sub_sign;
         };
       },
       link: function(scope, element, attrs) {
@@ -750,6 +751,7 @@
           },
           add: function(e, data) {
             var parent, type;
+            console.log(data);
             type = checkExtension(data);
             if (type === 'image' || type === 'audio' || type === 'video') {
               if (correctFileSize(data)) {
@@ -879,11 +881,8 @@
                   _ref = scope.model.images;
                   for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
                     image = _ref[index];
-                    console.log(image.image._id, data);
                     if (image != null) {
-                      console.log('image present');
                       if (image.image._id === data) {
-                        console.log('id is same');
                         if (image.cover === true) {
                           scope.model.cover = {};
                         }
@@ -937,11 +936,35 @@
   }).directive('dragAndDropInit', function() {
     return {
       link: function(scope, element, attrs) {
+        var canvas, cavas_processor, fileupload;
+        canvas = document.createElement("canvas");
+        fileupload = $("#fileupload");
+        cavas_processor = function(img, type) {
+          if (type == null) {
+            type = "image/jpeg";
+          }
+          canvas.width = img.width;
+          canvas.height = img.height;
+          if (canvas.getContext && canvas.toBlob) {
+            canvas.getContext("2d").drawImage(img, 0, 0, img.width, img.height);
+            canvas.toBlob((function(blob) {
+              return fileupload.fileupload("add", {
+                files: [blob]
+              });
+            }), type);
+          }
+          return true;
+        };
         $(document).bind('drop dragover', function(e) {
           return e.preventDefault();
         });
         $(document).bind("dragover", function(e) {
           var doc, dropZone, found, found_index, node, timeout;
+          if ($(e.originalEvent.srcElement).hasClass('do_not_drop')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
           dropZone = $(".dropzone");
           doc = $("body");
           timeout = scope.dropZoneTimeout;
@@ -981,27 +1004,31 @@
           }
         });
         return $(document).bind("drop", function(e) {
-          var url;
-          url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src");
-          console.log(url);
-          return $.getImageData({
-            url: url,
-            server: "" + scope.backend_url + "/imagedata",
-            success: function(img) {
-              var canvas;
-              canvas = document.createElement("canvas");
-              canvas.width = img.width;
-              canvas.height = img.height;
-              if (canvas.getContext && canvas.toBlob) {
-                canvas.getContext("2d").drawImage(img, 0, 0, img.width, img.height);
-                return canvas.toBlob((function(blob) {
-                  return $("#fileupload").fileupload("add", {
-                    files: [blob]
-                  });
-                }), "image/jpeg");
+          var img, url;
+          fileupload = $(e.originalEvent.target).parents('li').find("input[type='file']");
+          if (e.originalEvent.dataTransfer) {
+            if ($(e.target).hasClass('do_not_drop')) {
+              e.stopPropagation();
+              e.preventDefault();
+              return false;
+            }
+            url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src");
+            if (url) {
+              if (url.indexOf('data:image') >= 0) {
+                img = new Image();
+                img.src = url;
+                return img.onload = function() {
+                  return cavas_processor(img);
+                };
+              } else {
+                return $.getImageData({
+                  url: url,
+                  server: "" + scope.backend_url + "/imagedata",
+                  success: cavas_processor
+                });
               }
             }
-          });
+          }
         });
       }
     };
@@ -1353,6 +1380,7 @@
           items: "li:not(.timestamp):not(.upload_item)",
           revert: true,
           scroll: false,
+          delay: 100,
           start: function(event, ui) {
             ui.item.data('start', ui.item.index());
             ui.helper.addClass('dragged');
@@ -1383,7 +1411,7 @@
         });
       }
     };
-  }).directive('draggable', function($rootScope, $i18next, imageMappingHelpers) {
+  }).directive('jsDraggable', function($rootScope, $i18next, imageMappingHelpers) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
@@ -1396,18 +1424,18 @@
           cursor: "pointer",
           start: function(event, ui) {
             var image;
-            image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
+            image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
             return image.dragging = true;
           },
           drag: function(event, ui) {
             var current_time, image, index, item, _i, _len, _ref;
             current_time = imageMappingHelpers.calc_timestamp(ui, false);
-            image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
+            image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
             if (image != null) {
               if (image.mappings[$rootScope.lang].timestamp !== current_time) {
                 image.mappings[$rootScope.lang].timestamp = current_time;
-                scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-                _ref = scope.$parent.$parent.active_exhibit.images;
+                scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+                _ref = scope.$parent.container.images;
                 for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
                   item = _ref[index];
                   item.image.order = index;
@@ -1420,11 +1448,11 @@
           stop: function(event, ui) {
             var image, index, item, _i, _len, _ref;
             console.log('drag_stop');
-            image = scope.$parent.$parent.active_exhibit.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
+            image = scope.$parent.container.stories[scope.$parent.$parent.current_museum.language].mapped_images[ui.helper.data('image-index')];
             image.dragging = false;
             scope.$parent.set_hover(image, false);
-            scope.$parent.$parent.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-            _ref = scope.$parent.$parent.active_exhibit.images;
+            scope.$parent.container.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+            _ref = scope.$parent.container.images;
             for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
               item = _ref[index];
               item.image.order = index;
@@ -1436,21 +1464,32 @@
         });
       }
     };
-  }).directive('draggableRevert', function() {
+  }).directive('jsDraggableRevert', function() {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
+        var parent, sortable, timeline;
+        console.log('initef revert');
         element = $(element);
+        parent = element.parents('.description');
+        timeline = parent.find('.timline_container');
+        sortable = parent.find('ul.images');
         return element.draggable({
           revert: true,
           cursor: "pointer",
           scroll: false,
           start: function(event, ui) {
             ui.helper.addClass('dragged');
-            return element.parents('.description').find('.timline_container').addClass('highlite');
+            return timeline.addClass('highlite');
           },
           stop: function(event, ui) {
-            element.parents('.description').find('.timline_container').removeClass('highlite');
+            timeline.removeClass('highlite');
+            parent.find('ul.images').sortable("option", "disabled", true);
+            setTimeout(function() {
+              sortable.sortable("option", "disabled", false);
+              sortable.sortable("refresh");
+              return sortable.sortable("refreshPositions");
+            }, 300);
             return event.stopPropagation();
           }
         });
@@ -1460,7 +1499,11 @@
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
+        var parent, sortable, timeline;
         element = $(element);
+        parent = element.parents('.description');
+        timeline = parent.find('.timline_container');
+        sortable = parent.find('ul.images');
         element.droppable({
           accept: '.dragable_image',
           out: function(event, ui) {
@@ -1470,8 +1513,15 @@
             return element.addClass('can_drop');
           },
           drop: function(event, ui) {
-            var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, mapped_images, seek_bar, target_image, _i, _j, _len, _len1, _ref;
+            var dropped, droppedOn, found, image, index, item, jp_durat, jp_play, mapped_images, seek_bar, target_image, target_storyset, _i, _j, _len, _len1, _ref;
+            target_storyset = element.hasClass('active_exhibit') ? (console.log('exhibit'), scope.active_exhibit) : element.hasClass('current_museum') ? (console.log('current_museum'), scope.current_museum) : void 0;
             element.removeClass('can_drop');
+            sortable.sortable("option", "disabled", true);
+            setTimeout(function() {
+              sortable.sortable("option", "disabled", false);
+              sortable.sortable("refresh");
+              return sortable.sortable("refreshPositions");
+            }, 300);
             found = false;
             dropped = ui.draggable;
             droppedOn = $(this);
@@ -1479,8 +1529,9 @@
             seek_bar = element.find('.jp-seek-bar');
             jp_durat = element.find('.jp-duration');
             jp_play = element.find('.jp-play');
-            target_image = scope.active_exhibit.images[dropped.data('array-index')];
-            mapped_images = scope.active_exhibit.stories[scope.current_museum.language].mapped_images;
+            target_image = target_storyset.images[dropped.data('array-index')];
+            console.log(target_image, target_storyset);
+            mapped_images = target_storyset.stories[scope.current_museum.language].mapped_images;
             if (mapped_images == null) {
               mapped_images = [];
             }
@@ -1497,8 +1548,8 @@
               target_image.mappings[dropped.data('lang')].timestamp = imageMappingHelpers.calc_timestamp(ui, true);
               target_image.mappings[dropped.data('lang')].language = dropped.data('lang');
               target_image.mappings[dropped.data('lang')].media = target_image.image._id;
-              scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
-              _ref = scope.active_exhibit.images;
+              target_storyset.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+              _ref = target_storyset.images;
               for (index = _j = 0, _len1 = _ref.length; _j < _len1; index = ++_j) {
                 item = _ref[index];
                 item.image.order = index;
@@ -1506,7 +1557,7 @@
               }
               imageMappingHelpers.create_mapping(target_image, scope.backend_url);
               scope.$digest();
-              return scope.recalculate_marker_positions(scope.active_exhibit.stories[scope.current_museum.language], element);
+              return scope.recalculate_marker_positions(target_storyset.stories[scope.current_museum.language], element);
             }
           }
         });

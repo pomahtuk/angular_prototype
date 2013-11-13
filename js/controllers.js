@@ -122,9 +122,9 @@
       };
       $scope.museum_change_progress = true;
       ngProgress.color('#fd6e3b');
-      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526a0a26a15cfbe815000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526a0a26a15cfbe815000001";
-      $scope.backend_url = "http://192.168.158.128:3000/api";
+      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526e1baa0439f8b01a000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526e1baa0439f8b01a000001";
+      $scope.backend_url = "http://prototype.izi.travel/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'Sort 0-9';
@@ -252,7 +252,7 @@
         ngProgress.start();
         console.log('anim started');
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
-          var found, image, item, key, museum, story, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+          var found, image, item, key, museum, story, value, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
           $scope.museums = [];
           found = false;
           $scope.langs = [];
@@ -285,6 +285,14 @@
               story.story.audio = story.audio;
               story.story.video = story.video;
               story.story.quiz.answers = story.quiz.answers;
+              story.story.mapped_images = [];
+              _ref2 = museum.images;
+              for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
+                image = _ref2[_l];
+                if (image.mappings[story.story.language]) {
+                  story.story.mapped_images.push(image);
+                }
+              }
               museum.stories[story.story.language] = story.story;
               $scope.langs.push(story.story.language);
             }
@@ -294,9 +302,9 @@
               museum.active = true;
               $scope.current_museum = museum;
               found = true;
-              _ref2 = museum.stories;
-              for (key in _ref2) {
-                value = _ref2[key];
+              _ref3 = museum.stories;
+              for (key in _ref3) {
+                value = _ref3[key];
                 console.log(key);
                 $scope.modal_translations[key] = {
                   name: $i18next(key)
