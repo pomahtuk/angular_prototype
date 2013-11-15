@@ -121,12 +121,16 @@
 
   "Select the preview area. Images won't crop. You can always return to this later on.": "Выбирите область для превью. Изображения не обрезаются. Вы всегда сможете вернуться к этому позже",
   "Preview": "Превью",
+  "Mobile app preview": "Мобильное превью",
   "Cover": "Обложка",
   "Set as cover": "Сделать обложкой",
   "Done": "Готово",
   "Drag images to audio timeline to sync it": "Перетащите изображения для синхронизации",
 
   "Sync images and audio": "Синхронизировать изображения и аудио",
+
+  "Select thumbnail area": "Выбрать область превью",
+  "Select fullsize image area": "Выбрать область для полного изображения",
 
   "ru": "Русский",
   "en": "Английский",

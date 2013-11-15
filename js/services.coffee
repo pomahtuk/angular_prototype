@@ -107,6 +107,19 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
       errorProcessing.addError $i18next 'Failed to set timestamp'
     true
 
+.service "uploadHelpers", ->
+  cavas_processor: (img, type = "image/jpeg") ->
+    canvas = document.createElement("canvas")
+    canvas.width = img.width
+    canvas.height = img.height
+    if canvas.getContext and canvas.toBlob
+      canvas.getContext("2d").drawImage img, 0, 0, img.width, img.height
+      canvas.toBlob ((blob) ->
+        fileupload = $('#drop_down, #museum_drop_down').filter(':visible').find("input[type=file]")
+        fileupload.fileupload "add",
+          files: [blob]
+      ), type
+    true
 
 .service "errorProcessing", ($rootScope, $timeout) ->
   errors: []

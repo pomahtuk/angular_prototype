@@ -860,27 +860,31 @@ angular.module("Museum.controllers", [])
         $scope.recalculate_marker_positions(item, selector)
       , 100
 
-  $scope.delete_mapping = (index, event) ->
-    image = $scope.active_exhibit.images[index]
+  $scope.delete_mapping = (index, type, event) ->
+    target = if type is 'active_exhibit'
+      $scope.active_exhibit
+    else
+      $scope.current_museum
+    image = target.images[index]
     # console.log image
     lang  = $scope.current_museum.language
     $http.delete("#{$scope.backend_url}/media_mapping/#{image.mappings[lang]._id}").success (data) ->
 
       console.log 'ok', data
-      for mapped_image, sub_index in $scope.active_exhibit.stories[lang].mapped_images
+      for mapped_image, sub_index in target.stories[lang].mapped_images
         if mapped_image.image._id is image.image._id
-          $scope.active_exhibit.stories[lang].mapped_images.splice(sub_index, 1)
+          target.stories[lang].mapped_images.splice(sub_index, 1)
           break
       delete image.mappings[lang]
 
-      $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
+      target.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func)
 
       orders = {}
-      for item, index in $scope.active_exhibit.images
+      for item, index in target.images
         item.image.order = index
         orders[item.image._id] = index
 
-      imageMappingHelpers.update_images $scope.active_exhibit.images[0].image.parent, orders, $scope.backend_url
+      imageMappingHelpers.update_images target.images[0].image.parent, orders, $scope.backend_url
 
     .error ->
       errorProcessing.addError $i18next 'Failed to delete timestamp'

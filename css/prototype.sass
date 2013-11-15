@@ -432,12 +432,12 @@ body
       display: block
       position: absolute
       height: 15px
-      width: 28px
+      width: 33px
       content: ''
       left: 50%
       margin-left: -10px
-      bottom: -18px
-      background: url('/img/orange-pop-in-arrow.png')
+      bottom: -17px
+      background: url('/img/pop-in-arrow.png')
 
   .lang 
     &.open a
@@ -717,9 +717,9 @@ ul.exhibits
         position: absolute
 
         i 
-          font-size: 20px
+          font-size: 18px
           font-style: normal
-          color: $unmain_text_color
+          color: #aaa
 
         .on_hover
           display: none
@@ -766,8 +766,9 @@ ul.exhibits
           display: block
 
     &.active
-      background: url('../img/orange-pop-in-arrow.png') no-repeat center bottom
+      background: url('../img/pop-in-arrow.png') no-repeat center bottom
       padding-bottom: 30px
+      z-index: 2
 
     &:hover,
     &.active
@@ -889,9 +890,10 @@ ul.exhibits
   border-top: 1px solid $slideDownOuterBorderColor
   border-bottom: 1px solid $slideDownOuterBorderColor
   // height: $slideDownHeight - 2 // minus border
-  margin: 0 0 30px
+  margin: -1px 0 30px 0px
   position: relative
   width: 100%
+  z-index: 1
 
   &.hidden
     display: none
@@ -1006,10 +1008,15 @@ ul.exhibits
         span
           line-height: 112px
           padding: 0px 0px
-        .upload
+        .upload_variants
           float: right
-          margin: 40px 5px
-          // margin-top: 40px
+          width: 135px
+
+          .upload
+            float: right
+            width: 100%
+            margin: 15px 0px
+            // margin-top: 40px
 
   #fileupload, #museum_fileupload
     display: none
@@ -1796,22 +1803,49 @@ a
   display: none
   +box-sizing(border-box)
   // display: block
-  padding: 30px 90px
+  padding: 15px 90px 30px 90px
   z-index: 999
 
-  .explain_text
-    color: #fff
-    margin-bottom: 20px
-    font-size: 14px
+  .nav-tabs
+    text-align: center
+    li
+      +inline-block
+      float: none
+      border-bottom: 3px solid transparent
+      a
+        color: #fff
+      &:hover, &.active
+        border-bottom: 3px solid #fb8521
+        a
+          color: #fff
+          background: transparent
+          border-color: transparent
+
+  // .explain_text
+  //   color: #fff
+  //   margin-bottom: 20px
+  //   font-size: 14px
 
   .apply_resize
     position: absolute
-    top: 30px
+    top: 10px
     right: 25px
 
   .content
     height: 360px
-    margin-bottom: 10px
+    margin: 30px auto 0px auto
+    width: 1040px
+
+    &.full
+      width: 800px
+
+    .notification
+      float: left
+      width: 300px
+      color: #fff
+      margin: 0px 25px
+      text-align: center
+      padding-top: 90px
 
     .preview
       width: 240px
@@ -1820,17 +1854,19 @@ a
       line-height: 34px
       margin-top: -10px
       color: #fff
+      text-align: center
 
       .mobile
         position: relative
-        width: 225px
-        height: 480px
-        background: url('../img/iphone preview.png')
+        width: 255px
+        height: 300px
+        background: url('../img/iphone-preview_short.png') center no-repeat
+        border-bottom: 1px solid white
 
         .image
           position: absolute
           top: 131px
-          left: 24px
+          left: 39px
           overflow: hidden
           width: 177px
           height: 133px
@@ -1840,7 +1876,7 @@ a
 
     .cropping_area
       float: left
-      width: calc(100% - 240px)
+      // width: calc(100% - 240px)
       overflow: hidden
       img
         display: block
@@ -1850,10 +1886,9 @@ a
       .jcrop-holder
         margin: 0 auto
 
-  .slider, .timeline
+  .slider
     +inline-block
-    float: left
-    width: calc(100% - 240px)
+    width: 100%
     margin: 0 auto
     // width: 100%
     font-size: 0px
@@ -1967,47 +2002,47 @@ a
 
 
 
-.timeline_toggler
-  margin-top: -75px
-  position: relative
-
 .timline_container_holder
   width: 96%
-  margin: 0 auto
+  margin: 20px auto 0px auto
+  +transition-property(padding)
+  +transition-duration(0.3s)
+  padding: 0px 0px 0px 0px
+  max-height: 60px
 
   .placeholder
     height: 20px
 
-.drag_images
-  // margin-bottom: 10px
-  +inline-block
-  margin: 0 auto 10px auto
-  position: relative
-  margin-left: -130px
-  left: 50%
+.timeline_controls
+  margin-top: 15px
 
-  img
-    margin-right: 10px
+  .timeline_toggler
+    +inline-block
+
+  .drag_images
+    +inline-block
+    margin-left: 40px
+
+    img
+      margin-right: 10px
+
 
 .timline_container
-  height: 0px
-  +transition-property(height)
+  height: 55px
+  +transition-property(all, max-height)
   +transition-duration(0.3s)
+  opacity: 0
   overflow: hidden
-  margin-top: -20px
   padding: 0px 2px
+  position: relative
+  top: 0px
 
   .control-label
     margin-left: -20px
 
-  &.opened
-    height: 60px
-    margin: -20px 0px 0px 0px
-    position: relative
-
   &.can_drop, &.highlite
-    margin-top: -22px
-    padding: 0px
+    height: 53px
+    padding: 3px 0px 0px 0px
     margin-bottom: 2px
 
   &.highlite
@@ -2020,7 +2055,7 @@ a
     position: relative
     padding-left: 42px
     margin-top: -30px
-    width: 91.9999999999%
+    width: 100%
     float: right
     height: 30px
 
@@ -2031,13 +2066,13 @@ a
     background: #fff
     border: 1px solid $exhibitTextColorHover
     position: absolute
-    top: 17px
+    top: -17px
     text-align: center
     color: #010101
     cursor: pointer
 
     &:before
-      top: -13px
+      top: 18px
       height: 13px
       width: 1px
       left: 8px
@@ -2049,6 +2084,17 @@ a
     &.hovered
       color: #fff
       background: $exhibitTextColorHover
+
+.timline_container_holder.opened 
+  padding: 40px 0px 90px 0px
+  max-height: 300px
+
+  .timline_container
+    +translate(0, 55px)
+    opacity: 1
+    height: 55px
+    padding-top: 3px
+    position: relative
 
 
 // .visibility
@@ -2063,3 +2109,8 @@ a
 
 img.do_not_drop
   pointer-events: none
+
+
+.hint_text
+  color: #aaa
+  font-size: 14px

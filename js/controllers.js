@@ -897,31 +897,32 @@
           }, 100);
         }
       };
-      $scope.delete_mapping = function(index, event) {
-        var image, lang;
-        image = $scope.active_exhibit.images[index];
+      $scope.delete_mapping = function(index, type, event) {
+        var image, lang, target;
+        target = type === 'active_exhibit' ? $scope.active_exhibit : $scope.current_museum;
+        image = target.images[index];
         lang = $scope.current_museum.language;
         $http["delete"]("" + $scope.backend_url + "/media_mapping/" + image.mappings[lang]._id).success(function(data) {
           var item, mapped_image, orders, sub_index, _i, _j, _len, _len1, _ref, _ref1;
           console.log('ok', data);
-          _ref = $scope.active_exhibit.stories[lang].mapped_images;
+          _ref = target.stories[lang].mapped_images;
           for (sub_index = _i = 0, _len = _ref.length; _i < _len; sub_index = ++_i) {
             mapped_image = _ref[sub_index];
             if (mapped_image.image._id === image.image._id) {
-              $scope.active_exhibit.stories[lang].mapped_images.splice(sub_index, 1);
+              target.stories[lang].mapped_images.splice(sub_index, 1);
               break;
             }
           }
           delete image.mappings[lang];
-          $scope.active_exhibit.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
+          target.images.sort(imageMappingHelpers.sort_weight_func).sort(imageMappingHelpers.sort_time_func);
           orders = {};
-          _ref1 = $scope.active_exhibit.images;
+          _ref1 = target.images;
           for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
             item = _ref1[index];
             item.image.order = index;
             orders[item.image._id] = index;
           }
-          return imageMappingHelpers.update_images($scope.active_exhibit.images[0].image.parent, orders, $scope.backend_url);
+          return imageMappingHelpers.update_images(target.images[0].image.parent, orders, $scope.backend_url);
         }).error(function() {
           return errorProcessing.addError($i18next('Failed to delete timestamp'));
         });

@@ -735,7 +735,7 @@ angular.module("Museum.directives", [])
             </ul>
           </div>
           <div class="jp-timeline">
-            <a class="dropdown-toggle" href="#">{{item[field].name}}</a>
+            <a class="dropdown-toggle" href="#">&nbsp;</a>
             <div class="jp-progress">
               <div class="jp-seek-bar">
                 <div class="jp-play-bar">
@@ -862,7 +862,6 @@ angular.module("Museum.directives", [])
       else
         type = object.files[0].type.split('/')[0]
         object.files[0].subtype = object.files[0].type.split('/')[1]
-      console.log type
       type
 
     correctFileSize = (object) ->
@@ -896,7 +895,7 @@ angular.module("Museum.directives", [])
         $.each data.files, (index, file) ->
           console.log "Dropped file: " + file.name
       add: (e, data) ->
-        console.log data
+        # console.log data
         type = checkExtension(data)
         if type is 'image' || type is 'audio' || type is 'video'
           if correctFileSize(data)
@@ -954,6 +953,7 @@ angular.module("Museum.directives", [])
         $(".progress .progress-bar").css "width", progress + "%"
         if data.loaded is data.total
           scope.$parent.last_save_time = new Date()
+          ## should open lightgox cropper
           hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
@@ -1022,22 +1022,8 @@ angular.module("Museum.directives", [])
                 storySetValidation.checkValidity {item: scope.model, root: parent, field_type: 'story'}
             scope.$parent.last_save_time = new Date()
 
-.directive 'dragAndDropInit', ->
+.directive 'dragAndDropInit', (uploadHelpers) ->
   link: (scope, element, attrs) ->
-
-    canvas = document.createElement("canvas")
-    fileupload = $("#fileupload")
-
-    cavas_processor = (img, type = "image/jpeg") ->
-      canvas.width = img.width
-      canvas.height = img.height
-      if canvas.getContext and canvas.toBlob
-        canvas.getContext("2d").drawImage img, 0, 0, img.width, img.height
-        canvas.toBlob ((blob) ->
-          fileupload.fileupload "add",
-            files: [blob]
-        ), type
-      true
 
     $(document).bind 'drop dragover', (e) ->
       e.preventDefault()
@@ -1093,12 +1079,31 @@ angular.module("Museum.directives", [])
             img = new Image()
             img.src = url
             img.onload = ->
-              cavas_processor img
+              uploadHelpers.cavas_processor img
           else
             $.getImageData
               url: url
               server: "#{scope.backend_url}/imagedata"
-              success: cavas_processor     
+              success: uploadHelpers.cavas_processor     
+
+.directive 'urlUpload', ($http, uploadHelpers) ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+    element = $ element
+
+    testRegex = /(http(s?):)|([/|.|\w|\s])*\.(?:jpe?g|gif|png)/i
+
+    element.change ->
+      url = element.val()
+      console.log url, testRegex.test(url)
+      if testRegex.test(url)
+        $.getImageData
+          url: url
+          server: "#{scope.$parent.backend_url}/imagedata"
+          success: (img) ->
+            element.val ''
+            ## probably, should show some preloader or load indicator
+            uploadHelpers.cavas_processor img
 
 .directive 'dropDownEdit', ($timeout, $http) ->
   restrict: 'A'
@@ -1201,7 +1206,7 @@ angular.module("Museum.directives", [])
         element.parents('li').removeClass('dragged')
       else
         lightbox.show()
-        parent.height(lightbox.height() + 60) if lightbox.height() + 60 > parent.height()
+        parent.height(lightbox.height() + 45) if lightbox.height() + 45 > parent.height()
         lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
     true
 
@@ -1213,54 +1218,60 @@ angular.module("Museum.directives", [])
     model: '=model'
   template: """
     <div class="lightbox_area">
-      <div class="explain_text">
-        {{ "Select the preview area. Images won't crop. You can always return to this later on." | i18next }}
-      </div>
-      <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
-      <div class="content">
-        <div class="preview">
-          {{ "PREVIEW" | i18next }}
-          <div class="mobile">
-            <div class="image">
-              <img src="{{model.images[active_image_index].image.url}}">
+      <ul class="nav nav-tabs">
+        <li ng-class="{'active': story_tab == 'thumb'}">
+          <a href="#" ng-click="story_tab = 'thumb'" >{{ 'Select thumbnail area' | i18next }}</a>
+        </li>
+        <li ng-class="{'active': story_tab == 'full'}">
+          <a href="#" ng-click="story_tab = 'full'" >{{ 'Select fullsize image area' | i18next }}</a>
+        </li>        
+      </ul>
+        <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
+        <div class="content {{story_tab}}">
+          <div class="cropping_area">
+            <img src="{{model.images[active_image_index].image.url}}">
+          </div>
+          <div class="notification" ng-switch on="story_tab">
+            <span ng-switch-when="thumb">
+              {{ "Select the preview area. Images won't crop. You can always return to this later on." | i18next }}
+            </span>
+            <span ng-switch-when="full">
+              {{ "Images won't crop. You can always return to this later on." | i18next }}
+            </span>
+          </div>
+          <div class="preview" ng-hide="story_tab == 'full'">
+            {{ "Mobile app preview" | i18next }}
+            <div class="mobile">
+              <div class="image">
+                <img src="{{model.images[active_image_index].image.url}}">
+              </div>
             </div>
           </div>
         </div>
-        <div class="cropping_area">
-          <img src="{{model.images[active_image_index].image.url}}">
+        <div class="slider">
+          <ul class="images_sortable" sortable="model.images" lang="$parent.current_museum.language">
+            <li class="thumb item_{{$index}} " ng-class="{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}" ng-repeat="image in images">
+              <img ng-click="$parent.$parent.set_index($index)" src="{{image.image.thumbnailUrl}}" />
+              <div class="label_timestamp" ng-show="image.mappings[lang].timestamp >= 0">
+                <span class="letter_label">
+                  {{ image.image.order | numstring }}
+                </span>
+                <span class="time">
+                  {{ image.mappings[lang].timestamp | timerepr }}
+                </span>
+              </div>
+              <a class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.$parent.make_cover($index)" ng-switch on="image.image.cover">
+                <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
+                <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
+              </a>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="slider">
-        <a class="left" href="#" ng-click="set_index(active_image_index - 1)">
-          <i class="icon-angle-left"></i>
-        </a>
-        <ul class="images_sortable" sortable="model.images" lang="$parent.current_museum.language">
-          <li class="thumb item_{{$index}} " ng-class="{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}" ng-repeat="image in images">
-            <img ng-click="$parent.$parent.set_index($index)" src="{{image.image.thumbnailUrl}}" />
-            <div class="label_timestamp" ng-show="image.mappings[lang].timestamp >= 0">
-              <span class="letter_label">
-                {{ image.image.order | numstring }}
-              </span>
-              <span class="time">
-                {{ image.mappings[lang].timestamp | timerepr }}
-              </span>
-            </div>
-            <a class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.$parent.make_cover($index)" ng-switch on="image.image.cover">
-              <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
-              <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
-            </a>
-          </li>
-        </ul>
-        <a class="right" href="#" ng-click="set_index(active_image_index + 1)">
-          <i class="icon-angle-right"></i>
-        </a>
-      </div>
     </div>
   """
   controller: ($scope, $element, $attrs) ->
 
     $scope.set_index = (index) ->
-      console.log 'called set_index with index', index
       $scope.update_media $scope.active_image_index, ->
         $scope.active_image_index = index
 
@@ -1287,20 +1298,22 @@ angular.module("Museum.directives", [])
           false
       
   link: (scope, element, attrs) ->
-    element = $ element
-    right   = element.find('a.right')
-    left    = element.find('a.left')
-    cropper = element.find('.cropping_area img')
-    preview = element.find('.mobile .image img')
-    done    = element.find('.apply_resize')
-    parent  = element.parents('#drop_down, #museum_edit_dropdown')
-    imageWidth  = 0
-    imageHeight = 0
-    max_height  = 330
-    prev_height = 133
-    prev_width  = 177
-    selected    = {}
-    bounds = []
+    scope.story_tab = 'thumb'
+    element         = $ element
+    right           = element.find('a.right')
+    left            = element.find('a.left')
+    cropper         = element.find('.cropping_area img')
+    preview         = element.find('.mobile .image img')
+    done            = element.find('.apply_resize')
+    parent          = element.parents('#drop_down, #museum_edit_dropdown')
+    imageWidth      = 0
+    imageHeight     = 0
+    max_height      = 330
+    max_width       = 450
+    prev_height     = 133
+    prev_width      = 177
+    selected        = {}
+    bounds          = []
 
     done.click ->
       scope.update_media scope.active_image_index
@@ -1311,8 +1324,9 @@ angular.module("Museum.directives", [])
       false
 
     scope.update_media = (index, callback) ->
+      selected.mode = scope.story_tab
+      console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
-        console.log  data
         angular.extend(scope.model.images[index].image, data)
         callback() if callback
         return true
@@ -1336,16 +1350,28 @@ angular.module("Museum.directives", [])
       result
 
     cropper.on 'load', ->
-      imageWidth = cropper.get(0).naturalWidth
+      imageWidth  = cropper.get(0).naturalWidth
       imageHeight = cropper.get(0).naturalHeight
 
-      cropper.height max_height
-      cropper.width imageWidth * ( max_height / imageHeight )
+      new_imageWidth  = imageWidth * ( max_height / imageHeight )
+      new_imageHeight = max_height
+
+      if new_imageWidth > max_width
+        new_imageWidth  = max_width
+        new_imageHeight = new_imageHeight * (max_width / new_imageWidth)
+
+      cropper.height new_imageHeight
+      cropper.width new_imageWidth
 
       preview.attr 'style', ""
 
-      if scope.model.images[scope.active_image_index].image.selection
-        selected = JSON.parse scope.model.images[scope.active_image_index].image.selection 
+      selection = if scope.story_tab is 'thumb'
+        scope.model.images[scope.active_image_index].image.selection
+      else
+        scope.model.images[scope.active_image_index].image.full_selection
+
+      if selection
+        selected = JSON.parse selection
       else
         selected = {
           x: 0
@@ -1379,6 +1405,7 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'model.images', (newValue, oldValue) ->
       if newValue?
+        scope.story_tab = 'thumb'
         if newValue.length > 0
           for image in newValue
             image.image.active = false
@@ -1386,17 +1413,12 @@ angular.module("Museum.directives", [])
           left.css({'opacity': 0})
           scope.active_image_index = 0
 
+    scope.$watch 'story_tab', (newValue, oldValue) ->
+      if newValue? and newValue isnt oldValue
+        console.log 'not same and present, should update cropper'
+
     scope.$watch 'active_image_index', (newValue, oldValue) ->
-      if newValue?
-        if newValue is -1
-          newValue = 0
-        left.css({'opacity': 255})
-        right.css({'opacity': 255})
-        if newValue is scope.model.images.length - 1
-          right.css({'opacity': 0})
-        if newValue is 0
-          left.css({'opacity': 0})
-        scope.check_active_image()      
+      scope.check_active_image()      
 
     true
 

@@ -61,7 +61,7 @@
         <div class="left_content">
           <a class="menu_opener" href="#" toggle-menu=""><i class="icon-reorder"></i></a>
           <h1 class="museum_title" ng-class="{&#39;opened&#39;:museum_edit_dropdown_opened}">
-            {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
+            {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name |truncate:40}}
           </h1>
           <div class="btn-group lang top_space">
             <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">{{ current_museum.language | i18next }}  <i class="icon-chevron-down"></i></a>
@@ -123,39 +123,41 @@
                   <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Name&#39; | i18next }}" placeholder="current_museum.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="current_museum.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Description&#39; | i18next }}" placeholder="current_museum.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                 </form>
               </div>
-              <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;images&#39; }">
-                <div class="timline_container_holder">
-                  <div class="placeholder" ng-show="!current_museum.stories[current_museum.language].audio"></div>
-                  <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:museum_timline_opened  || current_museum.stories[current_museum.language].mapped_images.length &gt; 0}" ng-click="museum_timline_opened = !museum_timline_opened" ng-hide="!current_museum.stories[current_museum.language].audio">{{ 'Sync images and audio' | i18next }}</button>
-                  <div class="timline_container current_museum" droppable="" id="{{current_museum._id}}" ng-class="{&#39;opened&#39;: museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length &gt; 0}">
-                    <div class="col-xs-1 control-label">
-                      {{ 'Audio' | i18next }}
-                    </div>
-                    <player container="current_museum" ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="current_museum.stories[current_museum.language]" type="media"></player>
-                  </div>
-                  <div class="drag_images" id="{{current_museum._id}}" ng-show="museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length &gt; 0">
-                    <img src="./img/drag_images_to_timeline.png"><span>{{ 'Drag images to audio timeline to sync it' | i18next }}</span>
-                  </div>
-                </div>
-                <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="current_museum.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
-                <ul class="images col-xs-11 {{$parent.current_museum.has_hovered}}" lang="current_museum.language" sortable="current_museum.images">
+              <div class="tab-pane row" ng-class="{&#39;active&#39;: museum_tab == &#39;images&#39; }">
+                <ul class="images col-xs-12 {{$parent.current_museum.has_hovered}}" lang="current_museum.language" sortable="current_museum.images">
                   <li class="dragable_image" data-array-index="{{$index}}" data-lang="{{lang}}" ng-class="{&#39;hovered&#39;: image.image.hovered, &#39;timestamp&#39;: image.mappings[lang].timestamp &gt;= 0 }" ng-repeat="image in $parent.current_museum.images">
-                    <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="$parent.set_hover(image, true)" ng-mouseout="$parent.set_hover(image, false)" open-lightbox="{{$index}}">
+                    <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="$parent.$parent.set_hover(image, true)" ng-mouseout="$parent.$parent.set_hover(image, false)" open-lightbox="{{$index}}">
                       <div class="label_timestamp" ng-show="image.mappings[lang].timestamp &gt;= 0">
-                        <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.$parent.delete_mapping($index, $event)">×</span>
+                        <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.$parent.delete_mapping($index, &#39;current_museum&#39;, $event)">×</span>
                       </div>
                       <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" class="do_not_drop" draggable="false" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image.image" parent="$parent.$parent.current_museum" rel="nofollow" stop-event="">×</a>
                   </li>
-                  <li class="upload_item">
+                  <li class="upload_item hint_text">
                     <div class="drag_here">
                       <div class="img"></div>
                       <span>{{ 'Drag images here' | i18next }}</span>
                     </div>
                     <div class="or_upload">
-                      <span>{{ 'or' | i18next }}</span><a button-file-upload="" class="btn btn-default upload" href="#">{{ 'Click to upload' | i18next }}</a>
+                      <span>{{ 'or' | i18next }}
+                        <div class="upload_variants">
+                          <a button-file-upload="" class="btn btn-default upload" href="#">{{ 'Click to upload' | i18next }}</a><input class="form-control" placeholder="Paste image url" type="text" url-upload="current_museum">
+                        </div>
+                      </span>
                     </div>
                   </li>
                 </ul>
+                <div class="timline_container_holder" ng-class="{&#39;opened&#39;: museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length &gt; 0}">
+                  <div class="placeholder" ng-show="!current_museum.stories[current_museum.language].audio"></div>
+                  <div class="timeline_controls">
+                    <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:museum_timline_opened  || current_museum.stories[current_museum.language].mapped_images.length &gt; 0}" ng-click="museum_timline_opened = !museum_timline_opened" ng-hide="!current_museum.stories[current_museum.language].audio">{{ 'Sync images and audio' | i18next }}</button>
+                    <div class="drag_images" id="{{current_museum._id}}" ng-show="museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length &gt; 0">
+                      <span class="hint_text">{{ 'Drag images to audio timeline to sync it' | i18next }}&nbsp;&nbsp;&nbsp;<i class="icon-long-arrow-down">&nbsp;</i><i class="icon-long-arrow-down">&nbsp;</i><i class="icon-long-arrow-down">&nbsp;</i></span>
+                    </div>
+                  </div>
+                  <div class="timline_container current_museum" droppable="" id="{{current_museum._id}}">
+                    <player container="current_museum" ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="current_museum.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="current_museum.stories[current_museum.language]" type="media"></player>
+                  </div>
+                </div>
               </div>
               <div class="tab-pane" ng-class="{&#39;active&#39;: museum_tab == &#39;more&#39; }">
                 <ul class="nav nav-stacked nav-list col-xs-2">
@@ -449,39 +451,40 @@
                     <placeholderfield ng-field="name" ng-help="help text for popup 2" ng-id="name" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Name&#39; | i18next }}" placeholder="active_exhibit.stories[current_museum.def_lang].name" type="story"></placeholderfield><audioplayer ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="active_exhibit.stories[current_museum.language]" type="media"></audioplayer><placeholdertextarea maxlength="2000" ng-field="long_description" ng-help="help text for popup 3" ng-id="description" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Description&#39; | i18next }}" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type="story"></placeholdertextarea>
                   </form>
                 </div>
-                <div class="tab-pane row" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }" plumb="">
-                  <div class="timline_container_holder">
-                    <div class="placeholder" ng-show="!active_exhibit.stories[current_museum.language].audio"></div>
-                    <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-hide="!active_exhibit.stories[current_museum.language].audio">{{ 'Sync images and audio' | i18next }}</button>
-                    <div class="timline_container active_exhibit" droppable="" id="{{active_exhibit._id}}" ng-class="{&#39;opened&#39;: exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}">
-                      <div class="col-xs-1 control-label">
-                        {{ 'Audio' | i18next }}
-                      </div>
-                      <player container="active_exhibit" ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="active_exhibit.stories[current_museum.language]" type="media"></player>
-                    </div>
-                    <div class="drag_images" id="{{active_exhibit._id}}" ng-show="exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0">
-                      <img src="./img/drag_images_to_timeline.png"><span>{{ 'Drag images to audio timeline to sync it' | i18next }}</span>
-                    </div>
-                  </div>
-                  <label class="col-xs-1 control-label">{{ 'Images' | i18next }}<span class="label label-danger" ng-show="active_exhibit.images.length == 0">{{ 'Fill to publish' | i18next }}</span></label>
-                  <ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" lang="current_museum.language" sortable="active_exhibit.images">
+                <div class="tab-pane row" ng-class="{&#39;active&#39;: story_tab == &#39;images&#39; }">
+                  <ul class="images col-xs-12 {{$parent.active_exhibit.has_hovered}}" lang="current_museum.language" sortable="active_exhibit.images">
                     <li class="dragable_image" data-array-index="{{$index}}" data-lang="{{lang}}" ng-class="{&#39;hovered&#39;: image.image.hovered, &#39;timestamp&#39;: image.mappings[lang].timestamp &gt;= 0 }" ng-repeat="image in $parent.active_exhibit.images">
                       <a class="img_thumbnail" data-start="{{$index}}" href="#" ng-mouseenter="$parent.$parent.set_hover(image, true)" ng-mouseout="$parent.$parent.set_hover(image, false)" open-lightbox="{{$index}}">
                         <div class="label_timestamp" ng-show="image.mappings[lang].timestamp &gt;= 0">
-                          <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.$parent.delete_mapping($index, $event)">×</span>
+                          <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.$parent.delete_mapping($index, &#39;active_exhibit&#39;, $event)">×</span>
                         </div>
                         <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" class="do_not_drop" draggable="false" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                     </li>
-                    <li class="upload_item">
+                    <li class="upload_item hint_text">
                       <div class="drag_here">
                         <div class="img"></div>
                         <span>{{ 'Drag images here' | i18next }}</span>
                       </div>
                       <div class="or_upload">
-                        <span>{{ 'or' | i18next }}</span><a button-file-upload="" class="btn btn-default upload" href="#">{{ 'Click to upload' | i18next }}</a>
+                        <span>{{ 'or' | i18next }}</span>
+                        <div class="upload_variants">
+                          <a button-file-upload="" class="btn btn-default upload" href="#">{{ 'Click to upload' | i18next }}</a><input class="form-control" placeholder="Paste image url" type="text" url-upload="active_exhibit">
+                        </div>
                       </div>
                     </li>
                   </ul>
+                  <div class="timline_container_holder" ng-class="{&#39;opened&#39;: exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}">
+                    <div class="placeholder" ng-show="!active_exhibit.stories[current_museum.language].audio"></div>
+                    <div class="timeline_controls">
+                      <button class="btn btn-default timeline_toggler" ng-class="{&#39;active&#39;:exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0}" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-hide="!active_exhibit.stories[current_museum.language].audio">{{ 'Sync images and audio' | i18next }}</button>
+                      <div class="drag_images" id="{{active_exhibit._id}}" ng-show="exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length &gt; 0">
+                        <span class="hint_text">{{ 'Drag images to audio timeline to sync it' | i18next }}&nbsp;&nbsp;&nbsp;<i class="icon-long-arrow-down">&nbsp;</i><i class="icon-long-arrow-down">&nbsp;</i><i class="icon-long-arrow-down">&nbsp;</i></span>
+                      </div>
+                    </div>
+                    <div class="timline_container active_exhibit" droppable="" id="{{active_exhibit._id}}">
+                      <player container="active_exhibit" ng-field="audio" ng-help="help text for popup 5" ng-id="audio" ng-item="active_exhibit.stories[current_museum.language]" ng-title="{{ &#39;Audio&#39; | i18next }}" parent="active_exhibit.stories[current_museum.language]" type="media"></player>
+                    </div>
+                  </div>
                 </div>
                 <div class="tab-pane" ng-class="{&#39;active&#39;: story_tab == &#39;more&#39; }">
                   <ul class="nav nav-stacked nav-list col-xs-2">

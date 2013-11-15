@@ -7,6 +7,15 @@ angular.module("Museum.filters", [])
   (input) ->
     String.fromCharCode(input + 97).toUpperCase()
 
+.filter "truncate", ->
+  (text, length, end) ->
+    length = 10  if isNaN(length)
+    end = "..."  unless end
+    if text.length <= length or text.length - end.length <= length
+      text
+    else
+      String(text).substring(0, length - end.length) + end
+
 .filter "timerepr", ->
   (input) ->
     source_seconds = parseInt(input, 10)

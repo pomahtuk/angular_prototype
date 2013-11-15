@@ -140,6 +140,29 @@
         return true;
       }
     };
+  }).service("uploadHelpers", function() {
+    return {
+      cavas_processor: function(img, type) {
+        var canvas;
+        if (type == null) {
+          type = "image/jpeg";
+        }
+        canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        if (canvas.getContext && canvas.toBlob) {
+          canvas.getContext("2d").drawImage(img, 0, 0, img.width, img.height);
+          canvas.toBlob((function(blob) {
+            var fileupload;
+            fileupload = $('#drop_down, #museum_drop_down').filter(':visible').find("input[type=file]");
+            return fileupload.fileupload("add", {
+              files: [blob]
+            });
+          }), type);
+        }
+        return true;
+      }
+    };
   }).service("errorProcessing", function($rootScope, $timeout) {
     return {
       errors: [],

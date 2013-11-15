@@ -80,7 +80,7 @@ html lang="en" ng-app="Museum"
           a.menu_opener href="#" toggle-menu=""
             i.icon-reorder
           h1.museum_title ng-class="{'opened':museum_edit_dropdown_opened}"
-            | {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name}}
+            | {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name |truncate:40}}
           .btn-group.lang.top_space
             a.dropdown-toggle data-toggle="dropdown" href="javascript:void(0)"
               | {{ current_museum.language | i18next }}  
@@ -121,12 +121,6 @@ html lang="en" ng-app="Museum"
                 switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
               .close ng-click="museum_edit_dropdown_close()"
 
-            / .media_types.museum_invalid_media.col-xs-2 ng-class="{'invalid': current_museum.invalid}"
-            /   i class="icon-picture empty" ng-show="current_museum.images.length == 0"
-            /   i class="icon-list-ol empty" ng-show="current_museum.number.length == 0"
-            /   i class="icon-music empty" ng-hide="current_museum.stories[current_museum.language].audio"
-            /   i class="icon-align-left empty" ng-hide="current_museum.stories[current_museum.language].long_description"
-
             ul.nav.nav-tabs
               li ng-class="{'active': museum_tab == 'main'}"
                 a href="#" ng-click="museum_tab = 'main'" 
@@ -149,31 +143,16 @@ html lang="en" ng-app="Museum"
                   audioplayer ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"
                   placeholdertextarea ng-item="current_museum.stories[current_museum.language]" ng-id="description" ng-title="{{ 'Description' | i18next }}" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="current_museum.stories[current_museum.def_lang].long_description" type='story'
 
-              .tab-pane ng-class="{'active': museum_tab == 'images' }"
-                .timline_container_holder
-                  .placeholder ng-show="!current_museum.stories[current_museum.language].audio"
-                  button.btn.btn-default.timeline_toggler ng-hide="!current_museum.stories[current_museum.language].audio" ng-click="museum_timline_opened = !museum_timline_opened" ng-class="{'active':museum_timline_opened  || current_museum.stories[current_museum.language].mapped_images.length > 0}"
-                    | {{ 'Sync images and audio' | i18next }}
-                  .timline_container.current_museum ng-class="{'opened': museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length > 0}" id="{{current_museum._id}}" droppable=""
-                    .col-xs-1.control-label 
-                      | {{ 'Audio' | i18next }}
-                    player ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]" container="current_museum"
-                  .drag_images ng-show="museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length > 0" id="{{current_museum._id}}"
-                    img src="./img/drag_images_to_timeline.png"
-                    span
-                      | {{ 'Drag images to audio timeline to sync it' | i18next }}
-                label.col-xs-1.control-label 
-                  | {{ 'Images' | i18next }}
-                  span.label.label-danger ng-show="current_museum.images.length == 0" {{ 'Fill to publish' | i18next }}
-                ul class="images col-xs-11 {{$parent.current_museum.has_hovered}}" sortable="current_museum.images" lang="current_museum.language"
+              .tab-pane.row  ng-class="{'active': museum_tab == 'images' }"
+                ul class="images col-xs-12 {{$parent.current_museum.has_hovered}}" sortable="current_museum.images" lang="current_museum.language"
                   li.dragable_image ng-repeat="image in $parent.current_museum.images" data-lang="{{lang}}" data-array-index="{{$index}}" ng-class="{'hovered': image.image.hovered, 'timestamp': image.mappings[lang].timestamp >= 0 }"
-                    a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="$parent.set_hover(image, true)" ng-mouseout="$parent.set_hover(image, false)"
+                    a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="$parent.$parent.set_hover(image, true)" ng-mouseout="$parent.$parent.set_hover(image, false)"
                       .label_timestamp ng-show="image.mappings[lang].timestamp >= 0"
                         span.letter_label
                           | {{ image.image.order | numstring }} 
                         span.time 
                           | {{ image.mappings[lang].timestamp | timerepr }}
-                        span.delete_maping.close ng-click="$parent.$parent.delete_mapping($index, $event)" ×
+                        span.delete_maping.close ng-click="$parent.$parent.delete_mapping($index, 'current_museum', $event)" ×
                       span class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"
                         span ng-switch-when="true" 
                           i class="icon-ok" 
@@ -181,7 +160,7 @@ html lang="en" ng-app="Museum"
                       img.do_not_drop draggable="false" src="{{image.image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
                     a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.current_museum" rel="nofollow" ×
 
-                  li.upload_item
+                  li.upload_item.hint_text
                     .drag_here
                       .img
                       span 
@@ -189,8 +168,34 @@ html lang="en" ng-app="Museum"
                     .or_upload
                       span 
                         | {{ 'or' | i18next }}
-                      a.btn.btn-default.upload href="#" button-file-upload=""
-                        | {{ 'Click to upload' | i18next }}
+                        .upload_variants
+                          a.btn.btn-default.upload href="#" button-file-upload=""
+                            | {{ 'Click to upload' | i18next }}
+                          input.form-control type="text" placeholder="Paste image url" url-upload="current_museum"
+
+                .timline_container_holder ng-class="{'opened': museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length > 0}"
+                  .placeholder ng-show="!current_museum.stories[current_museum.language].audio"
+                  .timeline_controls
+                    button.btn.btn-default.timeline_toggler ng-hide="!current_museum.stories[current_museum.language].audio" ng-click="museum_timline_opened = !museum_timline_opened" ng-class="{'active':museum_timline_opened  || current_museum.stories[current_museum.language].mapped_images.length > 0}"
+                      | {{ 'Sync images and audio' | i18next }}
+
+                    .drag_images ng-show="museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length > 0" id="{{current_museum._id}}"
+                      span.hint_text
+                        | {{ 'Drag images to audio timeline to sync it' | i18next }}
+                        | &nbsp;
+                        | &nbsp;
+                        | &nbsp;
+                        i.icon-long-arrow-down
+                          | &nbsp;
+                        i.icon-long-arrow-down
+                          | &nbsp;
+                        i.icon-long-arrow-down
+                          | &nbsp;
+
+                  .timline_container.current_museum id="{{current_museum._id}}" droppable=""
+                    / .col-xs-1.control-label 
+                    /   | {{ 'Audio' | i18next }}
+                    player ng-item="current_museum.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="current_museum.stories[current_museum.language]"  container="current_museum"
 
               .tab-pane ng-class="{'active': museum_tab == 'more' }"
 
@@ -499,23 +504,11 @@ html lang="en" ng-app="Museum"
                     audioplayer ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"
                     placeholdertextarea ng-item="active_exhibit.stories[current_museum.language]" ng-id="description" ng-title="{{ 'Description' | i18next }}" ng-field="long_description" ng-help="help text for popup 3" maxlength="2000" placeholder="active_exhibit.stories[current_museum.def_lang].long_description" type='story'
 
-                .tab-pane.row  ng-class="{'active': story_tab == 'images' }" plumb=""
-                  .timline_container_holder
-                    .placeholder ng-show="!active_exhibit.stories[current_museum.language].audio"
-                    button.btn.btn-default.timeline_toggler ng-hide="!active_exhibit.stories[current_museum.language].audio" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
-                      | {{ 'Sync images and audio' | i18next }}
-                    .timline_container.active_exhibit ng-class="{'opened': exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0}" id="{{active_exhibit._id}}" droppable=""
-                      .col-xs-1.control-label 
-                        | {{ 'Audio' | i18next }}
-                      player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"  container="active_exhibit"
-                    .drag_images ng-show="exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0" id="{{active_exhibit._id}}"
-                      img src="./img/drag_images_to_timeline.png"
-                      span
-                        | {{ 'Drag images to audio timeline to sync it' | i18next }}
-                  label.col-xs-1.control-label 
-                    | {{ 'Images' | i18next }}
-                    span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
-                  ul class="images col-xs-11 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images" lang="current_museum.language"
+                .tab-pane.row  ng-class="{'active': story_tab == 'images' }"
+                  / label.col-xs-1.control-label 
+                  /   | {{ 'Images' | i18next }}
+                  /   span.label.label-danger ng-show="active_exhibit.images.length == 0" {{ 'Fill to publish' | i18next }}
+                  ul class="images col-xs-12 {{$parent.active_exhibit.has_hovered}}" sortable="active_exhibit.images" lang="current_museum.language"
                     li.dragable_image ng-repeat="image in $parent.active_exhibit.images" data-lang="{{lang}}" data-array-index="{{$index}}" ng-class="{'hovered': image.image.hovered, 'timestamp': image.mappings[lang].timestamp >= 0 }"
                       a.img_thumbnail href="#" open-lightbox="{{$index}}" data-start="{{$index}}" ng-mouseenter="$parent.$parent.set_hover(image, true)" ng-mouseout="$parent.$parent.set_hover(image, false)"
                         .label_timestamp ng-show="image.mappings[lang].timestamp >= 0"
@@ -523,7 +516,7 @@ html lang="en" ng-app="Museum"
                             | {{ image.image.order | numstring }} 
                           span.time 
                             | {{ image.mappings[lang].timestamp | timerepr }}
-                          span.delete_maping.close ng-click="$parent.$parent.delete_mapping($index, $event)" ×
+                          span.delete_maping.close ng-click="$parent.$parent.delete_mapping($index, 'active_exhibit', $event)" ×
                         span class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"
                           span ng-switch-when="true" 
                             i class="icon-ok" 
@@ -531,7 +524,7 @@ html lang="en" ng-app="Museum"
                         img.do_not_drop draggable="false" src="{{image.image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
                       a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" ×
 
-                    li.upload_item
+                    li.upload_item.hint_text
                       .drag_here
                         .img
                         span 
@@ -539,8 +532,34 @@ html lang="en" ng-app="Museum"
                       .or_upload
                         span 
                           | {{ 'or' | i18next }}
-                        a.btn.btn-default.upload href="#" button-file-upload=""
-                          | {{ 'Click to upload' | i18next }}
+                        .upload_variants
+                          a.btn.btn-default.upload href="#" button-file-upload=""
+                            | {{ 'Click to upload' | i18next }}
+                          input.form-control type="text" placeholder="Paste image url" url-upload="active_exhibit"
+
+                  .timline_container_holder ng-class="{'opened': exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
+                    .placeholder ng-show="!active_exhibit.stories[current_museum.language].audio"
+                    .timeline_controls
+                      button.btn.btn-default.timeline_toggler ng-hide="!active_exhibit.stories[current_museum.language].audio" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
+                        | {{ 'Sync images and audio' | i18next }}
+
+                      .drag_images ng-show="exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0" id="{{active_exhibit._id}}"
+                        span.hint_text
+                          | {{ 'Drag images to audio timeline to sync it' | i18next }}
+                          | &nbsp;
+                          | &nbsp;
+                          | &nbsp;
+                          i.icon-long-arrow-down
+                            | &nbsp;
+                          i.icon-long-arrow-down
+                            | &nbsp;
+                          i.icon-long-arrow-down
+                            | &nbsp;
+
+                    .timline_container.active_exhibit id="{{active_exhibit._id}}" droppable=""
+                      / .col-xs-1.control-label 
+                      /   | {{ 'Audio' | i18next }}
+                      player ng-item="active_exhibit.stories[current_museum.language]" ng-id="audio" ng-title="{{ 'Audio' | i18next }}" ng-field="audio" ng-help="help text for popup 5" type='media' parent="active_exhibit.stories[current_museum.language]"  container="active_exhibit"
 
                 .tab-pane ng-class="{'active': story_tab == 'more' }"
                   ul.nav.nav-stacked.nav-list.col-xs-2
