@@ -954,6 +954,11 @@ angular.module("Museum.directives", [])
         if data.loaded is data.total
           scope.$parent.last_save_time = new Date()
           ## should open lightgox cropper
+          setTimeout ->
+            first_image = element.parents('li').find('ul.images li.dragable_image a.img_thumbnail').last()
+            first_image.click()
+          , 200
+          ## should open lightgox cropper
           hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
@@ -1207,7 +1212,9 @@ angular.module("Museum.directives", [])
       else
         lightbox.show()
         parent.height(lightbox.height() + 45) if lightbox.height() + 45 > parent.height()
-        lightbox.find(".slider img.thumb.item_#{attrs.openLightbox}").click()
+        setTimeout ->
+          $(".slider:visible .thumb.item_#{attrs.openLightbox} img").click()
+        , 100
     true
 
 .directive 'lightboxCropper', ($http, errorProcessing, $i18next) ->
@@ -1325,7 +1332,6 @@ angular.module("Museum.directives", [])
 
     scope.update_media = (index, callback) ->
       selected.mode = scope.story_tab
-      console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
         angular.extend(scope.model.images[index].image, data)
         callback() if callback
@@ -1353,8 +1359,12 @@ angular.module("Museum.directives", [])
       imageWidth  = cropper.get(0).naturalWidth
       imageHeight = cropper.get(0).naturalHeight
 
-      new_imageWidth  = imageWidth * ( max_height / imageHeight )
-      new_imageHeight = max_height
+      new_imageWidth  = imageWidth
+      new_imageHeight = imageHeight
+
+      if imageHeight > max_height
+        new_imageWidth  = imageWidth * ( max_height / imageHeight )
+        new_imageHeight = max_height
 
       if new_imageWidth > max_width
         new_imageWidth  = max_width

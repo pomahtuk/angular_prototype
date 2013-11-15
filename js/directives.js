@@ -829,6 +829,11 @@
             $(".progress .progress-bar").css("width", progress + "%");
             if (data.loaded === data.total) {
               scope.$parent.last_save_time = new Date();
+              setTimeout(function() {
+                var first_image;
+                first_image = element.parents('li').find('ul.images li.dragable_image a.img_thumbnail').last();
+                return first_image.click();
+              }, 200);
               return hide_drop_area();
             }
           }
@@ -1173,7 +1178,9 @@
             if (lightbox.height() + 45 > parent.height()) {
               parent.height(lightbox.height() + 45);
             }
-            return lightbox.find(".slider img.thumb.item_" + attrs.openLightbox).click();
+            return setTimeout(function() {
+              return $(".slider:visible .thumb.item_" + attrs.openLightbox + " img").click();
+            }, 100);
           }
         });
         return true;
@@ -1254,7 +1261,6 @@
         });
         scope.update_media = function(index, callback) {
           selected.mode = scope.story_tab;
-          console.log(selected);
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
             angular.extend(scope.model.images[index].image, data);
             if (callback) {
@@ -1287,8 +1293,12 @@
           var jcrop, new_imageHeight, new_imageWidth, options, selection;
           imageWidth = cropper.get(0).naturalWidth;
           imageHeight = cropper.get(0).naturalHeight;
-          new_imageWidth = imageWidth * (max_height / imageHeight);
-          new_imageHeight = max_height;
+          new_imageWidth = imageWidth;
+          new_imageHeight = imageHeight;
+          if (imageHeight > max_height) {
+            new_imageWidth = imageWidth * (max_height / imageHeight);
+            new_imageHeight = max_height;
+          }
           if (new_imageWidth > max_width) {
             new_imageWidth = max_width;
             new_imageHeight = new_imageHeight * (max_width / new_imageWidth);
