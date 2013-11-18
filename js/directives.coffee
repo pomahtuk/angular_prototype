@@ -1081,10 +1081,11 @@ angular.module("Museum.directives", [])
         url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src")
         if url
           if url.indexOf('data:image') >= 0
+            type = url.split(';base64')[0].split('data:')[1]
             img = new Image()
             img.src = url
             img.onload = ->
-              uploadHelpers.cavas_processor img
+              uploadHelpers.cavas_processor img, type
           else
             $.getImageData
               url: url
@@ -1096,19 +1097,22 @@ angular.module("Museum.directives", [])
   link: (scope, element, attrs) ->
     element = $ element
 
-    testRegex = /(http(s?):)|([/|.|\w|\s])*\.(?:jpe?g|gif|png)/i
+    testRegex = /^(http(s?):)|([/|.|\w|\s])*\.(?:jpg|jpeg|gif|png)?/
 
-    element.change ->
+    element.keyup (e) ->
+      return true if e.which in [8, 17, 16, 18, 35, 36, 37, 38, 39, 40, 45, 46]
       url = element.val()
-      console.log url, testRegex.test(url)
+      # console.log url, testRegex.test(url)
       if testRegex.test(url)
+        type = "image/#{url.split('.').reverse()[0]}" 
+        console.log 'ok'
         $.getImageData
           url: url
           server: "#{scope.$parent.backend_url}/imagedata"
           success: (img) ->
             element.val ''
             ## probably, should show some preloader or load indicator
-            uploadHelpers.cavas_processor img
+            uploadHelpers.cavas_processor img, type
 
 .directive 'dropDownEdit', ($timeout, $http) ->
   restrict: 'A'
@@ -1236,7 +1240,7 @@ angular.module("Museum.directives", [])
         <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
         <div class="content {{story_tab}}">
           <div class="cropping_area">
-            <img src="{{model.images[active_image_index].image.url}}">
+            <img src="{{img_url}}">
           </div>
           <div class="notification" ng-switch on="story_tab">
             <span ng-switch-when="thumb">
@@ -1278,9 +1282,11 @@ angular.module("Museum.directives", [])
   """
   controller: ($scope, $element, $attrs) ->
 
-    $scope.set_index = (index) ->
+    $scope.set_index = (index, tab) ->
       $scope.update_media $scope.active_image_index, ->
         $scope.active_image_index = index
+        if tab? and tab isnt $scope.story_tab
+          $scope.story_tab = tab
 
     $scope.make_cover = (index) ->
       $scope.model.cover = $scope.model.images[index].image
@@ -1298,14 +1304,24 @@ angular.module("Museum.directives", [])
           errorProcessing.addError $i18next 'Failed to set cover' 
 
     $scope.check_active_image = ->
+      console.log 'checking'
       for image, index in $scope.model.images
-        image.image.active = if index is $scope.active_image_index
-          true
+        if index is $scope.active_image_index
+          if $scope.story_tab is 'thumb' and image.image.fullUrl
+            $scope.img_url = image.image.fullUrl
+            # console.log 'full and present', $scope.img_url
+          else
+            # console.log 'either not full or not present link'
+            $scope.img_url = image.image.url
+          image.image.active = true
+          # console.log image.image, $scope
         else
-          false
+          image.image.active = false
       
   link: (scope, element, attrs) ->
+    # scope.active_image_index = 0
     scope.story_tab = 'thumb'
+    scope.img_url   = ''
     element         = $ element
     right           = element.find('a.right')
     left            = element.find('a.left')
@@ -1324,6 +1340,7 @@ angular.module("Museum.directives", [])
 
     done.click ->
       scope.update_media scope.active_image_index
+      scope.story_tab = 'thumb'
       # this line resizes parent back
       parent.attr('style', '')
       #####
@@ -1333,6 +1350,7 @@ angular.module("Museum.directives", [])
     scope.update_media = (index, callback) ->
       selected.mode = scope.story_tab
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
+        # console.log data
         angular.extend(scope.model.images[index].image, data)
         callback() if callback
         return true
@@ -1376,8 +1394,10 @@ angular.module("Museum.directives", [])
       preview.attr 'style', ""
 
       selection = if scope.story_tab is 'thumb'
+        console.log 'thumb'
         scope.model.images[scope.active_image_index].image.selection
       else
+        console.log 'full'
         scope.model.images[scope.active_image_index].image.full_selection
 
       if selection
@@ -1391,6 +1411,8 @@ angular.module("Museum.directives", [])
           x2: imageWidth
           y2: imageHeight
         }
+
+      console.log selected
 
       options =
         boxWidth: cropper.width()
@@ -1425,6 +1447,7 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'story_tab', (newValue, oldValue) ->
       if newValue? and newValue isnt oldValue
+        scope.check_active_image()
         console.log 'not same and present, should update cropper'
 
     scope.$watch 'active_image_index', (newValue, oldValue) ->

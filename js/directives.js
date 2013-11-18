@@ -988,7 +988,7 @@
           }
         });
         return $(document).bind("drop", function(e) {
-          var fileupload, img, url;
+          var fileupload, img, type, url;
           fileupload = $(e.originalEvent.target).parents('li').find("input[type='file']");
           if (e.originalEvent.dataTransfer) {
             if ($(e.target).hasClass('do_not_drop')) {
@@ -999,10 +999,11 @@
             url = $(e.originalEvent.dataTransfer.getData("text/html")).filter("img").attr("src");
             if (url) {
               if (url.indexOf('data:image') >= 0) {
+                type = url.split(';base64')[0].split('data:')[1];
                 img = new Image();
                 img.src = url;
                 return img.onload = function() {
-                  return uploadHelpers.cavas_processor(img);
+                  return uploadHelpers.cavas_processor(img, type);
                 };
               } else {
                 return $.getImageData({
@@ -1022,18 +1023,22 @@
       link: function(scope, element, attrs) {
         var testRegex;
         element = $(element);
-        testRegex = /(http(s?):)|([/|.|\w|\s])*\.(?:jpe?g|gif|png)/i;
-        return element.change(function() {
-          var url;
+        testRegex = /^(http(s?):)|([/|.|\w|\s])*\.(?:jpg|jpeg|gif|png)?/;
+        return element.keyup(function(e) {
+          var type, url, _ref;
+          if ((_ref = e.which) === 8 || _ref === 17 || _ref === 16 || _ref === 18 || _ref === 35 || _ref === 36 || _ref === 37 || _ref === 38 || _ref === 39 || _ref === 40 || _ref === 45 || _ref === 46) {
+            return true;
+          }
           url = element.val();
-          console.log(url, testRegex.test(url));
           if (testRegex.test(url)) {
+            type = "image/" + (url.split('.').reverse()[0]);
+            console.log('ok');
             return $.getImageData({
               url: url,
               server: "" + scope.$parent.backend_url + "/imagedata",
               success: function(img) {
                 element.val('');
-                return uploadHelpers.cavas_processor(img);
+                return uploadHelpers.cavas_processor(img, type);
               }
             });
           }
@@ -1194,11 +1199,14 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area\">\n        <img src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{model.images[active_image_index].image.url}}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area\">\n        <img src=\"{{img_url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{model.images[active_image_index].image.url}}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
       controller: function($scope, $element, $attrs) {
-        $scope.set_index = function(index) {
+        $scope.set_index = function(index, tab) {
           return $scope.update_media($scope.active_image_index, function() {
-            return $scope.active_image_index = index;
+            $scope.active_image_index = index;
+            if ((tab != null) && tab !== $scope.story_tab) {
+              return $scope.story_tab = tab;
+            }
           });
         };
         $scope.make_cover = function(index) {
@@ -1226,11 +1234,21 @@
         };
         return $scope.check_active_image = function() {
           var image, index, _i, _len, _ref, _results;
+          console.log('checking');
           _ref = $scope.model.images;
           _results = [];
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             image = _ref[index];
-            _results.push(image.image.active = index === $scope.active_image_index ? true : false);
+            if (index === $scope.active_image_index) {
+              if ($scope.story_tab === 'thumb' && image.image.fullUrl) {
+                $scope.img_url = image.image.fullUrl;
+              } else {
+                $scope.img_url = image.image.url;
+              }
+              _results.push(image.image.active = true);
+            } else {
+              _results.push(image.image.active = false);
+            }
           }
           return _results;
         };
@@ -1238,6 +1256,7 @@
       link: function(scope, element, attrs) {
         var bounds, cropper, done, getSelection, imageHeight, imageWidth, left, max_height, max_width, parent, prev_height, prev_width, preview, right, selected, showPreview;
         scope.story_tab = 'thumb';
+        scope.img_url = '';
         element = $(element);
         right = element.find('a.right');
         left = element.find('a.left');
@@ -1255,6 +1274,7 @@
         bounds = [];
         done.click(function() {
           scope.update_media(scope.active_image_index);
+          scope.story_tab = 'thumb';
           parent.attr('style', '');
           element.hide();
           return false;
@@ -1306,7 +1326,7 @@
           cropper.height(new_imageHeight);
           cropper.width(new_imageWidth);
           preview.attr('style', "");
-          selection = scope.story_tab === 'thumb' ? scope.model.images[scope.active_image_index].image.selection : scope.model.images[scope.active_image_index].image.full_selection;
+          selection = scope.story_tab === 'thumb' ? (console.log('thumb'), scope.model.images[scope.active_image_index].image.selection) : (console.log('full'), scope.model.images[scope.active_image_index].image.full_selection);
           if (selection) {
             selected = JSON.parse(selection);
           } else {
@@ -1319,6 +1339,7 @@
               y2: imageHeight
             };
           }
+          console.log(selected);
           options = {
             boxWidth: cropper.width(),
             boxHeight: cropper.height(),
@@ -1358,6 +1379,7 @@
         });
         scope.$watch('story_tab', function(newValue, oldValue) {
           if ((newValue != null) && newValue !== oldValue) {
+            scope.check_active_image();
             return console.log('not same and present, should update cropper');
           }
         });

@@ -109,6 +109,7 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
 
 .service "uploadHelpers", ->
   cavas_processor: (img, type = "image/jpeg") ->
+    console.log 'called'
     canvas = document.createElement("canvas")
     canvas.width = img.width
     canvas.height = img.height

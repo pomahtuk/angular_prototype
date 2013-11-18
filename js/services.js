@@ -147,6 +147,7 @@
         if (type == null) {
           type = "image/jpeg";
         }
+        console.log('called');
         canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
