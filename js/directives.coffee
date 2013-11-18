@@ -1241,6 +1241,9 @@ angular.module("Museum.directives", [])
         </li>        
       </ul>
         <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
+        <div class="lightbox_preloader">
+          <img src="/img/big_loader_2.gif">
+        </div>
         <div class="content {{story_tab}}">
           <div class="cropping_area {{story_tab}}">
             {{story_tab}}
@@ -1320,6 +1323,8 @@ angular.module("Museum.directives", [])
     scope.story_tab  = 'thumb'
     scope.img_url    = ''
     element          = $ element
+    preloader        = element.find('.lightbox_preloader')
+    content          = element.find('.content')
     right            = element.find('a.right')
     left             = element.find('a.left')
     cropper_thumb    = element.find('.cropping_area img.cropper_thumb')
@@ -1350,11 +1355,12 @@ angular.module("Museum.directives", [])
 
     scope.update_media = (index, callback) ->
       console.log 'updating media'
-      selected = if scope.story_tab is 'full'
-        selected_full
+      if scope.story_tab is 'full'
+        selected = selected_full
       else
-        selected_thumb
-      # console.log selected
+        selected = selected_thumb
+        preloader.show()
+        content.hide()
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
         # console.log data
         delete scope.model.images[index].image.url
@@ -1363,6 +1369,11 @@ angular.module("Museum.directives", [])
         delete scope.model.images[index].image.full_selection
         delete scope.model.images[index].image.thumbnailUrl
         angular.extend(scope.model.images[index].image, data)
+        ## and now - close preloader and show data with 50ms delay
+        setTimeout ->
+          preloader.hide()
+          content.show()
+        , 200 if scope.story_tab is 'thumb'
         callback() if callback
         return true
       .error ->

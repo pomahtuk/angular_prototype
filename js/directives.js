@@ -1203,7 +1203,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"lightbox_preloader\">\n      <img src=\"/img/big_loader_2.gif\">\n    </div>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index, tab) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1248,10 +1248,12 @@
         };
       },
       link: function(scope, element, attrs) {
-        var bounds, cropper_full, cropper_thumb, done, getSelection, imageHeight, imageHeight_full, imageWidth, imageWidth_full, left, max_height, max_width, parent, prev_height, prev_width, preview, right, selected_full, selected_thumb, showPreview, update_selection;
+        var bounds, content, cropper_full, cropper_thumb, done, getSelection, imageHeight, imageHeight_full, imageWidth, imageWidth_full, left, max_height, max_width, parent, preloader, prev_height, prev_width, preview, right, selected_full, selected_thumb, showPreview, update_selection;
         scope.story_tab = 'thumb';
         scope.img_url = '';
         element = $(element);
+        preloader = element.find('.lightbox_preloader');
+        content = element.find('.content');
         right = element.find('a.right');
         left = element.find('a.left');
         cropper_thumb = element.find('.cropping_area img.cropper_thumb');
@@ -1280,7 +1282,13 @@
         scope.update_media = function(index, callback) {
           var selected;
           console.log('updating media');
-          selected = scope.story_tab === 'full' ? selected_full : selected_thumb;
+          if (scope.story_tab === 'full') {
+            selected = selected_full;
+          } else {
+            selected = selected_thumb;
+            preloader.show();
+            content.hide();
+          }
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
             delete scope.model.images[index].image.url;
             delete scope.model.images[index].image.fullUrl;
@@ -1288,6 +1296,12 @@
             delete scope.model.images[index].image.full_selection;
             delete scope.model.images[index].image.thumbnailUrl;
             angular.extend(scope.model.images[index].image, data);
+            if (scope.story_tab === 'thumb') {
+              setTimeout(function() {
+                preloader.hide();
+                return content.show();
+              }, 200);
+            }
             if (callback) {
               callback();
             }

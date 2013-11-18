@@ -2431,10 +2431,24 @@ a:hover {
   z-index: 999;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031817}}
+.lightbox_area .lightbox_preloader {
+  display: none;
+  height: 454px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031821}}
+.lightbox_area .lightbox_preloader img {
+  display: block;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin-left: -64px;
+  margin-top: -64px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031829}}
 .lightbox_area .nav-tabs {
   text-align: center;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031819}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031831}}
 .lightbox_area .nav-tabs li {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2445,37 +2459,37 @@ a:hover {
   float: none;
   border-bottom: 3px solid transparent;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031823}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031835}}
 .lightbox_area .nav-tabs li a {
   color: white;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031825}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031837}}
 .lightbox_area .nav-tabs li:hover, .lightbox_area .nav-tabs li.active {
   border-bottom: 3px solid #fb8521;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031827}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031839}}
 .lightbox_area .nav-tabs li:hover a, .lightbox_area .nav-tabs li.active a {
   color: white;
   background: transparent;
   border-color: transparent;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031837}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031849}}
 .lightbox_area .apply_resize {
   position: absolute;
   top: 10px;
   right: 25px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031842}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031854}}
 .lightbox_area .content {
   height: 360px;
   margin: 30px auto 0px auto;
   width: 1040px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031847}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031859}}
 .lightbox_area .content.full {
   width: 800px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031850}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031862}}
 .lightbox_area .content .notification {
   float: left;
   width: 300px;
@@ -2484,7 +2498,7 @@ a:hover {
   text-align: center;
   padding-top: 90px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031858}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031870}}
 .lightbox_area .content .preview {
   width: 240px;
   float: left;
@@ -2494,7 +2508,7 @@ a:hover {
   color: white;
   text-align: center;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031867}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031879}}
 .lightbox_area .content .preview .mobile {
   position: relative;
   width: 255px;
@@ -2502,7 +2516,7 @@ a:hover {
   background: url("../img/iphone-preview_short.png") center no-repeat;
   border-bottom: 1px solid white;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031874}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031886}}
 .lightbox_area .content .preview .mobile .image {
   position: absolute;
   top: 131px;
@@ -2511,35 +2525,35 @@ a:hover {
   width: 177px;
   height: 133px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031881}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031893}}
 .lightbox_area .content .preview .mobile .image img {
   width: 177px;
   height: 133px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031885}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031897}}
 .lightbox_area .content .cropping_area {
   float: left;
   overflow: hidden;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031889}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031901}}
 .lightbox_area .content .cropping_area img {
   display: block;
   margin: 0 auto;
   max-height: 350px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031895}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031907}}
 .lightbox_area .content .cropping_area.full img.cropper_thumb, .lightbox_area .content .cropping_area.full img.cropper_thumb + div.jcrop-holder {
   display: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031899}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031911}}
 .lightbox_area .content .cropping_area.thumb img.cropper_full, .lightbox_area .content .cropping_area.thumb img.cropper_full + div.jcrop-holder {
   display: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031902}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031914}}
 .lightbox_area .content .cropping_area .jcrop-holder {
   margin: 0 auto;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031905}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031917}}
 .lightbox_area .slider {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2553,7 +2567,7 @@ a:hover {
   text-align: center;
   position: relative;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031914}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031926}}
 .lightbox_area .slider .left, .lightbox_area .slider .right {
   margin: 0px 10px;
   color: white;
@@ -2564,16 +2578,16 @@ a:hover {
   left: 0px;
   margin-top: -20px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031924}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031936}}
 .lightbox_area .slider .right {
   right: 0px;
   left: auto;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031928}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031940}}
 .lightbox_area .slider .right:hover {
   color: #fd6e3b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031931}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031943}}
 .lightbox_area .slider li {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2587,27 +2601,27 @@ a:hover {
   cursor: pointer;
   position: relative;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031939}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031951}}
 .lightbox_area .slider li img {
   width: 105px;
   height: 80px;
   border: 2px solid transparent;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031944}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031956}}
 .lightbox_area .slider li.active img {
   border: 2px solid #fd6e3b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031947}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031959}}
 .lightbox_area .slider li:hover .cover {
   visibility: visible;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031950}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031962}}
 .lightbox_area .timeline {
   height: 100px;
   background: white;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031954}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031966}}
 .cover {
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
@@ -2636,7 +2650,7 @@ a:hover {
   visibility: hidden;
   pointer-events: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031972}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031984}}
 .cover span {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2651,21 +2665,21 @@ a:hover {
   margin-left: -2px;
   text-align: left;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031981}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031993}}
 .cover.active {
   visibility: visible;
   max-width: 92px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031985}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031997}}
 .cover.active span {
   max-width: 80px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031988}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032000}}
 .cover:hover {
   max-width: 92px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000031991}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032003}}
 .label_timestamp {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2683,28 +2697,28 @@ a:hover {
   padding-right: 15px;
   pointer-events: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032003}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032015}}
 .label_timestamp span {
   font-size: 14px;
   line-height: 12px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032008}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032020}}
 .tab-pane {
   width: 100%;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032011}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032023}}
 .tab-content > .active, .pill-content > .active {
   display: block;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032016}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032028}}
 .ui-state-highlight {
   border: 3px dashed #666666;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032023}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032035}}
 .timline_container_holder {
   width: 96%;
   margin: 20px auto 0px auto;
@@ -2719,16 +2733,16 @@ a:hover {
   padding: 0px 0px 0px 0px;
   max-height: 60px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032031}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032043}}
 .timline_container_holder .placeholder {
   height: 20px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032034}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032046}}
 .timeline_controls {
   margin-top: 15px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032037}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032049}}
 .timeline_controls .timeline_toggler {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2737,7 +2751,7 @@ a:hover {
   zoom: 1;
   *display: inline;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032040}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032052}}
 .timeline_controls .drag_images {
   display: -moz-inline-stack;
   display: inline-block;
@@ -2747,12 +2761,12 @@ a:hover {
   *display: inline;
   margin-left: 40px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032044}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032056}}
 .timeline_controls .drag_images img {
   margin-right: 10px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032048}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032060}}
 .timline_container {
   height: 55px;
   -webkit-transition-property: all, max-height;
@@ -2769,25 +2783,25 @@ a:hover {
   position: relative;
   top: 0px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032058}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032070}}
 .timline_container .control-label {
   margin-left: -20px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032061}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032073}}
 .timline_container.can_drop, .timline_container.highlite {
   height: 53px;
   padding: 3px 0px 0px 0px;
   margin-bottom: 2px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032066}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032078}}
 .timline_container.highlite {
   border: 2px dashed #666666;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032069}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032081}}
 .timline_container.can_drop {
   border: 2px solid #fd6e3b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032072}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032084}}
 .timline_container .points_position_holder {
   position: relative;
   padding-left: 42px;
@@ -2796,7 +2810,7 @@ a:hover {
   float: right;
   height: 30px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032080}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032092}}
 .timline_container .image_connection {
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
@@ -2813,7 +2827,7 @@ a:hover {
   color: #010101;
   cursor: pointer;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032092}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032104}}
 .timline_container .image_connection:before {
   top: 18px;
   height: 13px;
@@ -2824,18 +2838,18 @@ a:hover {
   position: absolute;
   border: 1px solid #fd6e3b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032102}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032114}}
 .timline_container .image_connection.hovered {
   color: white;
   background: #fd6e3b;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032106}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032118}}
 .timline_container_holder.opened {
   padding: 40px 0px 90px 0px;
   max-height: 300px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032110}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032122}}
 .timline_container_holder.opened .timline_container {
   -webkit-transform: translate(0, 55px);
   -moz-transform: translate(0, 55px);
@@ -2848,12 +2862,12 @@ a:hover {
   position: relative;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032128}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032140}}
 img.do_not_drop {
   pointer-events: none;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032132}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/Users\/ilja\/Documents\/GitHub\/angular_prototype\/css\/prototype\.sass}line{font-family:\000032144}}
 .hint_text {
   color: #aaaaaa;
   font-size: 14px;
