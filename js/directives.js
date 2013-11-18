@@ -1199,7 +1199,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area\">\n        <img src=\"{{img_url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{img_url}}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index, tab) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1234,43 +1234,37 @@
         };
         return $scope.check_active_image = function() {
           var image, index, _i, _len, _ref, _results;
-          console.log('checking');
           _ref = $scope.model.images;
           _results = [];
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             image = _ref[index];
-            if (index === $scope.active_image_index) {
-              if ($scope.story_tab === 'thumb' && image.image.fullUrl) {
-                $scope.img_url = image.image.fullUrl;
-              } else {
-                $scope.img_url = image.image.url;
-              }
-              _results.push(image.image.active = true);
-            } else {
-              _results.push(image.image.active = false);
-            }
+            _results.push(image.image.active = index === $scope.active_image_index ? true : false);
           }
           return _results;
         };
       },
       link: function(scope, element, attrs) {
-        var bounds, cropper, done, getSelection, imageHeight, imageWidth, left, max_height, max_width, parent, prev_height, prev_width, preview, right, selected, showPreview;
+        var bounds, cropper_full, cropper_thumb, done, getSelection, imageHeight, imageHeight_full, imageWidth, imageWidth_full, left, max_height, max_width, parent, prev_height, prev_width, preview, right, selected_full, selected_thumb, showPreview, update_selection;
         scope.story_tab = 'thumb';
         scope.img_url = '';
         element = $(element);
         right = element.find('a.right');
         left = element.find('a.left');
-        cropper = element.find('.cropping_area img');
+        cropper_thumb = element.find('.cropping_area img.cropper_thumb');
+        cropper_full = element.find('.cropping_area img.cropper_full');
         preview = element.find('.mobile .image img');
         done = element.find('.apply_resize');
         parent = element.parents('#drop_down, #museum_edit_dropdown');
         imageWidth = 0;
+        imageWidth_full = 0;
+        imageHeight_full = 0;
         imageHeight = 0;
         max_height = 330;
         max_width = 450;
         prev_height = 133;
         prev_width = 177;
-        selected = {};
+        selected_thumb = {};
+        selected_full = {};
         bounds = [];
         done.click(function() {
           scope.update_media(scope.active_image_index);
@@ -1280,8 +1274,17 @@
           return false;
         });
         scope.update_media = function(index, callback) {
-          selected.mode = scope.story_tab;
+          var selected;
+          console.log('updating media');
+          selected = scope.story_tab === 'full' ? selected_full : selected_thumb;
+          console.log(selected);
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
+            console.log(data);
+            delete scope.model.images[index].image.url;
+            delete scope.model.images[index].image.fullUrl;
+            delete scope.model.images[index].image.selection;
+            delete scope.model.images[index].image.full_selection;
+            delete scope.model.images[index].image.thumbnailUrl;
             angular.extend(scope.model.images[index].image, data);
             if (callback) {
               callback();
@@ -1294,73 +1297,128 @@
         };
         showPreview = function(coords) {
           var rx, ry;
-          selected = coords;
-          rx = 177 / selected.w;
-          ry = 133 / selected.h;
+          selected_thumb = coords;
+          selected_thumb.mode = 'thumb';
+          rx = 177 / selected_thumb.w;
+          ry = 133 / selected_thumb.h;
           return preview.css({
             width: Math.round(rx * bounds[0]) + "px",
             height: Math.round(ry * bounds[1]) + "px",
-            marginLeft: "-" + Math.round(rx * selected.x) + "px",
-            marginTop: "-" + Math.round(ry * selected.y) + "px"
+            marginLeft: "-" + Math.round(rx * selected_thumb.x) + "px",
+            marginTop: "-" + Math.round(ry * selected_thumb.y) + "px"
           });
         };
         getSelection = function(selection) {
           var result;
           result = [selection.x, selection.y, selection.x2, selection.y2];
-          console.log(result);
           return result;
         };
-        cropper.on('load', function() {
-          var jcrop, new_imageHeight, new_imageWidth, options, selection;
-          imageWidth = cropper.get(0).naturalWidth;
-          imageHeight = cropper.get(0).naturalHeight;
-          new_imageWidth = imageWidth;
-          new_imageHeight = imageHeight;
-          if (imageHeight > max_height) {
-            new_imageWidth = imageWidth * (max_height / imageHeight);
-            new_imageHeight = max_height;
-          }
-          if (new_imageWidth > max_width) {
-            new_imageHeight = new_imageHeight * (max_width / new_imageWidth);
-            new_imageWidth = max_width;
-          }
-          cropper.height(new_imageHeight);
-          cropper.width(new_imageWidth);
-          preview.attr('style', "");
-          selection = scope.story_tab === 'thumb' ? (console.log('thumb'), scope.model.images[scope.active_image_index].image.selection) : (console.log('full'), scope.model.images[scope.active_image_index].image.full_selection);
-          if (selection) {
-            selected = JSON.parse(selection);
-          } else {
-            selected = {
-              x: 0,
-              y: 0,
-              w: imageWidth,
-              h: imageHeight,
-              x2: imageWidth,
-              y2: imageHeight
+        update_selection = function(coords) {
+          selected_full = coords;
+          selected_full.mode = 'full';
+          return true;
+        };
+        cropper_thumb.on('load', function() {
+          return setTimeout((function() {
+            var new_imageHeight, new_imageWidth, options, selection, thumb_jcrop;
+            imageWidth = cropper_thumb.get(0).naturalWidth;
+            imageHeight = cropper_thumb.get(0).naturalHeight;
+            new_imageWidth = imageWidth;
+            new_imageHeight = imageHeight;
+            if (imageHeight > max_height) {
+              new_imageWidth = imageWidth * (max_height / imageHeight);
+              new_imageHeight = max_height;
+            }
+            if (new_imageWidth > max_width) {
+              new_imageHeight = new_imageHeight * (max_width / new_imageWidth);
+              new_imageWidth = max_width;
+            }
+            cropper_thumb.height(new_imageHeight);
+            cropper_thumb.width(new_imageWidth);
+            preview.attr('style', "");
+            selection = scope.model.images[scope.active_image_index].image.selection;
+            if (selection) {
+              selected_thumb = JSON.parse(selection);
+            } else {
+              selected_thumb = {
+                x: 0,
+                y: 0,
+                w: imageWidth,
+                h: imageHeight,
+                x2: imageWidth,
+                y2: imageHeight,
+                mode: 'thumb'
+              };
+            }
+            options = {
+              boxWidth: cropper_thumb.width(),
+              boxHeight: cropper_thumb.height(),
+              setSelect: getSelection(selected_thumb),
+              trueSize: [imageWidth, imageHeight],
+              onChange: showPreview,
+              onSelect: showPreview,
+              aspectRatio: 4 / 3
             };
-          }
-          options = {
-            boxWidth: cropper.width(),
-            boxHeight: cropper.height(),
-            setSelect: getSelection(selected),
-            trueSize: [imageWidth, imageHeight],
-            onChange: showPreview,
-            onSelect: showPreview
-          };
-          if (scope.story_tab === 'thumb') {
-            options.aspectRatio = 4 / 3;
-          }
-          if (this.jcrop) {
-            this.jcrop.destroy();
-          }
-          jcrop = null;
-          cropper.Jcrop(options, function() {
-            jcrop = this;
-            return bounds = jcrop.getBounds();
-          });
-          showPreview(selected);
-          return this.jcrop = jcrop;
+            if (this.thumb_jcrop) {
+              this.thumb_jcrop.destroy();
+            }
+            thumb_jcrop = null;
+            cropper_thumb.Jcrop(options, function() {
+              thumb_jcrop = this;
+              return bounds = thumb_jcrop.getBounds();
+            });
+            showPreview(selected_thumb);
+            return this.thumb_jcrop = thumb_jcrop;
+          }).bind(this), 20);
+        });
+        cropper_full.on('load', function() {
+          return setTimeout((function() {
+            var full_jcrop, full_selection, new_full_imageHeight, new_full_imageWidth, new_imageWidth, options;
+            imageWidth_full = cropper_full.get(0).naturalWidth;
+            imageHeight_full = cropper_full.get(0).naturalHeight;
+            new_full_imageWidth = imageWidth_full;
+            new_full_imageHeight = imageHeight_full;
+            if (imageHeight_full > max_height) {
+              new_full_imageWidth = imageWidth_full * (max_height / imageHeight_full);
+              new_full_imageHeight = max_height;
+            }
+            if (new_full_imageWidth > max_width) {
+              new_full_imageHeight = new_full_imageHeight * (max_width / new_full_imageWidth);
+              new_imageWidth = max_width;
+            }
+            cropper_full.height(new_full_imageHeight);
+            cropper_full.width(new_full_imageWidth);
+            full_selection = scope.model.images[scope.active_image_index].image.full_selection;
+            if (full_selection) {
+              selected_full = JSON.parse(full_selection);
+            } else {
+              selected_full = {
+                x: 0,
+                y: 0,
+                w: imageWidth_full,
+                h: imageHeight_full,
+                x2: imageWidth_full,
+                y2: imageHeight_full,
+                mode: 'full'
+              };
+            }
+            options = {
+              boxWidth: cropper_full.width(),
+              boxHeight: cropper_full.height(),
+              setSelect: getSelection(selected_full),
+              trueSize: [imageWidth_full, imageHeight_full],
+              onChange: update_selection,
+              onSelect: update_selection
+            };
+            if (this.full_jcrop) {
+              this.full_jcrop.destroy();
+            }
+            full_jcrop = null;
+            cropper_full.Jcrop(options, function() {
+              return full_jcrop = this;
+            });
+            return this.full_jcrop = full_jcrop;
+          }).bind(this), 20);
         });
         scope.$watch('model.images', function(newValue, oldValue) {
           var image, _i, _len;
@@ -1381,7 +1439,7 @@
         });
         scope.$watch('story_tab', function(newValue, oldValue) {
           if ((newValue != null) && newValue !== oldValue) {
-            scope.check_active_image();
+            scope.update_media(scope.active_image_index);
             return console.log('not same and present, should update cropper');
           }
         });

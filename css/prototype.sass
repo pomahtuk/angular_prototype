@@ -1883,6 +1883,14 @@ a
         margin: 0 auto
         max-height: 350px
 
+      &.full
+        img.cropper_thumb, img.cropper_thumb + div.jcrop-holder
+          display: none
+
+      &.thumb
+        img.cropper_full, img.cropper_full + div.jcrop-holder
+          display: none
+
       .jcrop-holder
         margin: 0 auto
 

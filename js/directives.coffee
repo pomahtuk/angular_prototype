@@ -953,12 +953,11 @@ angular.module("Museum.directives", [])
         $(".progress .progress-bar").css "width", progress + "%"
         if data.loaded is data.total
           scope.$parent.last_save_time = new Date()
-          ## should open lightgox cropper
           setTimeout ->
             first_image = element.parents('li').find('ul.images li.dragable_image a.img_thumbnail').last()
             first_image.click()
           , 200
-          ## should open lightgox cropper
+          ## should hide preloader
           hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
@@ -1112,6 +1111,7 @@ angular.module("Museum.directives", [])
           success: (img) ->
             element.val ''
             ## probably, should show some preloader or load indicator
+            ## the only question is - whrn should i hide this?
             uploadHelpers.cavas_processor img, type
 
 .directive 'dropDownEdit', ($timeout, $http) ->
@@ -1239,8 +1239,10 @@ angular.module("Museum.directives", [])
       </ul>
         <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
         <div class="content {{story_tab}}">
-          <div class="cropping_area">
-            <img src="{{img_url}}">
+          <div class="cropping_area {{story_tab}}">
+            {{story_tab}}
+            <img class="cropper_thumb" src="{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}">
+            <img class="cropper_full" src="{{model.images[active_image_index].image.url}}">
           </div>
           <div class="notification" ng-switch on="story_tab">
             <span ng-switch-when="thumb">
@@ -1254,7 +1256,7 @@ angular.module("Museum.directives", [])
             {{ "Mobile app preview" | i18next }}
             <div class="mobile">
               <div class="image">
-                <img src="{{img_url}}">
+                <img src="{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}">
               </div>
             </div>
           </div>
@@ -1304,39 +1306,35 @@ angular.module("Museum.directives", [])
           errorProcessing.addError $i18next 'Failed to set cover' 
 
     $scope.check_active_image = ->
-      console.log 'checking'
       for image, index in $scope.model.images
-        if index is $scope.active_image_index
-          if $scope.story_tab is 'thumb' and image.image.fullUrl
-            $scope.img_url = image.image.fullUrl
-            # console.log 'full and present', $scope.img_url
-          else
-            # console.log 'either not full or not present link'
-            $scope.img_url = image.image.url
-          image.image.active = true
-          # console.log image.image, $scope
+        image.image.active = if index is $scope.active_image_index
+          true
         else
-          image.image.active = false
+          false
       
   link: (scope, element, attrs) ->
     # scope.active_image_index = 0
-    scope.story_tab = 'thumb'
-    scope.img_url   = ''
-    element         = $ element
-    right           = element.find('a.right')
-    left            = element.find('a.left')
-    cropper         = element.find('.cropping_area img')
-    preview         = element.find('.mobile .image img')
-    done            = element.find('.apply_resize')
-    parent          = element.parents('#drop_down, #museum_edit_dropdown')
-    imageWidth      = 0
-    imageHeight     = 0
-    max_height      = 330
-    max_width       = 450
-    prev_height     = 133
-    prev_width      = 177
-    selected        = {}
-    bounds          = []
+    scope.story_tab  = 'thumb'
+    scope.img_url    = ''
+    element          = $ element
+    right            = element.find('a.right')
+    left             = element.find('a.left')
+    cropper_thumb    = element.find('.cropping_area img.cropper_thumb')
+    cropper_full     = element.find('.cropping_area img.cropper_full')
+    preview          = element.find('.mobile .image img')
+    done             = element.find('.apply_resize')
+    parent           = element.parents('#drop_down, #museum_edit_dropdown')
+    imageWidth       = 0
+    imageWidth_full  = 0
+    imageHeight_full = 0
+    imageHeight      = 0
+    max_height       = 330
+    max_width        = 450
+    prev_height      = 133
+    prev_width       = 177
+    selected_thumb   = {}
+    selected_full    = {}
+    bounds           = []
 
     done.click ->
       scope.update_media scope.active_image_index
@@ -1348,9 +1346,19 @@ angular.module("Museum.directives", [])
       false
 
     scope.update_media = (index, callback) ->
-      selected.mode = scope.story_tab
+      console.log 'updating media'
+      selected = if scope.story_tab is 'full'
+        selected_full
+      else
+        selected_thumb
+      console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
-        # console.log data
+        console.log data
+        delete scope.model.images[index].image.url
+        delete scope.model.images[index].image.fullUrl
+        delete scope.model.images[index].image.selection
+        delete scope.model.images[index].image.full_selection
+        delete scope.model.images[index].image.thumbnailUrl
         angular.extend(scope.model.images[index].image, data)
         callback() if callback
         return true
@@ -1359,87 +1367,142 @@ angular.module("Museum.directives", [])
         return false
 
     showPreview = (coords) ->
-      selected = coords
-      rx = 177 / selected.w
-      ry = 133 / selected.h
+      selected_thumb = coords
+      selected_thumb.mode = 'thumb'
+      rx = 177 / selected_thumb.w
+      ry = 133 / selected_thumb.h
       preview.css
         width: Math.round(rx * bounds[0]) + "px"
         height: Math.round(ry * bounds[1]) + "px"
-        marginLeft: "-" + Math.round(rx * selected.x) + "px"
-        marginTop: "-" + Math.round(ry * selected.y) + "px"
+        marginLeft: "-" + Math.round(rx * selected_thumb.x) + "px"
+        marginTop: "-" + Math.round(ry * selected_thumb.y) + "px"
 
     getSelection = (selection) ->
       # console.log selection
       result = [selection.x, selection.y, selection.x2, selection.y2] #array [ x, y, x2, y2 ]
-      console.log result
       result
 
-    cropper.on 'load', ->
-      imageWidth  = cropper.get(0).naturalWidth
-      imageHeight = cropper.get(0).naturalHeight
+    update_selection = (coords) ->
+      selected_full      = coords
+      selected_full.mode = 'full'
+      true
 
-      new_imageWidth  = imageWidth
-      new_imageHeight = imageHeight
+    cropper_thumb.on 'load', ->
+      setTimeout (->
+        imageWidth  = cropper_thumb.get(0).naturalWidth
+        imageHeight = cropper_thumb.get(0).naturalHeight
 
-      if imageHeight > max_height
-        new_imageWidth  = imageWidth * ( max_height / imageHeight )
-        new_imageHeight = max_height
+        new_imageWidth  = imageWidth
+        new_imageHeight = imageHeight
 
-      if new_imageWidth > max_width
-        new_imageHeight = new_imageHeight * (max_width / new_imageWidth)
-        new_imageWidth  = max_width
+        if imageHeight > max_height
+          new_imageWidth  = imageWidth * ( max_height / imageHeight )
+          new_imageHeight = max_height
 
-      cropper.height new_imageHeight
-      cropper.width new_imageWidth
+        if new_imageWidth > max_width
+          new_imageHeight = new_imageHeight * (max_width / new_imageWidth)
+          new_imageWidth  = max_width
 
-      # console.log imageWidth, imageHeight, new_imageWidth, new_imageHeight
+        cropper_thumb.height new_imageHeight
+        cropper_thumb.width new_imageWidth
 
-      preview.attr 'style', ""
+        # console.log imageWidth, imageHeight, new_imageWidth, new_imageHeight
 
-      selection = if scope.story_tab is 'thumb'
-        console.log 'thumb'
-        scope.model.images[scope.active_image_index].image.selection
-      else
-        console.log 'full'
-        scope.model.images[scope.active_image_index].image.full_selection
+        preview.attr 'style', ""
 
-      if selection
-        selected = JSON.parse selection
-      else
-        selected = {
-          x: 0
-          y: 0
-          w: imageWidth
-          h: imageHeight
-          x2: imageWidth
-          y2: imageHeight
-        }
+        selection = scope.model.images[scope.active_image_index].image.selection
 
-      # console.log selected
+        if selection
+          selected_thumb = JSON.parse selection
+        else
+          selected_thumb = {
+            x: 0
+            y: 0
+            w: imageWidth
+            h: imageHeight
+            x2: imageWidth
+            y2: imageHeight
+            mode: 'thumb'
+          }
 
-      options =
-        boxWidth: cropper.width()
-        boxHeight: cropper.height()
-        setSelect: getSelection(selected)
-        trueSize: [imageWidth, imageHeight]
-        onChange: showPreview
-        onSelect: showPreview
+        options =
+          boxWidth: cropper_thumb.width()
+          boxHeight: cropper_thumb.height()
+          setSelect: getSelection(selected_thumb)
+          trueSize: [imageWidth, imageHeight]
+          onChange: showPreview
+          onSelect: showPreview
+          aspectRatio: 4 / 3
+        
+        @thumb_jcrop.destroy() if @thumb_jcrop
 
-      options.aspectRatio = 4 / 3 if scope.story_tab is 'thumb'
+        thumb_jcrop = null
 
-      # console.log options
-      
-      @jcrop.destroy() if @jcrop
+        cropper_thumb.Jcrop options, -> 
+          thumb_jcrop = @
+          bounds = thumb_jcrop.getBounds()
 
-      jcrop = null
+        showPreview selected_thumb
 
-      cropper.Jcrop options, -> 
-        jcrop = @
-        bounds = jcrop.getBounds()
+        @thumb_jcrop = thumb_jcrop
+      ).bind(@)
+      , 20
 
-      showPreview selected
+    cropper_full.on 'load', ->
+      setTimeout (->
+        imageWidth_full  = cropper_full.get(0).naturalWidth
+        imageHeight_full = cropper_full.get(0).naturalHeight
 
-      @jcrop = jcrop
+        new_full_imageWidth  = imageWidth_full
+        new_full_imageHeight = imageHeight_full
+
+        if imageHeight_full > max_height
+          new_full_imageWidth  = imageWidth_full * ( max_height / imageHeight_full )
+          new_full_imageHeight = max_height
+
+        if new_full_imageWidth > max_width
+          new_full_imageHeight = new_full_imageHeight * (max_width / new_full_imageWidth)
+          new_imageWidth  = max_width
+
+        cropper_full.height new_full_imageHeight
+        cropper_full.width new_full_imageWidth
+
+        full_selection = scope.model.images[scope.active_image_index].image.full_selection
+
+        if full_selection
+          selected_full = JSON.parse full_selection
+        else
+          selected_full = {
+            x: 0
+            y: 0
+            w: imageWidth_full
+            h: imageHeight_full
+            x2: imageWidth_full
+            y2: imageHeight_full
+            mode: 'full'
+          }
+
+        options =
+          boxWidth: cropper_full.width()
+          boxHeight: cropper_full.height()
+          setSelect: getSelection(selected_full)
+          trueSize: [imageWidth_full, imageHeight_full]
+          onChange: update_selection
+          onSelect: update_selection
+        
+        @full_jcrop.destroy() if @full_jcrop
+
+        full_jcrop = null
+
+        cropper_full.Jcrop options, -> 
+          full_jcrop = @
+          # bounds = full_jcrop.getBounds()
+
+        # showPreview selected_full
+
+        @full_jcrop = full_jcrop
+      ).bind(@)
+      , 20
 
     scope.$watch 'model.images', (newValue, oldValue) ->
       if newValue?
@@ -1453,7 +1516,7 @@ angular.module("Museum.directives", [])
 
     scope.$watch 'story_tab', (newValue, oldValue) ->
       if newValue? and newValue isnt oldValue
-        scope.check_active_image()
+        scope.update_media scope.active_image_index
         console.log 'not same and present, should update cropper'
 
     scope.$watch 'active_image_index', (newValue, oldValue) ->
