@@ -160,6 +160,10 @@ html lang="en" ng-app="Museum"
                       img.do_not_drop draggable="false" src="{{image.image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
                     a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.current_museum" rel="nofollow" ×
 
+                  li.museum_image_placeholder
+                    a.img_thumbnail href="#"
+                      img.do_not_drop src="/img/big_loader_2.gif" alt=""
+
                   li.upload_item.hint_text
                     .drag_here
                       .img
@@ -523,6 +527,10 @@ html lang="en" ng-app="Museum"
                             |  {{ "Cover" | i18next }}
                         img.do_not_drop draggable="false" src="{{image.image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
                       a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" ×
+
+                    li.museum_image_placeholder
+                      a.img_thumbnail href="#"
+                        img.do_not_drop src="/img/big_loader_2.gif" alt=""
 
                     li.upload_item.hint_text
                       .drag_here

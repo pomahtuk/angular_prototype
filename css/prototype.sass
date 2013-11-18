@@ -1201,6 +1201,13 @@ textarea
   .img_thumbnail
     position: relative
 
+  .museum_image_placeholder
+    display: none
+    img
+      height: 112px
+      width: auto
+      margin: 0 auto
+
   a
     text-decoration: none
 
@@ -1228,6 +1235,7 @@ textarea
     line-height: 14px
     top: 3px
     right: 3px
+    pointer-events: auto
 
   li
     display: inline-block
@@ -1959,6 +1967,7 @@ a
   // transition: all 0.2s
   // -webkit-transition: all 0.2s
   visibility: hidden
+  pointer-events: none
 
   span
     +inline-block
@@ -1989,6 +1998,7 @@ a
   padding: 0px 5px
   border-radius: 5px
   padding-right: 15px
+  pointer-events: none
 
   span
     font-size: 14px

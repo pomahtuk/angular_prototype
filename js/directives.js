@@ -834,6 +834,7 @@
                 first_image = element.parents('li').find('ul.images li.dragable_image a.img_thumbnail').last();
                 return first_image.click();
               }, 200);
+              element.parents('li').find('ul.images .museum_image_placeholder').hide();
               return hide_drop_area();
             }
           }
@@ -1033,6 +1034,9 @@
           if (testRegex.test(url)) {
             type = "image/" + (url.split('.').reverse()[0]);
             console.log('ok');
+            element.parents('ul.images').find('.museum_image_placeholder').css({
+              'display': 'inline-block'
+            });
             return $.getImageData({
               url: url,
               server: "" + scope.$parent.backend_url + "/imagedata",
@@ -1277,9 +1281,7 @@
           var selected;
           console.log('updating media');
           selected = scope.story_tab === 'full' ? selected_full : selected_thumb;
-          console.log(selected);
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
-            console.log(data);
             delete scope.model.images[index].image.url;
             delete scope.model.images[index].image.fullUrl;
             delete scope.model.images[index].image.selection;

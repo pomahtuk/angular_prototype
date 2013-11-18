@@ -958,6 +958,8 @@ angular.module("Museum.directives", [])
             first_image.click()
           , 200
           ## should hide preloader
+          element.parents('li').find('ul.images .museum_image_placeholder').hide()
+
           hide_drop_area()
     ).prop("disabled", not $.support.fileInput).parent().addClass (if $.support.fileInput then `undefined` else "disabled")
 
@@ -1105,13 +1107,14 @@ angular.module("Museum.directives", [])
       if testRegex.test(url)
         type = "image/#{url.split('.').reverse()[0]}" 
         console.log 'ok'
+        ## probably, should show some preloader or load indicator
+        ## the only question is - when should i hide this?
+        element.parents('ul.images').find('.museum_image_placeholder').css({'display':'inline-block'})
         $.getImageData
           url: url
           server: "#{scope.$parent.backend_url}/imagedata"
           success: (img) ->
             element.val ''
-            ## probably, should show some preloader or load indicator
-            ## the only question is - whrn should i hide this?
             uploadHelpers.cavas_processor img, type
 
 .directive 'dropDownEdit', ($timeout, $http) ->
@@ -1351,9 +1354,9 @@ angular.module("Museum.directives", [])
         selected_full
       else
         selected_thumb
-      console.log selected
+      # console.log selected
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
-        console.log data
+        # console.log data
         delete scope.model.images[index].image.url
         delete scope.model.images[index].image.fullUrl
         delete scope.model.images[index].image.selection
