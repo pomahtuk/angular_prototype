@@ -1199,7 +1199,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area\">\n        <img src=\"{{img_url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{model.images[active_image_index].image.url}}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area\">\n        <img src=\"{{img_url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{img_url}}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index, tab) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1307,6 +1307,7 @@
         getSelection = function(selection) {
           var result;
           result = [selection.x, selection.y, selection.x2, selection.y2];
+          console.log(result);
           return result;
         };
         cropper.on('load', function() {
@@ -1320,8 +1321,8 @@
             new_imageHeight = max_height;
           }
           if (new_imageWidth > max_width) {
-            new_imageWidth = max_width;
             new_imageHeight = new_imageHeight * (max_width / new_imageWidth);
+            new_imageWidth = max_width;
           }
           cropper.height(new_imageHeight);
           cropper.width(new_imageWidth);
@@ -1339,16 +1340,17 @@
               y2: imageHeight
             };
           }
-          console.log(selected);
           options = {
             boxWidth: cropper.width(),
             boxHeight: cropper.height(),
-            aspectRatio: 4 / 3,
             setSelect: getSelection(selected),
             trueSize: [imageWidth, imageHeight],
             onChange: showPreview,
             onSelect: showPreview
           };
+          if (scope.story_tab === 'thumb') {
+            options.aspectRatio = 4 / 3;
+          }
           if (this.jcrop) {
             this.jcrop.destroy();
           }

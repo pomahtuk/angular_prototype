@@ -1254,7 +1254,7 @@ angular.module("Museum.directives", [])
             {{ "Mobile app preview" | i18next }}
             <div class="mobile">
               <div class="image">
-                <img src="{{model.images[active_image_index].image.url}}">
+                <img src="{{img_url}}">
               </div>
             </div>
           </div>
@@ -1371,6 +1371,7 @@ angular.module("Museum.directives", [])
     getSelection = (selection) ->
       # console.log selection
       result = [selection.x, selection.y, selection.x2, selection.y2] #array [ x, y, x2, y2 ]
+      console.log result
       result
 
     cropper.on 'load', ->
@@ -1385,11 +1386,13 @@ angular.module("Museum.directives", [])
         new_imageHeight = max_height
 
       if new_imageWidth > max_width
-        new_imageWidth  = max_width
         new_imageHeight = new_imageHeight * (max_width / new_imageWidth)
+        new_imageWidth  = max_width
 
       cropper.height new_imageHeight
       cropper.width new_imageWidth
+
+      # console.log imageWidth, imageHeight, new_imageWidth, new_imageHeight
 
       preview.attr 'style', ""
 
@@ -1412,16 +1415,19 @@ angular.module("Museum.directives", [])
           y2: imageHeight
         }
 
-      console.log selected
+      # console.log selected
 
       options =
         boxWidth: cropper.width()
         boxHeight: cropper.height()
-        aspectRatio: 4 / 3
         setSelect: getSelection(selected)
         trueSize: [imageWidth, imageHeight]
         onChange: showPreview
         onSelect: showPreview
+
+      options.aspectRatio = 4 / 3 if scope.story_tab is 'thumb'
+
+      # console.log options
       
       @jcrop.destroy() if @jcrop
 
