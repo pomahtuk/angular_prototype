@@ -777,9 +777,9 @@ angular.module("Museum.controllers", [])
 
   $scope.grid = ->
     collection = $('.exhibits>li.exhibit')
-    tileListMargin = 60
+    tileListMargin = 0
     tileWidth = collection.first().width()
-    tileSpace = 40 # parseInt(collection.first().css('margin-left'), 10) + parseInt(collection.first().css('margin-right'), 10)
+    tileSpace = 35 # parseInt(collection.first().css('margin-left'), 10) + parseInt(collection.first().css('margin-right'), 10)
     # $('.exhibits').css 'text-align': 'left'
     tileGrid(collection, tileWidth, tileSpace, tileListMargin)
     # $(window).resize(tileGrid.bind(@, collection, tileWidth, tileSpace, tileListMargin))

@@ -816,9 +816,9 @@
       $scope.grid = function() {
         var collection, tileListMargin, tileSpace, tileWidth;
         collection = $('.exhibits>li.exhibit');
-        tileListMargin = 60;
+        tileListMargin = 0;
         tileWidth = collection.first().width();
-        tileSpace = 40;
+        tileSpace = 35;
         return tileGrid(collection, tileWidth, tileSpace, tileListMargin);
       };
       $scope.museum_list_prepare = function() {
