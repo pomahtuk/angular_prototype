@@ -1289,6 +1289,9 @@
             preloader.show();
             content.hide();
           }
+          if (scope.model.images[scope.active_image_index] == null) {
+            scope.active_image_index = 0;
+          }
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
             delete scope.model.images[index].image.url;
             delete scope.model.images[index].image.fullUrl;

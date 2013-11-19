@@ -1361,6 +1361,7 @@ angular.module("Museum.directives", [])
         selected = selected_thumb
         preloader.show()
         content.hide()
+      scope.active_image_index = 0 unless scope.model.images[scope.active_image_index]?
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
         # console.log data
         delete scope.model.images[index].image.url
