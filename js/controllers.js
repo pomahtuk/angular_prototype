@@ -127,7 +127,8 @@
       $scope.backend_url = "http://prototype.izi.travel/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
-      $scope.sort_text = 'Sort 0-9';
+      $scope.sort_text = 'icon-sort-by-order';
+      $scope.exhibits_visibility_filter = '';
       $scope.ajax_progress = true;
       $scope.story_subtab = 'video';
       $scope.story_tab = 'main';

@@ -427,6 +427,7 @@ body
     line-height: 30px
     top: 10px
     border-right: 1px solid #c0c0c0
+    cursor: pointer
 
     &.opened:after
       display: block
@@ -519,6 +520,17 @@ body
 
 .filters_bar
   +box-shadow( rgba(0, 0, 0, .1)  0 2px 4px )
+  border-top: 1px solid #ccc
+  a
+    color: #777
+
+    &:hover
+      color: #333
+
+  .btn-group
+    button
+      font-size: 14px
+      padding: 3px 10px 4px 10px
 
 .actions_bar, .filters_bar
   position: relative
@@ -2145,3 +2157,18 @@ img.do_not_drop
 .hint_text
   color: #aaa
   font-size: 14px
+
+span.caret.chevron
+  border: none
+  width: 7px
+  position: relative
+
+  &:after
+    position: relative
+    top: -20px
+    font-family: FontAwesome
+    font-weight: normal
+    font-style: normal
+    text-decoration: inherit
+    -webkit-font-smoothing: antialiased
+    content: "\f078"

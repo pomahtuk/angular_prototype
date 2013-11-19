@@ -80,16 +80,23 @@
         var elem;
         elem = $(element);
         return elem.click(function() {
-          var filters, margin;
+          var filters, margin, placeholder;
           filters = $('.filters_bar');
+          placeholder = $('.filters_placeholder');
           margin = filters.css('top');
           if (margin === '0px') {
             filters.animate({
               'top': '-44px'
             }, 300);
+            placeholder.animate({
+              'height': '0px'
+            }, 300);
           } else {
             filters.animate({
               'top': '0px'
+            }, 300);
+            placeholder.animate({
+              'height': '44px'
             }, 300);
           }
           return scope.filters_opened = !scope.filters_opened;

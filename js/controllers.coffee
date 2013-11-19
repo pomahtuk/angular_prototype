@@ -108,14 +108,15 @@ angular.module("Museum.controllers", [])
   # $scope.backend_url = "http://192.168.158.128:3000/api"
   $scope.backend_url = "http://prototype.izi.travel/api"
 
-  $scope.sort_field     = 'number'
-  $scope.sort_direction = 1
-  $scope.sort_text      = 'Sort 0-9'
-  $scope.ajax_progress  = true
-  $scope.story_subtab   = 'video'
-  $scope.story_tab      = 'main'
-  $scope.museum_tab     = 'main'
-  $scope.museum_subtab  = 'video'
+  $scope.sort_field                 = 'number'
+  $scope.sort_direction             = 1
+  $scope.sort_text                  = 'icon-sort-by-order'
+  $scope.exhibits_visibility_filter = ''
+  $scope.ajax_progress              = true
+  $scope.story_subtab               = 'video'
+  $scope.story_tab                  = 'main'
+  $scope.museum_tab                 = 'main'
+  $scope.museum_subtab              = 'video'
 
   $scope.reload_exhibits = (sort_field = $scope.sort_field, sort_direction = $scope.sort_direction) ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->

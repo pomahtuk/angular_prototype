@@ -79,7 +79,7 @@ html lang="en" ng-app="Museum"
         .left_content
           a.menu_opener href="#" toggle-menu=""
             i.icon-reorder
-          h1.museum_title ng-class="{'opened':museum_edit_dropdown_opened}"
+          h1.museum_title ng-class="{'opened':museum_edit_dropdown_opened}" ng-click="show_museum_edit($event)"
             | {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name |truncate:40}}
           .btn-group.lang.top_space
             a.dropdown-toggle data-toggle="dropdown" href="javascript:void(0)"
@@ -339,45 +339,76 @@ html lang="en" ng-app="Museum"
             i.icon-question-sign
 
       .filters_bar
-        a.clear_fiters.spacer ng-show="exhibits_visibility_filter" ng-click="exhibits_visibility_filter = false" href="#" {{ 'Clear filters' | i18next }}
+        / a.clear_fiters.spacer ng-show="exhibits_visibility_filter" ng-click="exhibits_visibility_filter = false" href="#" {{ 'Clear filters' | i18next }}
 
-        .dropdown.spacer
-          a#sort_order.dropdown-toggle data-toggle="dropdown" href="#"
-            | {{sort_text | i18next }} 
-            span.caret
-          ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
-            li role="presentation"
-              a href="#" ng-click="sort_text='Sort 0-9'; reload_exhibits('number', 1)" {{ 'Sort 0-9' | i18next }}
-            li role="presentation"
-              a href="#" ng-click="sort_text='Sort 9-0'; reload_exhibits('number', -1)"  {{ 'Sort 9-0' | i18next }}
+        .btn-group.spacer
+          button.btn.btn-default.btn-sm ng-class="{'active': sort_text == 'icon-sort-by-order'}" ng-click="sort_text='icon-sort-by-order'; reload_exhibits('number', 1)" 
+            i.icon-sort-by-order
+          button.btn.btn-default.btn-sm ng-class="{'active': sort_text == 'icon-sort-by-order-alt'}" ng-click="sort_text='icon-sort-by-order-alt'; reload_exhibits('number', -1)"
+            i.icon-sort-by-order-alt
+
+        / .dropdown.spacer
+        /   a#sort_order.dropdown-toggle data-toggle="dropdown" href="#"
+        /     | {{'Sort' | i18next }} &nbsp;
+        /     i class="{{sort_text}}"
+        /     span.caret.chevron
+        /   ul.dropdown-menu aria-labelledby="visibility_filter" role="menu"
+        /     li role="presentation"
+        /       a href="#" ng-click="sort_text='icon-sort-by-order'; reload_exhibits('number', 1)" 
+        /         i.icon-sort-by-order
+        /         | &nbsp;&nbsp; {{ 'By item number' | i18next }}
+        /     li role="presentation"
+        /       a href="#" ng-click="sort_text='icon-sort-by-order-alt'; reload_exhibits('number', -1)"
+        /         i.icon-sort-by-order-alt
+        /         | &nbsp;&nbsp; {{ 'By item number' | i18next }}
             / li role="presentation"
             /   a href="#" ng-click="sort_text='Sort A-Z'; reload_exhibits('name', 1)"  Sort A-Z
             / li role="presentation"
             /   a href="#" ng-click="sort_text='Sort Z-A'; reload_exhibits('name', -1)"  Sort Z-A
 
-        .dropdown
-          a.dropdown-toggle data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter"
-            | {{ 'Visibility in mobile application' | i18next }}
-            span ng-switch-when="published"
-              |: {{ 'Published' | i18next }}
-            span ng-switch-when="passcode"
-              |: {{ 'Private' | i18next }}
-            span ng-switch-when="opas_invisible"
-              |: {{ 'Invisible' | i18next }}
-            span.caret
-          ul.dropdown-menu
-            li ng-click="exhibits_visibility_filter = 'published'"
-              a href="#" {{ 'Published' | i18next }}
-            li ng-click="exhibits_visibility_filter = 'passcode'"
-              a href="#" {{ 'Private' | i18next }}
-            li ng-click="exhibits_visibility_filter = 'opas_invisible'"
-              a href="#" {{ 'Invisible' | i18next }}
+        .btn-group.spacer
+          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = ''" ng-class="{'active': exhibits_visibility_filter == ''}"
+            | {{ 'All' | i18next }}
+          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'published'" ng-class="{'active': exhibits_visibility_filter == 'published'}"
+            i class="icon-globe" 
+          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'passcode'" ng-class="{'active': exhibits_visibility_filter == 'passcode'}"
+            i class="icon-lock"
+          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'opas_invisible'" ng-class="{'active': exhibits_visibility_filter == 'opas_invisible'}"
+            i class="icon-eye-close"
+          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'draft'" ng-class="{'active': exhibits_visibility_filter == 'draft'}" 
+            i class="icon-edit"
+
+        / .dropdown
+        /   a.dropdown-toggle data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter"
+        /     | {{ 'Visibility in mobile application' | i18next }}
+        /     span ng-switch-when="published"
+        /       |: {{ 'Published' | i18next }}
+        /     span ng-switch-when="passcode"
+        /       |: {{ 'Private' | i18next }}
+        /     span ng-switch-when="opas_invisible"
+        /       |: {{ 'Invisible' | i18next }}
+        /     span.caret.chevron
+        /   ul.dropdown-menu
+        /     li ng-click="exhibits_visibility_filter = 'published'"
+        /       a href="#" 
+        /         i class="icon-globe" 
+        /         | &nbsp;&nbsp;{{ 'Published' | i18next }}
+        /     li ng-click="exhibits_visibility_filter = 'passcode'"
+        /       a href="#"
+        /         i class="icon-lock"  
+        /         | &nbsp;&nbsp;&nbsp;{{ 'Private' | i18next }}
+        /     li ng-click="exhibits_visibility_filter = 'opas_invisible'"
+        /       a href="#" 
+        /         i class="icon-eye-close"
+        /         | &nbsp;{{ 'Invisible' | i18next }}
 
     .page-wrapper ng-mouseover="show_museum_edit_dropdown=false"
       
       .page-preloader
 
       .page
+
+        .filters_placeholder
 
         script type="text/ng-template" id="myDummyModalContent.html"
           .modal-dialog#dummyModal

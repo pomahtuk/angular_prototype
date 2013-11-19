@@ -60,7 +60,7 @@
       <div class="navbar navbar-default" ng-mouseover="show_museum_edit_dropdown=true">
         <div class="left_content">
           <a class="menu_opener" href="#" toggle-menu=""><i class="icon-reorder"></i></a>
-          <h1 class="museum_title" ng-class="{&#39;opened&#39;:museum_edit_dropdown_opened}">
+          <h1 class="museum_title" ng-class="{&#39;opened&#39;:museum_edit_dropdown_opened}" ng-click="show_museum_edit($event)">
             {{current_museum.stories[current_museum.language].name || current_museum.stories[current_museum.def_lang].name |truncate:40}}
           </h1>
           <div class="btn-group lang top_space">
@@ -288,37 +288,18 @@
         </div>
       </div>
       <div class="filters_bar">
-        <a class="clear_fiters spacer" href="#" ng-click="exhibits_visibility_filter = false" ng-show="exhibits_visibility_filter">{{ 'Clear filters' | i18next }}</a>
-        <div class="dropdown spacer">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="sort_order">{{sort_text | i18next }} <span class="caret"></span></a>
-          <ul aria-labelledby="visibility_filter" class="dropdown-menu" role="menu">
-            <li role="presentation">
-              <a href="#" ng-click="sort_text=&#39;Sort 0-9&#39;; reload_exhibits(&#39;number&#39;, 1)">{{ 'Sort 0-9' | i18next }}</a>
-            </li>
-            <li role="presentation">
-              <a href="#" ng-click="sort_text=&#39;Sort 9-0&#39;; reload_exhibits(&#39;number&#39;, -1)"> {{ 'Sort 9-0' | i18next }}</a>
-            </li>
-          </ul>
+        <div class="btn-group spacer">
+          <button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: sort_text == &#39;icon-sort-by-order&#39;}" ng-click="sort_text=&#39;icon-sort-by-order&#39;; reload_exhibits(&#39;number&#39;, 1)"><i class="icon-sort-by-order"></i></button><button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: sort_text == &#39;icon-sort-by-order-alt&#39;}" ng-click="sort_text=&#39;icon-sort-by-order-alt&#39;; reload_exhibits(&#39;number&#39;, -1)"><i class="icon-sort-by-order-alt"></i></button>
         </div>
-        <div class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-switch="" on="exhibits_visibility_filter">{{ 'Visibility in mobile application' | i18next }}<span ng-switch-when="published">: {{ 'Published' | i18next }}</span><span ng-switch-when="passcode">: {{ 'Private' | i18next }}</span><span ng-switch-when="opas_invisible">: {{ 'Invisible' | i18next }}</span><span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li ng-click="exhibits_visibility_filter = &#39;published&#39;">
-              <a href="#">{{ 'Published' | i18next }}</a>
-            </li>
-            <li ng-click="exhibits_visibility_filter = &#39;passcode&#39;">
-              <a href="#">{{ 'Private' | i18next }}</a>
-            </li>
-            <li ng-click="exhibits_visibility_filter = &#39;opas_invisible&#39;">
-              <a href="#">{{ 'Invisible' | i18next }}</a>
-            </li>
-          </ul>
+        <div class="btn-group spacer">
+          <button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: exhibits_visibility_filter == &#39;&#39;}" ng-click="exhibits_visibility_filter = &#39;&#39;">{{ 'All' | i18next }}</button><button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: exhibits_visibility_filter == &#39;published&#39;}" ng-click="exhibits_visibility_filter = &#39;published&#39;"><i class="icon-globe"></i></button><button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: exhibits_visibility_filter == &#39;passcode&#39;}" ng-click="exhibits_visibility_filter = &#39;passcode&#39;"><i class="icon-lock"></i></button><button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: exhibits_visibility_filter == &#39;opas_invisible&#39;}" ng-click="exhibits_visibility_filter = &#39;opas_invisible&#39;"><i class="icon-eye-close"></i></button><button class="btn btn-default btn-sm" ng-class="{&#39;active&#39;: exhibits_visibility_filter == &#39;draft&#39;}" ng-click="exhibits_visibility_filter = &#39;draft&#39;"><i class="icon-edit"></i></button>
         </div>
       </div>
     </div>
     <div class="page-wrapper" ng-mouseover="show_museum_edit_dropdown=false">
       <div class="page-preloader"></div>
       <div class="page">
+        <div class="filters_placeholder"></div>
         <script id="myDummyModalContent.html" type="text/ng-template">
           <div class="modal-dialog" id="dummyModal">
             <div class="modal-content">

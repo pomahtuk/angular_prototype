@@ -58,12 +58,15 @@ angular.module("Museum.directives", [])
     elem = $ element
     elem.click ->
       filters = $('.filters_bar')
+      placeholder = $('.filters_placeholder')
       # actions = $('.actions_bar')
       margin = filters.css('top')
       if margin is '0px'
         filters.animate {'top': '-44px'}, 300
+        placeholder.animate {'height': '0px'}, 300
       else
         filters.animate {'top': '0px'}, 300
+        placeholder.animate {'height': '44px'}, 300
       scope.filters_opened = !scope.filters_opened
 
 .directive 'postRender', ($timeout) ->
