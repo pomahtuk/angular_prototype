@@ -1735,7 +1735,7 @@
           target: $('.museum_edit_opener')
         };
         nav_museum = $('.museum_navigation_menu');
-        return $("ul.exhibits").scrollspy({
+        return $("ul.exhibits.common").scrollspy({
           min: 50,
           max: 99999,
           onEnter: function(element, position) {

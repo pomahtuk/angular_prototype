@@ -97,6 +97,7 @@ html lang="en" ng-app="Museum"
             |   {{ 'Edit' | i18next}}
         .right_content
           / span.autosaved_info ng-show="last_save_time" {{ 'Changes autosaved at' | i18next }} {{ last_save_time | date:'HH:mm'}}
+
           .hider ng-hide="museum_edit_dropdown_opened"
             switchpubitem ng-item="current_museum.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="current_museum"
 
@@ -344,8 +345,9 @@ html lang="en" ng-app="Museum"
           /     i.icon-chevron-left
           /   button.btn.btn-default.next type="button" 
           /     i.icon-chevron-right
+
           input.form-control.input-sm.search.spacer type="text" placeholder="{{ 'Search' | i18next }}" ng-model="exhibit_search" resizer=""
-          button.btn.btn-default.btn-sm.filter_opener.spacer ng-class="{'active': filters_opened || exhibits_visibility_filter}" type="button" toggle-filters="" 
+          button.btn.btn-default.btn-sm.filter_opener.spacer ng-class="{'active': filters_opened || exhibits_visibility_filter.length > 3}" type="button" toggle-filters="" 
             | {{ 'Filters and sorts' | i18next }}
           button.btn.btn-default.btn-sm.help_opener
             i.icon-question-sign
@@ -379,8 +381,10 @@ html lang="en" ng-app="Museum"
             /   a href="#" ng-click="sort_text='Sort Z-A'; reload_exhibits('name', -1)"  Sort Z-A
 
         .btn-group.spacer
-          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = ''" ng-class="{'active': exhibits_visibility_filter == ''}"
+          button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'all'" ng-class="{'active': exhibits_visibility_filter == 'all'}"
             | {{ 'All' | i18next }}
+          button.btn.btn-default.btn-sm ng-click="group_exhibits_processor()" ng-class="{'active': exhibits_visibility_filter == ''}"
+            | Group
           button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'published'" ng-class="{'active': exhibits_visibility_filter == 'published'}"
             i class="icon-globe" 
           button.btn.btn-default.btn-sm ng-click="exhibits_visibility_filter = 'passcode'" ng-class="{'active': exhibits_visibility_filter == 'passcode'}"
@@ -503,7 +507,7 @@ html lang="en" ng-app="Museum"
                   button type="button" class="btn btn-default" ng-click="ok()" {{ 'Delete' | i18next }}
                   button type="button" class="btn btn-default" ng-click="cancel()" {{ 'Cancel' | i18next }}
 
-        ul.exhibits
+        ul.exhibits.common ng-hide="grouped_exhibits"
 
           li#drop_down drop-down-edit="" ng-class="{'invalid': active_exhibit.invalid}"
             #dropzone.dropdown_area can-drag-and-drop="" upload-to="{{backend_url}}/upload/{{active_exhibit._id}}" model="active_exhibit" selector="fileupload" selector-dropzone="dropzone"
@@ -709,6 +713,142 @@ html lang="en" ng-app="Museum"
                 h4 
                   | {{new_exhibit.number || '' }} {{new_exhibit.stories[current_museum.language].name || '' }}
 
+        .groups ng-show="grouped_exhibits"
+
+          h2 ng-click="grouped_positions.published = !grouped_positions.published"
+            i ng-class="{'icon-chevron-down': grouped_positions.published == false, 'icon-chevron-right': grouped_positions.published == true}"
+            | {{ 'Published items' | i18next }} ({{ (grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('published')).length }})
+
+          ul class="exhibits published {{grouped_positions.published}}"
+
+            li.exhibit ng-repeat="exhibit in grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('published')" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
+              div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
+                .checkbox
+                  input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
+                .image
+                  img src="{{exhibit.cover.thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                .description ng-click="open_dropdown($event, exhibit)"
+                  h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
+                    | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
+                  .media_types ng-class="{'invalid': exhibit.invalid}"
+                    i class="icon-picture empty" ng-show="exhibit.images.length == 0"
+                    i class="icon-list-ol empty" ng-show="exhibit.number.length == 0"
+                    i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
+                    i class="icon-music empty" ng-hide="exhibit.stories[current_museum.language].audio"
+                    i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-align-left empty" ng-hide="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video"
+                    i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
+                .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
+                  i class="icon-globe placeholder" ng-switch-when="published"
+                  i class="icon-lock placeholder" ng-switch-when="passcode"
+                  i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"
+                  .on_hover
+                    switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
+
+          h2 ng-click="grouped_positions.passcode = !grouped_positions.passcode"
+            i ng-class="{'icon-chevron-down': grouped_positions.passcode == false, 'icon-chevron-right': grouped_positions.passcode == true}"
+            | {{ 'Private items' | i18next }} ({{ (grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('passcode')).length }})
+
+          ul class="exhibits passcode {{grouped_positions.passcode}}"
+
+            li.exhibit ng-repeat="exhibit in grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('passcode')" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
+              div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
+                .checkbox
+                  input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
+                .image
+                  img src="{{exhibit.cover.thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                .description ng-click="open_dropdown($event, exhibit)"
+                  h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
+                    | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
+                  .media_types ng-class="{'invalid': exhibit.invalid}"
+                    i class="icon-picture empty" ng-show="exhibit.images.length == 0"
+                    i class="icon-list-ol empty" ng-show="exhibit.number.length == 0"
+                    i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
+                    i class="icon-music empty" ng-hide="exhibit.stories[current_museum.language].audio"
+                    i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-align-left empty" ng-hide="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video"
+                    i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
+                .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
+                  i class="icon-globe placeholder" ng-switch-when="published"
+                  i class="icon-lock placeholder" ng-switch-when="passcode"
+                  i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"
+                  .on_hover
+                    switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
+
+          h2 ng-click="grouped_positions.invisible = !grouped_positions.invisible"
+            i ng-class="{'icon-chevron-down': grouped_positions.invisible == false, 'icon-chevron-right': grouped_positions.invisible == true}"
+            | {{ 'Invisible items' | i18next }} ({{ (grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('opas_invisible')).length }})
+
+          ul class="exhibits opas_invisible {{grouped_positions.invisible}}"
+
+            li.exhibit ng-repeat="exhibit in grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('opas_invisible')" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
+              div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
+                .checkbox
+                  input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
+                .image
+                  img src="{{exhibit.cover.thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                .description ng-click="open_dropdown($event, exhibit)"
+                  h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
+                    | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
+                  .media_types ng-class="{'invalid': exhibit.invalid}"
+                    i class="icon-picture empty" ng-show="exhibit.images.length == 0"
+                    i class="icon-list-ol empty" ng-show="exhibit.number.length == 0"
+                    i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
+                    i class="icon-music empty" ng-hide="exhibit.stories[current_museum.language].audio"
+                    i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-align-left empty" ng-hide="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video"
+                    i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
+                .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
+                  i class="icon-globe placeholder" ng-switch-when="published"
+                  i class="icon-lock placeholder" ng-switch-when="passcode"
+                  i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"
+                  .on_hover
+                    switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
+
+          h2 ng-click="grouped_positions.draft = !grouped_positions.draft"
+            i ng-class="{'icon-chevron-down': grouped_positions.draft == false, 'icon-chevron-right': grouped_positions.draft == true }"
+            | {{ 'Draft items' | i18next }} ({{ (grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('dummy')).length }})
+
+          ul class="exhibits draft {{grouped_positions.draft}}"
+
+            li.exhibit ng-repeat="exhibit in exhibits | filter:criteriaMatch(grouped_exhibits) | filter:statusMatch('dummy')" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
+              div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
+                .checkbox
+                  input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
+                .image
+                  img src="{{exhibit.cover.thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                .description ng-click="open_dropdown($event, exhibit)"
+                  h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
+                    | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
+                  .media_types ng-class="{'invalid': exhibit.invalid}"
+                    i class="icon-picture empty" ng-show="exhibit.images.length == 0"
+                    i class="icon-list-ol empty" ng-show="exhibit.number.length == 0"
+                    i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
+                    i class="icon-music empty" ng-hide="exhibit.stories[current_museum.language].audio"
+                    i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-align-left empty" ng-hide="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video"
+                    i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
+                .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
+                  i class="icon-globe placeholder" ng-switch-when="published"
+                  i class="icon-lock placeholder" ng-switch-when="passcode"
+                  i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"
+                  .on_hover
+                    switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
+
+
+            li.exhibit.dummy data-big-image='/img/img-bg.png' ng-show="new_item_creation"
+              div class="opener draft"
+                .overlay ng-click="open_dropdown($event, new_exhibit)"
+                .image
+                  img src='/img/img-bg.png'
+                .description ng-click="open_dropdown($event, new_exhibit)"
+                  h4 
+                    | {{new_exhibit.number || '' }} {{new_exhibit.stories[current_museum.language].name || '' }}
+
         div
           a href="#" ng-click="changeLng('en')" English
           a href="#" ng-click="changeLng('ru')" Russian
@@ -733,13 +873,13 @@ html lang="en" ng-app="Museum"
     script src="lib/jQuery-File-Upload/jquery.fileupload-fp.js"
     script src="lib/jQuery-File-Upload/locale.js"
     script src="lib/jquery-ui.js"
-    script src="lib/async.js"
+    / script src="lib/async.js"
+    script src="lib/jquery.getimagedata.min.js" 
     script src="lib/ngProgress.js"
     script src="lib/jquery.Jcrop.min.js"
     script src="lib/jquery.color.js"
     script src="lib/jquery-scrollspy.js"
     script src="lib/i18next-1.7.1.js"
-    script src="lib/jquery.getimagedata.min.js"
     script src="lib/canvas-to-blob.js"    
     / app part
     script src="js/app.js"

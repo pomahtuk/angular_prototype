@@ -77,7 +77,7 @@
 
   angular.module("Museum.controllers", []).controller('IndexController', [
     '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', 'imageMappingHelpers', function($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next, imageMappingHelpers) {
-      var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
+      var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id, tmp;
       window.sc = $scope;
       $scope.exhibit_search = '';
       $scope.changeLng = function(lng) {
@@ -86,38 +86,38 @@
       $scope.criteriaMatch = function(criteria) {
         return function(item) {
           var in_string, number_is, result;
-          if (item.stories[$scope.current_museum.language] != null) {
-            if (item.stories[$scope.current_museum.language].name) {
-              in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
-              number_is = parseInt(item.number, 10) === (parseInt(criteria, 10));
-              result = in_string || criteria === '' || number_is;
-              if (result) {
-                $scope.grid();
+          if (item) {
+            if (item.stories[$scope.current_museum.language]) {
+              if (item.stories[$scope.current_museum.language].name) {
+                if ((criteria != null) && typeof criteria === 'string') {
+                  in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1;
+                  number_is = parseInt(item.number, 10) === (parseInt(criteria, 10));
+                  result = in_string || criteria === '' || number_is;
+                  return result;
+                }
               }
-              return result;
-            } else {
-              return true;
             }
-          } else {
-            return true;
           }
+          return true;
         };
       };
-      $scope.statusMatch = function() {
+      $scope.statusMatch = function(status) {
+        if (status == null) {
+          status = $scope.exhibits_visibility_filter;
+        }
         return function(item) {
-          if (item.stories[$scope.current_museum.language] != null) {
-            if (item.stories[$scope.current_museum.language].status && $scope.exhibits_visibility_filter) {
-              if (item.stories[$scope.current_museum.language].status === $scope.exhibits_visibility_filter) {
-                return true;
-              } else {
-                return false;
+          if (status !== 'all') {
+            if (item) {
+              if (item.stories[$scope.current_museum.language] != null) {
+                if (item.stories[$scope.current_museum.language].status && status) {
+                  if (item.stories[$scope.current_museum.language].status !== status) {
+                    return false;
+                  }
+                }
               }
-            } else {
-              return true;
             }
-          } else {
-            return true;
           }
+          return true;
         };
       };
       $scope.museum_change_progress = true;
@@ -128,12 +128,18 @@
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
       $scope.sort_text = 'icon-sort-by-order';
-      $scope.exhibits_visibility_filter = '';
+      $scope.exhibits_visibility_filter = 'all';
       $scope.ajax_progress = true;
       $scope.story_subtab = 'video';
       $scope.story_tab = 'main';
       $scope.museum_tab = 'main';
       $scope.museum_subtab = 'video';
+      $scope.grouped_positions = {
+        draft: false,
+        passcode: false,
+        invisible: false,
+        published: false
+      };
       $scope.reload_exhibits = function(sort_field, sort_direction) {
         if (sort_field == null) {
           sort_field = $scope.sort_field;
@@ -1046,7 +1052,7 @@
         return true;
       };
       $scope.create_new_item = function() {
-        var e, i, lang, number, _i;
+        var i, lang, number, _i;
         if ($scope.new_item_creation !== true) {
           number = get_number();
           $scope.new_exhibit = {
@@ -1096,12 +1102,15 @@
             $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true;
           }
           $scope.new_item_creation = true;
-          $scope.story_tab = 'main';
-          e = {};
-          e.target = $('li.exhibit.dummy > .opener.draft');
-          console.log($('li.exhibit.dummy'));
-          $scope.open_dropdown(e, $scope.new_exhibit);
-          return $scope.grid();
+          return setTimeout(function() {
+            var e;
+            $scope.story_tab = 'main';
+            e = {};
+            e.target = $('li.exhibit.dummy:visible > .opener.draft');
+            console.log($('li.exhibit.dummy'));
+            $scope.open_dropdown(e, $scope.new_exhibit);
+            return $scope.grid();
+          }, 30);
         }
       };
       $scope.check_selected = function() {
@@ -1478,6 +1487,29 @@
           return errorProcessing.addError($i18next('Failed to delete exhibit with number ') + target_exhibit.number);
         });
       };
+      $scope.group_exhibits_processor = function(hide) {
+        if (hide == null) {
+          hide = false;
+        }
+        if (hide || ($scope.grouped_exhibits != null)) {
+          $scope.grouped_exhibits = void 0;
+          return setTimeout(function() {
+            return $scope.grid();
+          }, 100);
+        } else {
+          $scope.exhibits_visibility_filter = '';
+          $scope.grouped_exhibits = $scope.exhibits;
+          return $scope.grid();
+        }
+      };
+      tmp = localStorage.getItem("grouped_positions");
+      if (tmp) {
+        $scope.grouped_positions = JSON.parse(tmp);
+      }
+      tmp = localStorage.getItem("grouped");
+      if (tmp === 'true') {
+        $scope.group_exhibits_processor();
+      }
       $scope.$watch('current_museum.language', function(newValue, oldValue) {
         console.log(newValue);
         $rootScope.lang = newValue;
@@ -1556,8 +1588,23 @@
       $scope.$watch('exhibits_visibility_filter', function(newValue, oldValue) {
         if (newValue != null) {
           if (newValue !== oldValue) {
+            if (newValue !== '') {
+              $scope.group_exhibits_processor(true);
+            }
             return $scope.closeDropDown();
           }
+        }
+      });
+      $scope.$watch('grouped_positions', function(newValue, oldValue) {
+        if (newValue != null) {
+          return localStorage.setItem('grouped_positions', JSON.stringify($scope.grouped_positions));
+        }
+      }, true);
+      $scope.$watch('grouped_exhibits', function(newValue, oldValue) {
+        if (newValue != null) {
+          return localStorage.setItem('grouped', 'true');
+        } else {
+          return localStorage.setItem('grouped', 'false');
         }
       });
       $scope.$watch('exhibit_search', function(newValue, oldValue) {

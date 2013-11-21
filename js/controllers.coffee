@@ -63,31 +63,25 @@ angular.module("Museum.controllers", [])
 
   $scope.criteriaMatch = ( criteria ) ->
     ( item ) ->
-      if item.stories[$scope.current_museum.language]?
-        if item.stories[$scope.current_museum.language].name
-          in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
-          number_is = parseInt(item.number, 10) is (parseInt criteria, 10)
-          result = in_string || criteria is '' || number_is
-          $scope.grid() if result
-          return result
-        else
-          true
-      else
-        true
+      if item
+        if item.stories[$scope.current_museum.language]
+          if item.stories[$scope.current_museum.language].name
+            if criteria? and typeof(criteria) is 'string'
+              in_string = item.stories[$scope.current_museum.language].name.toLowerCase().indexOf(criteria.toLowerCase()) > -1
+              number_is = parseInt(item.number, 10) is (parseInt criteria, 10)
+              result = in_string || criteria is '' || number_is
+              # $scope.grid() if result
+              return result
+      return true
 
-  $scope.statusMatch = ->
+  $scope.statusMatch = (status = $scope.exhibits_visibility_filter) ->
     (item) ->
-      # console.log item
-      if item.stories[$scope.current_museum.language]?
-        if item.stories[$scope.current_museum.language].status && $scope.exhibits_visibility_filter
-          if item.stories[$scope.current_museum.language].status is $scope.exhibits_visibility_filter
-            return true
-          else
-            return false
-        else
-          return true
-      else
-        return true
+      if status isnt 'all'
+        if item
+          if item.stories[$scope.current_museum.language]?
+            if item.stories[$scope.current_museum.language].status && status
+              return false unless item.stories[$scope.current_museum.language].status is status
+      return true
 
   $scope.museum_change_progress = true
 
@@ -111,12 +105,18 @@ angular.module("Museum.controllers", [])
   $scope.sort_field                 = 'number'
   $scope.sort_direction             = 1
   $scope.sort_text                  = 'icon-sort-by-order'
-  $scope.exhibits_visibility_filter = ''
+  $scope.exhibits_visibility_filter = 'all'
   $scope.ajax_progress              = true
   $scope.story_subtab               = 'video'
   $scope.story_tab                  = 'main'
   $scope.museum_tab                 = 'main'
   $scope.museum_subtab              = 'video'
+  $scope.grouped_positions          = {
+    draft: false
+    passcode: false
+    invisible: false
+    published: false
+  }
 
   $scope.reload_exhibits = (sort_field = $scope.sort_field, sort_direction = $scope.sort_direction) ->
     $http.get("#{$scope.backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
@@ -1062,14 +1062,16 @@ angular.module("Museum.controllers", [])
         $scope.new_exhibit.stories[lang].quiz.answers[0].correct = true
 
       $scope.new_item_creation = true
-      $scope.story_tab = 'main'
-      e = {}
-      e.target = $('li.exhibit.dummy > .opener.draft')
-      console.log $('li.exhibit.dummy')
-      $scope.open_dropdown(e, $scope.new_exhibit)
+      setTimeout ->
+        $scope.story_tab = 'main'
+        e = {}
+        e.target = $('li.exhibit.dummy:visible > .opener.draft')
+        console.log $('li.exhibit.dummy')
+        $scope.open_dropdown(e, $scope.new_exhibit)
 
-      #hack to tile grid when adding an item to new line
-      $scope.grid()    
+        #hack to tile grid when adding an item to new line
+        $scope.grid()
+      , 30 
 
   $scope.check_selected = ->
     count = 0
@@ -1337,6 +1339,26 @@ angular.module("Museum.controllers", [])
     .error ->
       errorProcessing.addError $i18next('Failed to delete exhibit with number ') + target_exhibit.number
 
+  $scope.group_exhibits_processor = (hide = false) ->
+    # $scope.exhibits_visibility_filter = ''
+    if hide or $scope.grouped_exhibits?
+      $scope.grouped_exhibits = undefined
+      setTimeout ->
+        $scope.grid()
+      , 100
+    else
+      $scope.exhibits_visibility_filter = ''
+      $scope.grouped_exhibits = $scope.exhibits
+      $scope.grid()        
+
+
+  tmp = localStorage.getItem "grouped_positions"
+  if tmp
+    $scope.grouped_positions = JSON.parse tmp
+  tmp = localStorage.getItem "grouped"
+  $scope.group_exhibits_processor() if tmp is 'true'
+
+
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
     console.log newValue
     $rootScope.lang = newValue
@@ -1402,7 +1424,19 @@ angular.module("Museum.controllers", [])
   $scope.$watch 'exhibits_visibility_filter', (newValue, oldValue) ->
     if newValue?
       if newValue isnt oldValue
+        $scope.group_exhibits_processor(true) if newValue isnt ''
         $scope.closeDropDown()
+
+  $scope.$watch 'grouped_positions', (newValue, oldValue) ->
+    if newValue?
+      localStorage.setItem 'grouped_positions', JSON.stringify $scope.grouped_positions
+  , true
+
+  $scope.$watch 'grouped_exhibits', (newValue, oldValue) ->
+    if newValue?
+      localStorage.setItem 'grouped', 'true'
+    else
+      localStorage.setItem 'grouped', 'false'
 
   $scope.$watch 'exhibit_search', (newValue, oldValue) ->
     if newValue?

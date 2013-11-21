@@ -1848,7 +1848,7 @@ angular.module("Museum.directives", [])
       target: $('.museum_edit_opener')
     }
     nav_museum = $('.museum_navigation_menu')
-    $("ul.exhibits").scrollspy
+    $("ul.exhibits.common").scrollspy
       min: 50
       max: 99999
       onEnter: (element, position) ->

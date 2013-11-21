@@ -2214,3 +2214,32 @@ span.caret.chevron
     text-decoration: inherit
     -webkit-font-smoothing: antialiased
     content: "\f078"
+
+.groups
+  // margin-top: 10px
+
+  h2
+    +inline-block
+    font-size: 20px
+    margin: 20px 0px 20px 25px
+    cursor: pointer
+
+    i
+      +inline-block
+      font-size: 12px
+      width: 20px
+      height: 15px
+      // margin-top: px
+
+  .exhibits
+    margin: 0px
+    height: auto
+    overflow: hidden
+    +transition-property(all)
+    +transition-duration(0.3s)
+
+    &.true
+      height: 0px
+
+
+
