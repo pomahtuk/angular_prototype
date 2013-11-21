@@ -77,7 +77,7 @@
 
   angular.module("Museum.controllers", []).controller('IndexController', [
     '$rootScope', '$scope', '$http', '$filter', '$window', '$modal', '$routeParams', '$location', 'ngProgress', 'storySetValidation', 'errorProcessing', '$i18next', 'imageMappingHelpers', function($rootScope, $scope, $http, $filter, $window, $modal, $routeParams, $location, ngProgress, storySetValidation, errorProcessing, $i18next, imageMappingHelpers) {
-      var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id, tmp;
+      var content_provider_id, dropDown, findActive, get_lang, get_name, get_number, get_state, museum_id;
       window.sc = $scope;
       $scope.exhibit_search = '';
       $scope.changeLng = function(lng) {
@@ -141,13 +141,14 @@
         published: false
       };
       $scope.reload_exhibits = function(sort_field, sort_direction) {
+        var tmp;
         if (sort_field == null) {
           sort_field = $scope.sort_field;
         }
         if (sort_direction == null) {
           sort_direction = $scope.sort_direction;
         }
-        return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
+        $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
           var exhibit, exhibits, image, item, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
           exhibits = [];
           $scope.raw_data = data;
@@ -254,6 +255,14 @@
           }
           return $scope.museum_change_progress = false;
         });
+        tmp = localStorage.getItem("grouped_positions");
+        if (tmp) {
+          $scope.grouped_positions = JSON.parse(tmp);
+        }
+        tmp = localStorage.getItem("grouped");
+        if (tmp === 'true') {
+          return $scope.group_exhibits_processor();
+        }
       };
       $scope.reload_museums = function() {
         ngProgress.start();
@@ -1502,14 +1511,6 @@
           return $scope.grid();
         }
       };
-      tmp = localStorage.getItem("grouped_positions");
-      if (tmp) {
-        $scope.grouped_positions = JSON.parse(tmp);
-      }
-      tmp = localStorage.getItem("grouped");
-      if (tmp === 'true') {
-        $scope.group_exhibits_processor();
-      }
       $scope.$watch('current_museum.language', function(newValue, oldValue) {
         console.log(newValue);
         $rootScope.lang = newValue;

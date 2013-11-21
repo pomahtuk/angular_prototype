@@ -216,6 +216,12 @@ angular.module("Museum.controllers", [])
         }
 
       $scope.museum_change_progress = false
+    tmp = localStorage.getItem "grouped_positions"
+    if tmp
+      $scope.grouped_positions = JSON.parse tmp
+    tmp = localStorage.getItem "grouped"
+    $scope.group_exhibits_processor() if tmp is 'true'
+
 
   $scope.reload_museums = ->
     # ngProgress.complete()
@@ -1350,13 +1356,6 @@ angular.module("Museum.controllers", [])
       $scope.exhibits_visibility_filter = ''
       $scope.grouped_exhibits = $scope.exhibits
       $scope.grid()        
-
-
-  tmp = localStorage.getItem "grouped_positions"
-  if tmp
-    $scope.grouped_positions = JSON.parse tmp
-  tmp = localStorage.getItem "grouped"
-  $scope.group_exhibits_processor() if tmp is 'true'
 
 
   $scope.$watch 'current_museum.language', (newValue, oldValue) ->
