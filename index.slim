@@ -158,7 +158,17 @@ html lang="en" ng-app="Museum"
                           i class="icon-ok" 
                           |  {{ "Cover" | i18next }}
                       img.do_not_drop draggable="false" src="{{image.image.thumbnailUrl || '/img/img-bg.png'}}" alt=""
-                    a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.current_museum" rel="nofollow" ×
+                    a.remove href="#" data-confirm="{{ 'Are you sure you wish to delete this image?' | i18next }}" data-method="delete" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" delete-media="" stop-event="" media="image.image" parent="$parent.$parent.current_museum" data-show-overlay="true" rel="nofollow" ×
+
+                    .delete_overlay
+                      .preloader
+                      span
+                        | {{ "Remove image?" | i18next }}
+                      .overlay_controls
+                        a.btn.btn-default.btn-sm.delete href="#"
+                          | {{ "Delete" | i18next }}
+                        a.btn.btn-default.btn-sm.cancel href="#"
+                          | {{ "Cancel" | i18next }}
 
                   li.museum_image_placeholder
                     a.img_thumbnail href="#"
@@ -180,6 +190,8 @@ html lang="en" ng-app="Museum"
                 .timline_container_holder ng-class="{'opened': museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length > 0}"
                   .placeholder ng-show="!current_museum.stories[current_museum.language].audio"
                   .timeline_controls
+                    button.btn.btn-default.edit_images_btn open-lightbox="0"
+                      | {{ 'Edit images' | i18next }}
                     button.btn.btn-default.timeline_toggler ng-hide="!current_museum.stories[current_museum.language].audio" ng-click="museum_timline_opened = !museum_timline_opened" ng-class="{'active':museum_timline_opened  || current_museum.stories[current_museum.language].mapped_images.length > 0}"
                       | {{ 'Sync images and audio' | i18next }}
 
@@ -588,6 +600,8 @@ html lang="en" ng-app="Museum"
                   .timline_container_holder ng-class="{'opened': exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
                     .placeholder ng-show="!active_exhibit.stories[current_museum.language].audio"
                     .timeline_controls
+                      button.btn.btn-default.edit_images_btn open-lightbox="0"
+                        | {{ 'Edit images' | i18next }}
                       button.btn.btn-default.timeline_toggler ng-hide="!active_exhibit.stories[current_museum.language].audio" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
                         | {{ 'Sync images and audio' | i18next }}
 

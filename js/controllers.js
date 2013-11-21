@@ -253,7 +253,7 @@
         ngProgress.start();
         console.log('anim started');
         return $http.get("" + $scope.backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
-          var found, image, item, key, museum, story, value, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+          var found, image, item, lang, museum, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3;
           $scope.museums = [];
           found = false;
           $scope.langs = [];
@@ -303,15 +303,8 @@
               museum.active = true;
               $scope.current_museum = museum;
               found = true;
-              _ref3 = museum.stories;
-              for (key in _ref3) {
-                value = _ref3[key];
-                console.log(key);
-                $scope.modal_translations[key] = {
-                  name: $i18next(key)
-                };
-              }
             }
+            $scope.langs.unique();
           }
           if (!found) {
             $scope.current_museum = $scope.museums[0];
@@ -320,6 +313,13 @@
               $scope.current_museum.language = "ru";
             }
             museum_id = $scope.current_museum._id;
+          }
+          _ref3 = $scope.langs;
+          for (_m = 0, _len4 = _ref3.length; _m < _len4; _m++) {
+            lang = _ref3[_m];
+            $scope.modal_translations[lang] = {
+              name: $i18next(lang)
+            };
           }
           return $scope.reload_exhibits();
         });

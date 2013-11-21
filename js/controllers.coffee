@@ -259,15 +259,18 @@ angular.module("Museum.controllers", [])
           museum.active = true
           $scope.current_museum = museum
           found = true
-          for key, value of museum.stories
-            console.log key
-            $scope.modal_translations[key] = {name: $i18next(key)}
+          # for key, value of museum.stories
+          #   $scope.modal_translations[key] = {name: $i18next(key)}
+        $scope.langs.unique()
       unless found
         $scope.current_museum = $scope.museums[0]
         $scope.current_museum.def_lang = "ru"
         $scope.current_museum.language = "ru"  unless museum.language?
         museum_id = $scope.current_museum._id
       # $scope.form_translations()
+      for lang in $scope.langs
+        $scope.modal_translations[lang] = 
+          name: $i18next(lang)
       $scope.reload_exhibits()
 
   $scope.reload_museum = ->

@@ -1847,6 +1847,7 @@ angular.module("Museum.directives", [])
     opener = {
       target: $('.museum_edit_opener')
     }
+    nav_museum = $('.museum_navigation_menu')
     $("ul.exhibits").scrollspy
       min: 50
       max: 99999
@@ -1861,8 +1862,8 @@ angular.module("Museum.directives", [])
         $(".to_top").hide() unless $(".to_top").hasClass 'has_position'
 
       onTick: (position,state,enters,leaves) ->
-        if scope.museum_edit_dropdown_opened
-          scope.show_museum_edit(opener)
+        scope.show_museum_edit(opener) if scope.museum_edit_dropdown_opened
+        nav_museum.slideUp(100) if nav_museum.height() > 10
 
 .directive 'toTop', (errorProcessing) ->
   restrict: "E"
