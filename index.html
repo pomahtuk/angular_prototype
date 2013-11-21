@@ -442,7 +442,14 @@
                         <div class="label_timestamp" ng-show="image.mappings[lang].timestamp &gt;= 0">
                           <span class="letter_label">{{ image.image.order | numstring }} </span><span class="time">{{ image.mappings[lang].timestamp | timerepr }}</span><span class="delete_maping close" ng-click="$parent.$parent.delete_mapping($index, &#39;active_exhibit&#39;, $event)">×</span>
                         </div>
-                        <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" class="do_not_drop" draggable="false" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" delete-media="" href="#" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                        <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" class="do_not_drop" draggable="false" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" data-show-overlay="true" delete-media="" href="#" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
+                      <div class="delete_overlay">
+                        <div class="preloader"></div>
+                        <span>{{ "Remove image?" | i18next }}</span>
+                        <div class="overlay_controls">
+                          <a class="btn btn-default btn-sm delete" href="#">{{ "Delete" | i18next }}</a><a class="btn btn-default btn-sm cancel" href="#">{{ "Cancel" | i18next }}</a>
+                        </div>
+                      </div>
                     </li>
                     <li class="museum_image_placeholder">
                       <a class="img_thumbnail" href="#"><img alt="" class="do_not_drop" src="/img/big_loader_2.gif"></a>

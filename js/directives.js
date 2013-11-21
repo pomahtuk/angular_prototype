@@ -573,7 +573,7 @@
           if (confirm(elem.data('confirm'))) {
             parent = elem.parents('#drop_down, #museum_drop_down');
             parent.click();
-            input = parent.find('.images :file');
+            input = parent.find('input:file');
             return input.click();
           }
         });
@@ -876,70 +876,90 @@
         media: '=media'
       },
       link: function(scope, element, attrs) {
+        var delete_overlay;
         element = $(element);
+        delete_overlay = element.next('.delete_overlay');
         return element.click(function(e) {
-          var elem;
+          var confirm_text, delete_media_function, elem, show_overlay;
           e.preventDefault();
           e.stopPropagation();
           elem = $(this);
-          if (confirm(elem.data('confirm'))) {
-            return $.ajax({
-              url: elem.data('link'),
-              type: elem.data('method'),
-              success: function(data) {
-                var image, index, lang, mapping, parent, _i, _j, _len, _len1, _ref, _ref1;
-                if (scope.media.type === 'image') {
-                  _ref = scope.model.images;
-                  for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-                    image = _ref[index];
-                    if (image != null) {
-                      if (image.image._id === data) {
-                        if (image.cover === true) {
-                          scope.model.cover = {};
-                        }
-                        scope.model.images.splice(index, 1);
-                        scope.$digest();
+          confirm_text = elem.data('confirm');
+          show_overlay = elem.data('show-overlay');
+          delete_media_function = function() {
+            return $http["delete"](elem.data('link')).success(function(data) {
+              var image, index, lang, mapping, parent, _i, _j, _len, _len1, _ref, _ref1;
+              if (show_overlay) {
+                delete_overlay.hide();
+                delete_overlay.find('.preloader').hide();
+                delete_overlay.find('.overlay_controls, span').show();
+              }
+              if (scope.media.type === 'image') {
+                _ref = scope.model.images;
+                for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                  image = _ref[index];
+                  if (image != null) {
+                    if (image.image._id === data._id) {
+                      if (image.cover === true) {
+                        scope.model.cover = {};
                       }
+                      scope.model.images.splice(index, 1);
                     }
                   }
-                  if (scope.model.images.length === 0 && scope.model.stories[scope.$parent.$parent.current_museum.language].status === 'published') {
-                    storySetValidation.checkValidity({
-                      item: scope.model.stories[scope.$parent.$parent.current_museum.language],
-                      root: scope.model,
-                      field_type: 'story'
-                    });
-                  }
-                } else if (scope.media.type === 'audio') {
-                  parent = scope.$parent.$parent.active_exhibit;
-                  lang = scope.$parent.$parent.current_museum.language;
-                  scope.model.audio = void 0;
-                  scope.model.mapped_images = [];
-                  scope.$parent.$parent.exhibit_timline_opened = false;
-                  _ref1 = parent.images;
-                  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                    image = _ref1[_j];
-                    mapping = image.mappings[lang];
-                    if (mapping != null) {
-                      delete image.mappings[lang];
-                      $http["delete"]("" + scope.$parent.$parent.backend_url + "/media_mapping/" + mapping._id).success(function(data) {
-                        return console.log(data);
-                      }).error(function() {
-                        return errorProcessing.addError($i18next('Failed to delete timestamp'));
-                      });
-                    }
-                  }
-                  scope.$digest();
-                  if (scope.model.status === 'published') {
-                    storySetValidation.checkValidity({
-                      item: scope.model,
-                      root: parent,
-                      field_type: 'story'
+                }
+                if (scope.model.images.length === 0 && scope.model.stories[scope.$parent.$parent.current_museum.language].status === 'published') {
+                  storySetValidation.checkValidity({
+                    item: scope.model.stories[scope.$parent.$parent.current_museum.language],
+                    root: scope.model,
+                    field_type: 'story'
+                  });
+                }
+              } else if (scope.media.type === 'audio') {
+                parent = scope.$parent.$parent.active_exhibit;
+                lang = scope.$parent.$parent.current_museum.language;
+                scope.model.audio = void 0;
+                scope.model.mapped_images = [];
+                scope.$parent.$parent.exhibit_timline_opened = false;
+                _ref1 = parent.images;
+                for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                  image = _ref1[_j];
+                  mapping = image.mappings[lang];
+                  if (mapping != null) {
+                    delete image.mappings[lang];
+                    $http["delete"]("" + scope.$parent.$parent.backend_url + "/media_mapping/" + mapping._id).success(function(data) {
+                      return console.log(data);
+                    }).error(function() {
+                      return errorProcessing.addError($i18next('Failed to delete timestamp'));
                     });
                   }
                 }
-                return scope.$parent.last_save_time = new Date();
+                scope.$digest();
+                if (scope.model.status === 'published') {
+                  storySetValidation.checkValidity({
+                    item: scope.model,
+                    root: parent,
+                    field_type: 'story'
+                  });
+                }
               }
+              return scope.$parent.last_save_time = new Date();
             });
+          };
+          if (show_overlay) {
+            delete_overlay.show();
+            delete_overlay.find('.delete').unbind('click').bind('click', function(e) {
+              delete_overlay.find('.preloader').show();
+              delete_overlay.find('.overlay_controls, span').hide();
+              delete_media_function();
+              return e.preventDefault();
+            });
+            return delete_overlay.find('.cancel').unbind('click').bind('click', function(e) {
+              return e.preventDefault();
+            });
+          } else {
+            if (confirm(confirm_text)) {
+              return delete_media_function();
+            }
           }
         });
       }
@@ -1210,7 +1230,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"lightbox_preloader\">\n      <img src=\"/img/big_loader_2.gif\">\n    </div>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"lightbox_preloader\">\n      <img src=\"/img/big_loader_2.gif\">\n    </div>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover pointer_events\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index, tab) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1222,6 +1242,7 @@
         };
         $scope.make_cover = function(index) {
           var image, _i, _len, _ref, _results;
+          console.log('making a cover');
           $scope.model.cover = $scope.model.images[index].image;
           _ref = $scope.model.images;
           _results = [];
@@ -1231,6 +1252,7 @@
               image.image.cover = false;
             } else {
               image.image.cover = true;
+              $scope.model.cover = image.image;
               setTimeout((function() {
                 return this.order = 0;
               }).bind(image.image)(), 500);
@@ -1776,6 +1798,9 @@
           if (item.language === scope.current_museum.language) {
             weight -= 100;
           }
+          if (item.language === scope.oldLang) {
+            weight -= 50;
+          }
           return weight;
         };
         lang_sort = function(a, b) {
@@ -1790,6 +1815,7 @@
         return scope.$watch('current_museum.language', function(newValue, oldValue) {
           var key, value, _ref;
           scope.lang_arr = [];
+          scope.oldLang = oldValue;
           _ref = scope.current_museum.stories;
           for (key in _ref) {
             value = _ref[key];

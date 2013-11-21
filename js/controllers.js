@@ -802,7 +802,7 @@
         if ($scope.story_tab === 'images') {
           $scope.story_tab = 'main';
         }
-        if (clicked.hasClass('dummy')) {
+        if (clicked.hasClass('dummy' || clicked.hasClass('draft'))) {
           number = clicked.data('number');
           $('#opas_number').val(number).blur();
           $('#name').focus();

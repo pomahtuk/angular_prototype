@@ -764,7 +764,7 @@ angular.module("Museum.controllers", [])
     if $scope.story_tab is 'images'
       $scope.story_tab = 'main'
 
-    if clicked.hasClass 'dummy'
+    if clicked.hasClass 'dummy' or clicked.hasClass 'draft'
       number = clicked.data('number')
       $('#opas_number').val(number).blur()
       $('#name').focus()

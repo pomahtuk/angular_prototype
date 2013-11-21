@@ -698,7 +698,7 @@ angular.module("Museum.directives", [])
       if confirm elem.data('confirm')
         parent = elem.parents('#drop_down, #museum_drop_down')
         parent.click()
-        input = parent.find('.images :file')
+        input = parent.find('input:file')
         input.click()
 
     scope.$watch 'item[field]', (newValue, oldValue) ->
@@ -999,48 +999,104 @@ angular.module("Museum.directives", [])
     model: '=parent'
     media: '=media'
   link : (scope, element, attrs) ->
-    element = $ element
+    element        = $ element
+    delete_overlay = element.next('.delete_overlay')
     element.click (e) ->
       e.preventDefault()
       e.stopPropagation()
       elem   = $ @
 
-      if confirm elem.data('confirm')
-        # console.log elem.data('link'), elem.data('method'), scope.model
-        $.ajax
-          url: elem.data('link')
-          type: elem.data('method')
-          success: (data) ->
-            if scope.media.type is 'image'
-              for image, index in scope.model.images
-                if image?
-                  if image.image._id is data
-                    if image.cover is true
-                      scope.model.cover = {}
-                    scope.model.images.splice index, 1
-                    scope.$digest()
-              if scope.model.images.length is 0 && scope.model.stories[scope.$parent.$parent.current_museum.language].status is 'published'
-                storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
-            else if scope.media.type is 'audio'
-              parent = scope.$parent.$parent.active_exhibit
-              lang   = scope.$parent.$parent.current_museum.language
-              # client-side removal
-              scope.model.audio         = undefined
-              scope.model.mapped_images = []
-              scope.$parent.$parent.exhibit_timline_opened = false
-              for image in parent.images
-                mapping = image.mappings[lang]
-                if mapping?
-                  delete image.mappings[lang]
-                  # server-side removal
-                  $http.delete("#{scope.$parent.$parent.backend_url}/media_mapping/#{mapping._id}").success (data) ->
-                    console.log data
-                  .error ->
-                    errorProcessing.addError $i18next 'Failed to delete timestamp'
-              scope.$digest()
-              if scope.model.status is 'published'
-                storySetValidation.checkValidity {item: scope.model, root: parent, field_type: 'story'}
-            scope.$parent.last_save_time = new Date()
+      confirm_text = elem.data('confirm')
+      show_overlay = elem.data('show-overlay')
+
+      delete_media_function = ->
+        # console.log scope.media
+        $http.delete(elem.data('link')).success (data) ->
+          if show_overlay
+            delete_overlay.hide()
+            delete_overlay.find('.preloader').hide()
+            delete_overlay.find('.overlay_controls, span').show()
+
+          if scope.media.type is 'image'
+            for image, index in scope.model.images
+              if image?
+                if image.image._id is data._id
+                  if image.cover is true
+                    scope.model.cover = {}
+                  scope.model.images.splice index, 1
+                  # scope.$digest()
+            if scope.model.images.length is 0 && scope.model.stories[scope.$parent.$parent.current_museum.language].status is 'published'
+              storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
+          else if scope.media.type is 'audio'
+            parent = scope.$parent.$parent.active_exhibit
+            lang   = scope.$parent.$parent.current_museum.language
+            # client-side removal
+            scope.model.audio         = undefined
+            scope.model.mapped_images = []
+            scope.$parent.$parent.exhibit_timline_opened = false
+            for image in parent.images
+              mapping = image.mappings[lang]
+              if mapping?
+                delete image.mappings[lang]
+                # server-side removal
+                $http.delete("#{scope.$parent.$parent.backend_url}/media_mapping/#{mapping._id}").success (data) ->
+                  console.log data
+                .error ->
+                  errorProcessing.addError $i18next 'Failed to delete timestamp'
+            scope.$digest()
+            if scope.model.status is 'published'
+              storySetValidation.checkValidity {item: scope.model, root: parent, field_type: 'story'}
+          scope.$parent.last_save_time = new Date()
+
+      if show_overlay
+        delete_overlay.show()
+        delete_overlay.find('.delete').unbind('click').bind 'click', (e) ->
+          delete_overlay.find('.preloader').show()
+          delete_overlay.find('.overlay_controls, span').hide()
+          delete_media_function()
+          e.preventDefault()
+        delete_overlay.find('.cancel').unbind('click').bind 'click', (e) ->
+          e.preventDefault()
+      else
+        delete_media_function() if confirm confirm_text
+
+
+      # if confirm elem.data('confirm')
+      #   # console.log elem.data('link'), elem.data('method'), scope.model
+      #   $.ajax
+      #     url: elem.data('link')
+      #     type: elem.data('method')
+      #     success: (data) ->
+      #       if scope.media.type is 'image'
+      #         for image, index in scope.model.images
+      #           if image?
+      #             if image.image._id is data
+      #               if image.cover is true
+      #                 scope.model.cover = {}
+      #               scope.model.images.splice index, 1
+      #               scope.$digest()
+      #         if scope.model.images.length is 0 && scope.model.stories[scope.$parent.$parent.current_museum.language].status is 'published'
+      #           storySetValidation.checkValidity {item: scope.model.stories[scope.$parent.$parent.current_museum.language], root: scope.model, field_type: 'story'}
+      #       else if scope.media.type is 'audio'
+      #         parent = scope.$parent.$parent.active_exhibit
+      #         lang   = scope.$parent.$parent.current_museum.language
+      #         # client-side removal
+      #         scope.model.audio         = undefined
+      #         scope.model.mapped_images = []
+      #         scope.$parent.$parent.exhibit_timline_opened = false
+      #         for image in parent.images
+      #           mapping = image.mappings[lang]
+      #           if mapping?
+      #             delete image.mappings[lang]
+      #             # server-side removal
+      #             $http.delete("#{scope.$parent.$parent.backend_url}/media_mapping/#{mapping._id}").success (data) ->
+      #               console.log data
+      #             .error ->
+      #               errorProcessing.addError $i18next 'Failed to delete timestamp'
+      #         scope.$digest()
+      #         if scope.model.status is 'published'
+      #           storySetValidation.checkValidity {item: scope.model, root: parent, field_type: 'story'}
+      #       scope.$parent.last_save_time = new Date()
 
 .directive 'dragAndDropInit', (uploadHelpers) ->
   link: (scope, element, attrs) ->
@@ -1293,7 +1349,7 @@ angular.module("Museum.directives", [])
                   {{ image.mappings[lang].timestamp | timerepr }}
                 </span>
               </div>
-              <a class="cover" ng-class="{'active':image.image.cover}" ng-click="$parent.$parent.make_cover($index)" ng-switch on="image.image.cover">
+              <a class="cover pointer_events" ng-class="{'active':image.image.cover}" ng-click="$parent.$parent.make_cover($index)" ng-switch on="image.image.cover">
                 <span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span>
                 <span ng-switch-default><i class="icon-ok"></i> {{ "Set cover" | i18next }}</span>
               </a>
@@ -1311,12 +1367,14 @@ angular.module("Museum.directives", [])
           $scope.story_tab = tab
 
     $scope.make_cover = (index) ->
+      console.log 'making a cover'
       $scope.model.cover = $scope.model.images[index].image
       for image in $scope.model.images
         if image.image._id isnt $scope.model.cover._id
           image.image.cover = false
         else
-          image.image.cover = true
+          image.image.cover  = true
+          $scope.model.cover = image.image
           setTimeout (->
             @.order = 0).bind(image.image)()
           , 500
@@ -1866,10 +1924,10 @@ angular.module("Museum.directives", [])
     scope.first_display = []
     scope.last_display  = []
 
-
     weight_calc = (item) ->
       weight = 0
       weight -= 100 if item.language is scope.current_museum.language
+      weight -= 50 if item.language is scope.oldLang
       return weight
 
     lang_sort = (a, b) ->
@@ -1883,6 +1941,8 @@ angular.module("Museum.directives", [])
     scope.$watch 'current_museum.language', ( newValue, oldValue ) ->
 
       scope.lang_arr = []
+
+      scope.oldLang  = oldValue
 
       for key, value of scope.current_museum.stories
         scope.lang_arr.push value
