@@ -528,7 +528,7 @@ html lang="en" ng-app="Museum"
               .controls
                 a.delete_story ng-click="delete_modal_open()" href="#" 
                   i.icon-trash
-                .hider ng-hide="active_exhibit.stories[current_museum.language].status == 'draft'"
+                .hider ng-hide="active_exhibit.stories[current_museum.language].status == 'draft' || active_exhibit.stories[current_museum.language].name.length == 0"
                   switchpubitem ng-item="active_exhibit.stories[current_museum.language]" ng-provider='provider' ng-museum="current_museum" translations="translations" type='story' field="status" root="active_exhibit" 
                 .close
 
@@ -810,10 +810,35 @@ html lang="en" ng-app="Museum"
 
           h2 ng-click="grouped_positions.draft = !grouped_positions.draft"
             i ng-class="{'icon-chevron-down': grouped_positions.draft == false, 'icon-chevron-right': grouped_positions.draft == true }"
-            | {{ 'Draft items' | i18next }} ({{ (grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('dummy')).length }})
+            | {{ 'Draft items' | i18next }} ({{ (grouped_exhibits | filter:criteriaMatch(exhibit_search) | filter:statusMatch('draft')).length }})
 
           ul class="exhibits draft {{grouped_positions.draft}}"
 
+            li.exhibit ng-repeat="exhibit in exhibits | filter:criteriaMatch(grouped_exhibits) | filter:statusMatch('draft')" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
+              div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
+                .checkbox
+                  input type="checkbox" ng-model="exhibit.selected" ng-change="check_selected()"
+                .image
+                  img src="{{exhibit.cover.thumbnailUrl || '/img/img-bg.png'}}" ng-click="open_dropdown($event, exhibit)"
+                .description ng-click="open_dropdown($event, exhibit)"
+                  h4 ng-class="{'dummy_header':exhibit.stories[current_museum.language].name.length == 0}"
+                    | {{exhibit.number}} {{exhibit.stories[current_museum.language].name || exhibit.stories[current_museum.def_lang].name}}
+                  .media_types ng-class="{'invalid': exhibit.invalid}"
+                    i class="icon-picture empty" ng-show="exhibit.images.length == 0"
+                    i class="icon-list-ol empty" ng-show="exhibit.number.length == 0"
+                    i class="icon-music" ng-show="exhibit.stories[current_museum.language].audio"
+                    i class="icon-music empty" ng-hide="exhibit.stories[current_museum.language].audio"
+                    i class="icon-align-left" ng-show="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-align-left empty" ng-hide="exhibit.stories[current_museum.language].long_description"
+                    i class="icon-youtube-play" ng-show="exhibit.stories[current_museum.language].video"
+                    i class="icon-puzzle-piece" ng-show="exhibit.stories[current_museum.language].quiz.status == 'published'"
+                .visibility ng-switch="" on="exhibit.stories[current_museum.language].status" ng-class="{'invalid': exhibit.invalid}"
+                  i class="icon-globe placeholder" ng-switch-when="published"
+                  i class="icon-lock placeholder" ng-switch-when="passcode"
+                  i class="icon-eye-close placeholder" ng-switch-when="opas_invisible"
+                  .on_hover
+                    switchpub ng-item="exhibit.stories[current_museum.language]" ng-provider='provider' type='story' field='status' root='exhibit'
+            
             li.exhibit ng-repeat="exhibit in exhibits | filter:criteriaMatch(grouped_exhibits) | filter:statusMatch('dummy')" ng-class="{active: exhibit.active}" ng-hide="ajax_progress"
               div class="opener {{exhibit.stories[current_museum.language].status}} museum_{{current_museum.stories[current_museum.language].status}}" ng-class="{'border': exhibit.selected, 'draft':exhibit.stories[current_museum.language].name.length == 0}"
                 .checkbox
