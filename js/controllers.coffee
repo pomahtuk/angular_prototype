@@ -91,13 +91,13 @@ angular.module("Museum.controllers", [])
     $location.$$path.split('/')[1]
   else
     # "5285b3417de600691f000002"
-    "526e1baa0439f8b01a000002"
+    "528f05b3c99772031a000002"
 
   content_provider_id = if $routeParams.content_provider_id?
     $routeParams.content_provider_id
   else
     # "5285b3417de600691f000001"
-    "526e1baa0439f8b01a000001"
+    "528f05b3c99772031a000001"
 
   # $scope.backend_url = "http://192.168.158.128:3000/api"
   $scope.backend_url = "http://prototype.izi.travel/api"

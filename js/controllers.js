@@ -122,8 +122,8 @@
       };
       $scope.museum_change_progress = true;
       ngProgress.color('#fd6e3b');
-      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "526e1baa0439f8b01a000002";
-      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "526e1baa0439f8b01a000001";
+      museum_id = $location.$$path != null ? $location.$$path.split('/')[1] : "528f05b3c99772031a000002";
+      content_provider_id = $routeParams.content_provider_id != null ? $routeParams.content_provider_id : "528f05b3c99772031a000001";
       $scope.backend_url = "http://prototype.izi.travel/api";
       $scope.sort_field = 'number';
       $scope.sort_direction = 1;
