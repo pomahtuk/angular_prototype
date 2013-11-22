@@ -116,7 +116,7 @@
                   <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" class="do_not_drop" draggable="false" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" data-show-overlay="true" delete-media="" href="#" media="image.image" parent="$parent.$parent.current_museum" rel="nofollow" stop-event="">×</a>
                 <div class="delete_overlay">
                   <div class="preloader"></div>
-                  <span>{{ "Remove image?" | i18next }}</span>
+                  <span>{{ "Delete image?" | i18next }}</span>
                   <div class="overlay_controls">
                     <a class="btn btn-default btn-sm delete" href="#">{{ "Delete" | i18next }}</a><a class="btn btn-default btn-sm cancel" href="#">{{ "Cancel" | i18next }}</a>
                   </div>
@@ -434,7 +434,7 @@
                     <span class="cover" ng-class="{&#39;active&#39;:image.image.cover}" ng-click="$parent.make_cover($index)" ng-switch="" on="image.image.cover"><span ng-switch-when="true"><i class="icon-ok"></i> {{ "Cover" | i18next }}</span></span><img alt="" class="do_not_drop" draggable="false" src="{{image.image.thumbnailUrl || &#39;/img/img-bg.png&#39;}}"></a><a class="remove" data-confirm="{{ &#39;Are you sure you wish to delete this image?&#39; | i18next }}" data-link="{{$parent.$parent.$parent.backend_url}}/media/{{media._id}}" data-method="delete" data-show-overlay="true" delete-media="" href="#" media="image.image" parent="$parent.$parent.active_exhibit" rel="nofollow" stop-event="">×</a>
                   <div class="delete_overlay">
                     <div class="preloader"></div>
-                    <span>{{ "Remove image?" | i18next }}</span>
+                    <span>{{ "Delete image?" | i18next }}</span>
                     <div class="overlay_controls">
                       <a class="btn btn-default btn-sm delete" href="#">{{ "Delete" | i18next }}</a><a class="btn btn-default btn-sm cancel" href="#">{{ "Cancel" | i18next }}</a>
                     </div>

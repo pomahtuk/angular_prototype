@@ -1314,7 +1314,7 @@ angular.module("Museum.directives", [])
           <a href="#" ng-click="update_media(active_image_index); story_tab = 'full'" >{{ 'Select fullsize image area' | i18next }}</a>
         </li>        
       </ul>
-        <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
+        <button class="btn btn-warning apply_resize" type="button">{{ "Done image editing" | i18next }}</button>
         <div class="lightbox_preloader">
           <img src="/img/big_loader_2.GIF">
         </div>
@@ -1333,7 +1333,7 @@ angular.module("Museum.directives", [])
             </span>
           </div>
           <div class="preview" ng-hide="story_tab == 'full'">
-            {{ "Mobile app preview" | i18next }}
+            {{ "Thumbnail preview" | i18next }}
             <div class="mobile">
               <div class="image">
                 <img src="{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}">
@@ -1442,7 +1442,7 @@ angular.module("Museum.directives", [])
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
         # console.log data
 
-        console.log scope.model.images[index].image.thumbnailUrl, data.thumbnailUrl
+        # console.log scope.model.images[index].image.thumbnailUrl, data.thumbnailUrl
 
         delete scope.model.images[index].image.url
         delete scope.model.images[index].image.fullUrl
