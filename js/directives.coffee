@@ -695,11 +695,11 @@ angular.module("Museum.directives", [])
       e.stopPropagation()
       elem   = $ @
 
-      if confirm elem.data('confirm')
-        parent = elem.parents('#drop_down, #museum_drop_down')
-        parent.click()
-        input = parent.find('input:file')
-        input.click()
+      # if confirm elem.data('confirm')
+      parent = elem.parents('#drop_down, #museum_drop_down')
+      parent.click()
+      input = parent.find('input:file')
+      input.click()
 
     scope.$watch 'item[field]', (newValue, oldValue) ->
       unless newValue
@@ -1008,6 +1008,7 @@ angular.module("Museum.directives", [])
 
       confirm_text = elem.data('confirm')
       show_overlay = elem.data('show-overlay')
+      silent       = elem.data('silent-delete')
 
       delete_media_function = ->
         # console.log scope.media
@@ -1058,6 +1059,8 @@ angular.module("Museum.directives", [])
         delete_overlay.find('.btn-sm.cancel').unbind('click').bind 'click', (e) ->
           delete_overlay.hide()
           e.preventDefault()
+      else if silent
+        delete_media_function()
       else
         delete_media_function() if confirm confirm_text
 
@@ -1899,19 +1902,19 @@ angular.module("Museum.directives", [])
   transclude: true
   template: """
     <ul class="nav nav-tabs lang_list">
-      <li ng-class="{'active': $index == '0'}" ng-repeat="story in first_display">
+      <!-- <li ng-class="{'active': $index == '0'}" ng-repeat="story in first_display">
         <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
-      </li>
-      <li>
+      </li> -->
+      <li class="active">
         <a href="#" class="dropdown-toggle">
-          More
+          {{current_museum.language | i18next}}
           <i class="icon-chevron-down"></i>
         </a>
         <ul class="dropdown-menu">
-          <li ng-repeat="story in last_display">
+          <li ng-repeat="story in lang_arr">
             <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
           </li>
-          <li class="divider" ng-hide="last_display.length == 0"></li>
+          <li class="divider" ng-hide="lang_arr.length == 0"></li>
           <li>
             <a href="#" ng-click="new_museum_language()"> {{ 'newLanguage' | i18next }} </a>
           </li>
@@ -1948,7 +1951,7 @@ angular.module("Museum.directives", [])
         scope.lang_arr.push value
 
       scope.lang_arr.sort(lang_sort)
-      scope.first_display = scope.lang_arr.splice(0, 2)
-      scope.last_display  = scope.lang_arr
+      scope.lang_arr.splice(0, 1)
+      # scope.last_display  = scope.lang_arr
 
       # scope.$digest()

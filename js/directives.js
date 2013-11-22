@@ -570,12 +570,10 @@
           e.preventDefault();
           e.stopPropagation();
           elem = $(this);
-          if (confirm(elem.data('confirm'))) {
-            parent = elem.parents('#drop_down, #museum_drop_down');
-            parent.click();
-            input = parent.find('input:file');
-            return input.click();
-          }
+          parent = elem.parents('#drop_down, #museum_drop_down');
+          parent.click();
+          input = parent.find('input:file');
+          return input.click();
         });
         scope.$watch('item[field]', function(newValue, oldValue) {
           if (!newValue) {
@@ -880,12 +878,13 @@
         element = $(element);
         delete_overlay = element.next('.delete_overlay');
         return element.click(function(e) {
-          var confirm_text, delete_media_function, elem, show_overlay;
+          var confirm_text, delete_media_function, elem, show_overlay, silent;
           e.preventDefault();
           e.stopPropagation();
           elem = $(this);
           confirm_text = elem.data('confirm');
           show_overlay = elem.data('show-overlay');
+          silent = elem.data('silent-delete');
           delete_media_function = function() {
             return $http["delete"](elem.data('link')).success(function(data) {
               var image, index, lang, mapping, parent, _i, _j, _len, _len1, _ref, _ref1;
@@ -957,6 +956,8 @@
               delete_overlay.hide();
               return e.preventDefault();
             });
+          } else if (silent) {
+            return delete_media_function();
           } else {
             if (confirm(confirm_text)) {
               return delete_media_function();
@@ -1788,7 +1789,7 @@
       restrict: "E",
       replace: true,
       transclude: true,
-      template: "<ul class=\"nav nav-tabs lang_list\">\n  <li ng-class=\"{'active': $index == '0'}\" ng-repeat=\"story in first_display\">\n    <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n  </li>\n  <li>\n    <a href=\"#\" class=\"dropdown-toggle\">\n      More\n      <i class=\"icon-chevron-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in last_display\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"last_display.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
+      template: "<ul class=\"nav nav-tabs lang_list\">\n  <!-- <li ng-class=\"{'active': $index == '0'}\" ng-repeat=\"story in first_display\">\n    <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n  </li> -->\n  <li class=\"active\">\n    <a href=\"#\" class=\"dropdown-toggle\">\n      {{current_museum.language | i18next}}\n      <i class=\"icon-chevron-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in lang_arr\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"lang_arr.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
       link: function(scope, element, attrs) {
         var lang_sort, weight_calc;
         scope.first_display = [];
@@ -1823,8 +1824,7 @@
             scope.lang_arr.push(value);
           }
           scope.lang_arr.sort(lang_sort);
-          scope.first_display = scope.lang_arr.splice(0, 2);
-          return scope.last_display = scope.lang_arr;
+          return scope.lang_arr.splice(0, 1);
         });
       }
     };
