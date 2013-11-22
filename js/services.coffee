@@ -189,7 +189,7 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
         @exhibits = new_exhibits
         @ajax_progress  = false
         if new_exhibits.length is 0
-          $scope.active_exhibit = {
+          @active_exhibit = {
             index: 0
             name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
             number: '1'

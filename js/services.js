@@ -256,7 +256,7 @@
           this.exhibits = new_exhibits;
           this.ajax_progress = false;
           if (new_exhibits.length === 0) {
-            $scope.active_exhibit = {
+            this.active_exhibit = {
               index: 0,
               name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
               number: '1',
