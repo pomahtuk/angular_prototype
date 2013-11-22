@@ -188,69 +188,69 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
         @active_exhibit =  new_exhibits[0]
         @exhibits = new_exhibits
         @ajax_progress  = false
-        # if new_exhibits.length is 0
-        #   $scope.active_exhibit = {
-        #     index: 0
-        #     name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-        #     number: '1'
-        #     image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
-        #     thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-        #     publish_state: 'all'
-        #     description: ''
-        #     qr_code: {
-        #       url: '/img/qr_code.png'
-        #       print_link: 'http://localhost:8000/img/qr_code.png'
-        #     }
-        #     images: [
-        #       {
-        #         image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
-        #         thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-        #         id: 1
-        #         edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-        #       }
-        #       {
-        #         image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
-        #         thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-        #         id: 2
-        #         edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-        #       }
-        #     ]
-        #     stories: {
-        #       ru: {
-        #         name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-        #         description: 'test description'
-        #         publish_state: 'all'
-        #         audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
-        #         quiz: {
-        #           question: 'are you sure?'
-        #           description: 'can you tell me?'
-        #           state: 'published'
-        #           answers: [
-        #             {
-        #               title: 'yes'
-        #               correct: false
-        #               id: 0
-        #             }
-        #             {
-        #               title: 'may be'
-        #               correct: true
-        #               id: 1
-        #             }
-        #             {
-        #               title: 'who cares?'
-        #               correct: false
-        #               id: 2
-        #             }
-        #             {
-        #               title: 'nope'
-        #               correct: false
-        #               id: 3
-        #             }
-        #           ]
-        #         }
-        #       }
-        #     }
-        #   }
+        if new_exhibits.length is 0
+          $scope.active_exhibit = {
+            index: 0
+            name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+            number: '1'
+            image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+            thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+            publish_state: 'all'
+            description: ''
+            qr_code: {
+              url: '/img/qr_code.png'
+              print_link: 'http://localhost:8000/img/qr_code.png'
+            }
+            images: [
+              {
+                image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+                thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+                id: 1
+                edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+              }
+              {
+                image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+                thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+                id: 2
+                edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+              }
+            ]
+            stories: {
+              ru: {
+                name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+                description: 'test description'
+                publish_state: 'all'
+                audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+                quiz: {
+                  question: 'are you sure?'
+                  description: 'can you tell me?'
+                  state: 'published'
+                  answers: [
+                    {
+                      title: 'yes'
+                      correct: false
+                      id: 0
+                    }
+                    {
+                      title: 'may be'
+                      correct: true
+                      id: 1
+                    }
+                    {
+                      title: 'who cares?'
+                      correct: false
+                      id: 2
+                    }
+                    {
+                      title: 'nope'
+                      correct: false
+                      id: 3
+                    }
+                  ]
+                }
+              }
+            }
+          }
 
         # $scope.museum_change_progress = false
 
