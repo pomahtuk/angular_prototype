@@ -76,6 +76,24 @@ angular.module("Museum.directives", [])
   link : (scope, element, attrs) ->
     if scope.$last
       $timeout scope.grid, 200
+      opener = {
+        target: $('.museum_edit_opener')
+      }
+      $("ul.exhibits.common").scrollspy
+        min: 50
+        max: 99999
+        onEnter: (element, position) ->
+          $(".float_menu").addClass "navbar-fixed-top"
+          $(".navigation").addClass "bottom-padding"
+          $(".to_top").show()
+
+        onLeave: (element, position) ->
+          $(".float_menu").removeClass "navbar-fixed-top"
+          $(".navigation").removeClass "bottom-padding"
+          $(".to_top").hide() unless $(".to_top").hasClass 'has_position'
+
+        onTick: (position,state,enters,leaves) ->
+          scope.show_museum_edit(opener) if scope.museum_edit_dropdown_opened
     true
 
 # Custom HTML elements
@@ -1825,27 +1843,28 @@ angular.module("Museum.directives", [])
     scope.$on 'new_error', (event, errors) ->
       scope.errors = errors
 
-.directive 'scrollspyInit', ->
-  restrict: 'A'
-  link: (scope, element, attrs) ->
-    opener = {
-      target: $('.museum_edit_opener')
-    }
-    $("ul.exhibits.common").scrollspy
-      min: 50
-      max: 99999
-      onEnter: (element, position) ->
-        $(".float_menu").addClass "navbar-fixed-top"
-        $(".navigation").addClass "bottom-padding"
-        $(".to_top").show()
+# .directive 'scrollspyInit', ->
+#   restrict: 'A'
+#   link: (scope, element, attrs) ->
+#     console.log 'inited'
+#     opener = {
+#       target: $('.museum_edit_opener')
+#     }
+#     $("ul.exhibits.common").scrollspy
+#       min: 50
+#       max: 99999
+#       onEnter: (element, position) ->
+#         $(".float_menu").addClass "navbar-fixed-top"
+#         $(".navigation").addClass "bottom-padding"
+#         $(".to_top").show()
 
-      onLeave: (element, position) ->
-        $(".float_menu").removeClass "navbar-fixed-top"
-        $(".navigation").removeClass "bottom-padding"
-        $(".to_top").hide() unless $(".to_top").hasClass 'has_position'
+#       onLeave: (element, position) ->
+#         $(".float_menu").removeClass "navbar-fixed-top"
+#         $(".navigation").removeClass "bottom-padding"
+#         $(".to_top").hide() unless $(".to_top").hasClass 'has_position'
 
-      onTick: (position,state,enters,leaves) ->
-        scope.show_museum_edit(opener) if scope.museum_edit_dropdown_opened
+#       onTick: (position,state,enters,leaves) ->
+#         scope.show_museum_edit(opener) if scope.museum_edit_dropdown_opened
 
 .directive 'toTop', (errorProcessing) ->
   restrict: "E"

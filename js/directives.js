@@ -107,8 +107,33 @@
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
+        var opener;
         if (scope.$last) {
           $timeout(scope.grid, 200);
+          opener = {
+            target: $('.museum_edit_opener')
+          };
+          $("ul.exhibits.common").scrollspy({
+            min: 50,
+            max: 99999,
+            onEnter: function(element, position) {
+              $(".float_menu").addClass("navbar-fixed-top");
+              $(".navigation").addClass("bottom-padding");
+              return $(".to_top").show();
+            },
+            onLeave: function(element, position) {
+              $(".float_menu").removeClass("navbar-fixed-top");
+              $(".navigation").removeClass("bottom-padding");
+              if (!$(".to_top").hasClass('has_position')) {
+                return $(".to_top").hide();
+              }
+            },
+            onTick: function(position, state, enters, leaves) {
+              if (scope.museum_edit_dropdown_opened) {
+                return scope.show_museum_edit(opener);
+              }
+            }
+          });
         }
         return true;
       }
@@ -1717,37 +1742,6 @@
         };
         return scope.$on('new_error', function(event, errors) {
           return scope.errors = errors;
-        });
-      }
-    };
-  }).directive('scrollspyInit', function() {
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs) {
-        var opener;
-        opener = {
-          target: $('.museum_edit_opener')
-        };
-        return $("ul.exhibits.common").scrollspy({
-          min: 50,
-          max: 99999,
-          onEnter: function(element, position) {
-            $(".float_menu").addClass("navbar-fixed-top");
-            $(".navigation").addClass("bottom-padding");
-            return $(".to_top").show();
-          },
-          onLeave: function(element, position) {
-            $(".float_menu").removeClass("navbar-fixed-top");
-            $(".navigation").removeClass("bottom-padding");
-            if (!$(".to_top").hasClass('has_position')) {
-              return $(".to_top").hide();
-            }
-          },
-          onTick: function(position, state, enters, leaves) {
-            if (scope.museum_edit_dropdown_opened) {
-              return scope.show_museum_edit(opener);
-            }
-          }
         });
       }
     };

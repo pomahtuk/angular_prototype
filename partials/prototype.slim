@@ -155,7 +155,7 @@
 
               li.museum_image_placeholder
                 a.img_thumbnail href="#"
-                  img.do_not_drop src="/img/big_loader_2.gif" alt=""
+                  img.do_not_drop src="/img/big_loader_2.GIF" alt=""
 
               li.upload_item.hint_text
                 .drag_here
@@ -173,7 +173,7 @@
             .timline_container_holder ng-class="{'opened': museum_timline_opened || current_museum.stories[current_museum.language].mapped_images.length > 0}"
               .placeholder ng-show="!current_museum.stories[current_museum.language].audio"
               .timeline_controls
-                button.btn.btn-default.edit_images_btn open-lightbox="0"
+                button.btn.btn-default.edit_images_btn open-lightbox="0" ng-hide="current_museum.images.length == 0"
                   | {{ 'Edit images' | i18next }}
                 button.btn.btn-default.timeline_toggler ng-hide="!current_museum.stories[current_museum.language].audio" ng-click="museum_timline_opened = !museum_timline_opened" ng-class="{'active':museum_timline_opened  || current_museum.stories[current_museum.language].mapped_images.length > 0}"
                   | {{ 'Sync images and audio' | i18next }}
@@ -568,7 +568,7 @@
 
                 li.museum_image_placeholder
                   a.img_thumbnail href="#"
-                    img.do_not_drop src="/img/big_loader_2.gif" alt=""
+                    img.do_not_drop src="/img/big_loader_2.GIF" alt=""
 
                 li.upload_item.hint_text
                   .drag_here
@@ -586,7 +586,7 @@
               .timline_container_holder ng-class="{'opened': exhibit_timline_opened || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
                 .placeholder ng-show="!active_exhibit.stories[current_museum.language].audio"
                 .timeline_controls
-                  button.btn.btn-default.edit_images_btn open-lightbox="0"
+                  button.btn.btn-default.edit_images_btn open-lightbox="0" ng-hide="active_exhibit.images.length == 0"
                     | {{ 'Edit images' | i18next }}
                   button.btn.btn-default.timeline_toggler ng-hide="!active_exhibit.stories[current_museum.language].audio" ng-click="exhibit_timline_opened = !exhibit_timline_opened" ng-class="{'active':exhibit_timline_opened  || active_exhibit.stories[current_museum.language].mapped_images.length > 0}"
                     | {{ 'Sync images and audio' | i18next }}
