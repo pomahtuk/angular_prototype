@@ -417,19 +417,30 @@ body
   .museum_title
     float: left
     font-size: 24px
-    margin: 0px
-    line-height: 50px
-    margin-right: 10px
+    margin: 0px 20px 0px -5px
+    padding: 0px 5px
     position: relative
-    padding-right: 10px
     color: #333333
     height: 30px
     line-height: 30px
     top: 10px
-    border-right: 1px solid #c0c0c0
     cursor: pointer
 
-    &.opened:after
+    &:hover
+      background: #eee
+
+    &:after
+      display: block
+      position: absolute
+      height: 30px
+      width: 1px
+      content: ''
+      right: -5px
+      top: 0px
+      background: #c0c0c0
+
+
+    &.opened:before
       display: block
       position: absolute
       height: 15px
