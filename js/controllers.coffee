@@ -816,6 +816,10 @@ angular.module("Museum.controllers", [])
       $scope.museum_list_prepare()
     , 100
 
+  $('.page-wrapper').click ->
+    nav_museum = $('.museum_navigation_menu')
+    nav_museum.slideUp(100) if nav_museum.height() > 10
+
   $scope.new_item_creation = false
 
   $scope.all_selected = false

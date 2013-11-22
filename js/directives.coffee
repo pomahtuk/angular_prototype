@@ -1055,7 +1055,8 @@ angular.module("Museum.directives", [])
           delete_overlay.find('.overlay_controls, span').hide()
           delete_media_function()
           e.preventDefault()
-        delete_overlay.find('.cancel').unbind('click').bind 'click', (e) ->
+        delete_overlay.find('.btn-sm.cancel').unbind('click').bind 'click', (e) ->
+          delete_overlay.hide()
           e.preventDefault()
       else
         delete_media_function() if confirm confirm_text
@@ -1847,7 +1848,6 @@ angular.module("Museum.directives", [])
     opener = {
       target: $('.museum_edit_opener')
     }
-    nav_museum = $('.museum_navigation_menu')
     $("ul.exhibits.common").scrollspy
       min: 50
       max: 99999
@@ -1863,7 +1863,6 @@ angular.module("Museum.directives", [])
 
       onTick: (position,state,enters,leaves) ->
         scope.show_museum_edit(opener) if scope.museum_edit_dropdown_opened
-        nav_museum.slideUp(100) if nav_museum.height() > 10
 
 .directive 'toTop', (errorProcessing) ->
   restrict: "E"

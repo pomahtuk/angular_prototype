@@ -953,7 +953,8 @@
               delete_media_function();
               return e.preventDefault();
             });
-            return delete_overlay.find('.cancel').unbind('click').bind('click', function(e) {
+            return delete_overlay.find('.btn-sm.cancel').unbind('click').bind('click', function(e) {
+              delete_overlay.hide();
               return e.preventDefault();
             });
           } else {
@@ -1730,11 +1731,10 @@
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var nav_museum, opener;
+        var opener;
         opener = {
           target: $('.museum_edit_opener')
         };
-        nav_museum = $('.museum_navigation_menu');
         return $("ul.exhibits.common").scrollspy({
           min: 50,
           max: 99999,
@@ -1752,10 +1752,7 @@
           },
           onTick: function(position, state, enters, leaves) {
             if (scope.museum_edit_dropdown_opened) {
-              scope.show_museum_edit(opener);
-            }
-            if (nav_museum.height() > 10) {
-              return nav_museum.slideUp(100);
+              return scope.show_museum_edit(opener);
             }
           }
         });

@@ -859,6 +859,13 @@
           return $scope.museum_list_prepare();
         }, 100);
       });
+      $('.page-wrapper').click(function() {
+        var nav_museum;
+        nav_museum = $('.museum_navigation_menu');
+        if (nav_museum.height() > 10) {
+          return nav_museum.slideUp(100);
+        }
+      });
       $scope.new_item_creation = false;
       $scope.all_selected = false;
       $scope.modal_options = {
