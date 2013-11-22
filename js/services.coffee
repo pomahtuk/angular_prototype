@@ -300,9 +300,9 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
           @langs.push story.story.language
         @museums.push museum
         museum.active = false
-        if museum._id is museum_id
+        if museum._id is @museum_id
           museum.active = true
-          current_museum = museum
+          @current_museum = museum
           found = true
           # for key, value of museum.stories
           #   $scope.modal_translations[key] = {name: $i18next(key)}

@@ -276,7 +276,7 @@
         }
         request = $http.get("" + this.backend_url + "/provider/" + this.content_provider_id + "/museums");
         request.success((function(data) {
-          var current_museum, found, image, item, lang, museum, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3;
+          var found, image, item, lang, museum, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3;
           this.museums = [];
           found = false;
           this.langs = [];
@@ -322,9 +322,9 @@
             }
             this.museums.push(museum);
             museum.active = false;
-            if (museum._id === museum_id) {
+            if (museum._id === this.museum_id) {
               museum.active = true;
-              current_museum = museum;
+              this.current_museum = museum;
               found = true;
             }
             this.langs.unique();
