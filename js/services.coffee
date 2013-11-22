@@ -139,10 +139,7 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
     $rootScope.$broadcast 'new_error', @errors
 
 .service "backendWrapper", ($http, ngProgress, $location, $i18next) ->
-  museum_id: if $location.$$path?
-    $location.$$path.split('/')[1]
-  else
-    "5285b3417de600691f000002"
+  museum_id: "5285b3417de600691f000002"
     # "528f05b3c99772031a000002" #prototype
   content_provider_id: "5285b3417de600691f000001"
   # content_provider_id: "528f05b3c99772031a000001" #prototype
@@ -156,123 +153,124 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
   active_exhibit: {}
   sort_field: 'number'
   sort_direction: 1
+  ajax_progress: true
+  grouped_positions: {}
   reload_exhibits: (sort_field = sort_field, sort_direction = sort_direction, q) ->
-    $http.get("#{backend_url}/provider/#{content_provider_id}/museums/#{museum_id}/exhibits/#{sort_field}/#{sort_direction}").success (data) ->
-      new_exhibits = []
-      for item in data
-        if item?
-          exhibit = item.exhibit
-          exhibit.images = []
-          exhibit.mapped_images = []
-          exhibit.cover  = {}
-          for image in item.images
-            exhibit.images.push image
-            if image.image.cover is true
-              exhibit.cover = image.image
-            # if image.timestamp >= 0
-            #   exhibit.mapped_images.push exhibit.images[exhibit.images.length - 1]
-          exhibit.stories = {}
-          for story in item.stories
-            story.story.quiz = story.quiz.quiz
-            story.story.audio = story.audio
-            story.story.video = story.video
-            story.story.quiz.answers = story.quiz.answers
-            story.story.mapped_images = []
-            for image in exhibit.images
-              if image.mappings[story.story.language]
-                story.story.mapped_images.push image
-            exhibit.stories[story.story.language] = story.story
-          new_exhibits.push exhibit
+    request = $http.get("#{@backend_url}/provider/#{@content_provider_id}/museums/#{@museum_id}/exhibits/#{@sort_field}/#{@sort_direction}")
+    request.success ( (data) ->
+        new_exhibits = []
+        for item in data
+          if item?
+            exhibit = item.exhibit
+            exhibit.images = []
+            exhibit.mapped_images = []
+            exhibit.cover  = {}
+            for image in item.images
+              exhibit.images.push image
+              if image.image.cover is true
+                exhibit.cover = image.image
+              # if image.timestamp >= 0
+              #   exhibit.mapped_images.push exhibit.images[exhibit.images.length - 1]
+            exhibit.stories = {}
+            for story in item.stories
+              story.story.quiz = story.quiz.quiz
+              story.story.audio = story.audio
+              story.story.video = story.video
+              story.story.quiz.answers = story.quiz.answers
+              story.story.mapped_images = []
+              for image in exhibit.images
+                if image.mappings[story.story.language]
+                  story.story.mapped_images.push image
+              exhibit.stories[story.story.language] = story.story
+            new_exhibits.push exhibit
+        ngProgress.complete()
+        console.log 'anim completed'
+        @active_exhibit =  new_exhibits[0]
+        @exhibits = new_exhibits
+        @ajax_progress  = false
+        # if new_exhibits.length is 0
+        #   $scope.active_exhibit = {
+        #     index: 0
+        #     name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+        #     number: '1'
+        #     image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+        #     thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+        #     publish_state: 'all'
+        #     description: ''
+        #     qr_code: {
+        #       url: '/img/qr_code.png'
+        #       print_link: 'http://localhost:8000/img/qr_code.png'
+        #     }
+        #     images: [
+        #       {
+        #         image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+        #         thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+        #         id: 1
+        #         edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+        #       }
+        #       {
+        #         image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
+        #         thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+        #         id: 2
+        #         edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+        #       }
+        #     ]
+        #     stories: {
+        #       ru: {
+        #         name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
+        #         description: 'test description'
+        #         publish_state: 'all'
+        #         audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
+        #         quiz: {
+        #           question: 'are you sure?'
+        #           description: 'can you tell me?'
+        #           state: 'published'
+        #           answers: [
+        #             {
+        #               title: 'yes'
+        #               correct: false
+        #               id: 0
+        #             }
+        #             {
+        #               title: 'may be'
+        #               correct: true
+        #               id: 1
+        #             }
+        #             {
+        #               title: 'who cares?'
+        #               correct: false
+        #               id: 2
+        #             }
+        #             {
+        #               title: 'nope'
+        #               correct: false
+        #               id: 3
+        #             }
+        #           ]
+        #         }
+        #       }
+        #     }
+        #   }
+
+        # $scope.museum_change_progress = false
+
+        q.resolve() if q?
+      ).bind(@)
+    request.error ->
       ngProgress.complete()
-      console.log 'anim completed'
-      active_exhibit =  new_exhibits[0]
-      exhibits = new_exhibits
-      # ajax_progress  = false
-      if new_exhibits.length is 0
-        $scope.active_exhibit = {
-          index: 0
-          name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-          number: '1'
-          image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
-          thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-          publish_state: 'all'
-          description: ''
-          qr_code: {
-            url: '/img/qr_code.png'
-            print_link: 'http://localhost:8000/img/qr_code.png'
-          }
-          images: [
-            {
-              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
-              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-              id: 1
-              edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-            }
-            {
-              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg'
-              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-              id: 2
-              edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
-            }
-          ]
-          stories: {
-            ru: {
-              name: 'Богоматерь Владимирская, с двунадесятыми праздниками'
-              description: 'test description'
-              publish_state: 'all'
-              audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg'
-              quiz: {
-                question: 'are you sure?'
-                description: 'can you tell me?'
-                state: 'published'
-                answers: [
-                  {
-                    title: 'yes'
-                    correct: false
-                    id: 0
-                  }
-                  {
-                    title: 'may be'
-                    correct: true
-                    id: 1
-                  }
-                  {
-                    title: 'who cares?'
-                    correct: false
-                    id: 2
-                  }
-                  {
-                    title: 'nope'
-                    correct: false
-                    id: 3
-                  }
-                ]
-              }
-            }
-          }
-        }
+      q.reject() if q?
 
-      # $scope.museum_change_progress = false
-
-      if q?
-        q.resolve()
-
-    # tmp = localStorage.getItem "grouped_positions"
-    # if tmp
-    #   $scope.grouped_positions = JSON.parse tmp
-    # tmp = localStorage.getItem "grouped"
-    # $scope.group_exhibits_processor() if tmp is 'true'
-
-  fetch_data: (q) ->
-    console.log called
-    console.log backendWrapper
+  fetch_data: (museum_id, q) ->
+    ngProgress.color('#fd6e3b')
     ngProgress.start()
     console.log 'anim started'
-    $http.get("#{backend_url}/provider/#{content_provider_id}/museums").success (data) ->
-      museums = []
+    @museum_id = museum_id if museum_id?
+    request = $http.get("#{@backend_url}/provider/#{@content_provider_id}/museums")
+    request.success ( (data) ->
+      @museums = []
       found = false
-      langs = []
-      modal_translations = {}
+      @langs = []
+      @modal_translations = {}
       for item in data
         museum = item.exhibit
         museum.def_lang = "ru"
@@ -299,8 +297,8 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
             if image.mappings[story.story.language]
               story.story.mapped_images.push image
           museum.stories[story.story.language] = story.story
-          langs.push story.story.language
-        museums.push museum
+          @langs.push story.story.language
+        @museums.push museum
         museum.active = false
         if museum._id is museum_id
           museum.active = true
@@ -308,14 +306,18 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
           found = true
           # for key, value of museum.stories
           #   $scope.modal_translations[key] = {name: $i18next(key)}
-        langs.unique()
+        @langs.unique()
       unless found
-        current_museum = $scope.museums[0]
-        current_museum.def_lang = "ru"
-        current_museum.language = "ru"  unless museum.language?
-        museum_id = current_museum._id
+        @current_museum = @museums[0]
+        @current_museum.def_lang = "ru"
+        @current_museum.language = "ru"  unless museum.language?
+        @museum_id = @current_museum._id
       # $scope.form_translations()
-      for lang in $scope.langs
-        modal_translations[lang] = 
+      for lang in @langs
+        @modal_translations[lang] = 
           name: $i18next(lang)
-      reload_exhibits(null, null, q)
+      @reload_exhibits(null, null, q)
+    ).bind(@)
+    request.error ->
+      ngProgress.complete()
+      q.reject() if q?
