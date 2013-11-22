@@ -33,6 +33,7 @@ app.config ($locationProvider, $routeProvider) ->
     resolve:
       data: ($q, $route, backendWrapper) ->
         deferred = $q.defer()
+        console.log $route
         museum_id = $route.current.params.museum
         backendWrapper.fetch_data(museum_id, deferred)
         deferred.promise

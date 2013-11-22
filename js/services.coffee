@@ -263,7 +263,7 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
   fetch_data: (museum_id, q) ->
     ngProgress.color('#fd6e3b')
     ngProgress.start()
-    console.log 'anim started'
+    console.log 'anim started', museum_id
     @museum_id = museum_id if museum_id?
     request = $http.get("#{@backend_url}/provider/#{@content_provider_id}/museums")
     request.success ( (data) ->
@@ -300,6 +300,7 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
           @langs.push story.story.language
         @museums.push museum
         museum.active = false
+        console.log 'comparing ids', museum_id, museum._id
         if museum._id is @museum_id
           museum.active = true
           @current_museum = museum
