@@ -1316,7 +1316,7 @@ angular.module("Museum.directives", [])
       </ul>
         <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
         <div class="lightbox_preloader">
-          <img src="/img/big_loader_2.gif">
+          <img src="/img/big_loader_2.GIF">
         </div>
         <div class="content {{story_tab}}">
           <div class="cropping_area {{story_tab}}">

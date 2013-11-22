@@ -382,7 +382,6 @@
             }
             this.museums.push(museum);
             museum.active = false;
-            console.log('comparing ids', museum_id, museum._id);
             if (museum._id === this.museum_id) {
               museum.active = true;
               this.current_museum = museum;

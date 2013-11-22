@@ -140,10 +140,10 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
 
 .service "backendWrapper", ($http, ngProgress, $location, $i18next) ->
   # museum_id: "5285b3417de600691f000002"
-  museum_id: "528f05b3c99772031a000002" #prototype
   # content_provider_id: "5285b3417de600691f000001"
-  content_provider_id: "528f05b3c99772031a000001" #prototype
   # backend_url: "http://192.168.158.128:3000/api"
+  museum_id: "528f05b3c99772031a000002" #prototype
+  content_provider_id: "528f05b3c99772031a000001" #prototype
   backend_url: "http://prototype.izi.travel/api" #prototype
   museums: []
   exhibits: []
@@ -300,7 +300,6 @@ angular.module("Museum.services", []).service "sharedProperties", ($rootScope) -
           @langs.push story.story.language
         @museums.push museum
         museum.active = false
-        console.log 'comparing ids', museum_id, museum._id
         if museum._id is @museum_id
           museum.active = true
           @current_museum = museum
