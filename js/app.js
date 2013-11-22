@@ -21,8 +21,7 @@
         data: function($q, $route, backendWrapper) {
           var deferred, museum_id;
           deferred = $q.defer();
-          console.log($route);
-          museum_id = $route.current.params.museum;
+          museum_id = $route.current.params.museum_id;
           backendWrapper.fetch_data(museum_id, deferred);
           return deferred.promise;
         }

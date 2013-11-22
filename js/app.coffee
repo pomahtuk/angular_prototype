@@ -32,9 +32,8 @@ app.config ($locationProvider, $routeProvider) ->
     controller: "IndexController"
     resolve:
       data: ($q, $route, backendWrapper) ->
-        deferred = $q.defer()
-        console.log $route
-        museum_id = $route.current.params.museum
+        deferred  = $q.defer()
+        museum_id = $route.current.params.museum_id
         backendWrapper.fetch_data(museum_id, deferred)
         deferred.promise
   $locationProvider.html5Mode true
