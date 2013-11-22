@@ -187,6 +187,212 @@
         return $rootScope.$broadcast('new_error', this.errors);
       }
     };
+  }).service("backendWrapper", function($http, ngProgress, $location, $i18next) {
+    return {
+      museum_id: $location.$$path != null ? $location.$$path.split('/')[1] : "5285b3417de600691f000002",
+      content_provider_id: "5285b3417de600691f000001",
+      backend_url: "http://192.168.158.128:3000/api",
+      museums: [],
+      exhibits: [],
+      modal_translations: [],
+      langs: [],
+      current_museum: {},
+      active_exhibit: {},
+      sort_field: 'number',
+      sort_direction: 1,
+      reload_exhibits: function(sort_field, sort_direction, q) {
+        if (sort_field == null) {
+          sort_field = sort_field;
+        }
+        if (sort_direction == null) {
+          sort_direction = sort_direction;
+        }
+        return $http.get("" + backend_url + "/provider/" + content_provider_id + "/museums/" + museum_id + "/exhibits/" + sort_field + "/" + sort_direction).success(function(data) {
+          var active_exhibit, exhibit, exhibits, image, item, new_exhibits, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
+          new_exhibits = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            item = data[_i];
+            if (item != null) {
+              exhibit = item.exhibit;
+              exhibit.images = [];
+              exhibit.mapped_images = [];
+              exhibit.cover = {};
+              _ref = item.images;
+              for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+                image = _ref[_j];
+                exhibit.images.push(image);
+                if (image.image.cover === true) {
+                  exhibit.cover = image.image;
+                }
+              }
+              exhibit.stories = {};
+              _ref1 = item.stories;
+              for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+                story = _ref1[_k];
+                story.story.quiz = story.quiz.quiz;
+                story.story.audio = story.audio;
+                story.story.video = story.video;
+                story.story.quiz.answers = story.quiz.answers;
+                story.story.mapped_images = [];
+                _ref2 = exhibit.images;
+                for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
+                  image = _ref2[_l];
+                  if (image.mappings[story.story.language]) {
+                    story.story.mapped_images.push(image);
+                  }
+                }
+                exhibit.stories[story.story.language] = story.story;
+              }
+              new_exhibits.push(exhibit);
+            }
+          }
+          ngProgress.complete();
+          console.log('anim completed');
+          active_exhibit = new_exhibits[0];
+          exhibits = new_exhibits;
+          if (new_exhibits.length === 0) {
+            $scope.active_exhibit = {
+              index: 0,
+              name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+              number: '1',
+              image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+              thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+              publish_state: 'all',
+              description: '',
+              qr_code: {
+                url: '/img/qr_code.png',
+                print_link: 'http://localhost:8000/img/qr_code.png'
+              },
+              images: [
+                {
+                  image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+                  thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+                  id: 1,
+                  edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+                }, {
+                  image: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/14845c98-05ec-4da8-8aff-11808ecc123f_800x600.jpg',
+                  thumb: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg',
+                  id: 2,
+                  edit_url: 'http://media.izi.travel/fc85dcc2-3e95-40a9-9a78-14705a106230/7104d8b7-2f73-4b98-bfb2-b4245a325ce3_480x360.jpg'
+                }
+              ],
+              stories: {
+                ru: {
+                  name: 'Богоматерь Владимирская, с двунадесятыми праздниками',
+                  description: 'test description',
+                  publish_state: 'all',
+                  audio: 'http://www.jplayer.org/audio/ogg/TSP-01-Cro_magnon_man.ogg',
+                  quiz: {
+                    question: 'are you sure?',
+                    description: 'can you tell me?',
+                    state: 'published',
+                    answers: [
+                      {
+                        title: 'yes',
+                        correct: false,
+                        id: 0
+                      }, {
+                        title: 'may be',
+                        correct: true,
+                        id: 1
+                      }, {
+                        title: 'who cares?',
+                        correct: false,
+                        id: 2
+                      }, {
+                        title: 'nope',
+                        correct: false,
+                        id: 3
+                      }
+                    ]
+                  }
+                }
+              }
+            };
+          }
+          if (q != null) {
+            return q.resolve();
+          }
+        });
+      },
+      fetch_data: function(q) {
+        console.log(called);
+        console.log(backendWrapper);
+        ngProgress.start();
+        console.log('anim started');
+        return $http.get("" + backend_url + "/provider/" + content_provider_id + "/museums").success(function(data) {
+          var current_museum, found, image, item, lang, langs, modal_translations, museum, museum_id, museums, story, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3;
+          museums = [];
+          found = false;
+          langs = [];
+          modal_translations = {};
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            item = data[_i];
+            museum = item.exhibit;
+            museum.def_lang = "ru";
+            if (museum.language == null) {
+              museum.language = "ru";
+            }
+            museum.package_status = "process";
+            museum.stories = {};
+            museum.images = [];
+            museum.mapped_images = [];
+            museum.cover = {};
+            _ref = item.images;
+            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+              image = _ref[_j];
+              museum.images.push(image);
+              if (image.image.cover === true) {
+                museum.cover = image.image;
+              }
+            }
+            _ref1 = item.stories;
+            for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+              story = _ref1[_k];
+              story.story.city = "Saint-Petersburg";
+              story.story.quiz = story.quiz.quiz;
+              story.story.audio = story.audio;
+              story.story.video = story.video;
+              story.story.quiz.answers = story.quiz.answers;
+              story.story.mapped_images = [];
+              _ref2 = museum.images;
+              for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
+                image = _ref2[_l];
+                if (image.mappings[story.story.language]) {
+                  story.story.mapped_images.push(image);
+                }
+              }
+              museum.stories[story.story.language] = story.story;
+              langs.push(story.story.language);
+            }
+            museums.push(museum);
+            museum.active = false;
+            if (museum._id === museum_id) {
+              museum.active = true;
+              current_museum = museum;
+              found = true;
+            }
+            langs.unique();
+          }
+          if (!found) {
+            current_museum = $scope.museums[0];
+            current_museum.def_lang = "ru";
+            if (museum.language == null) {
+              current_museum.language = "ru";
+            }
+            museum_id = current_museum._id;
+          }
+          _ref3 = $scope.langs;
+          for (_m = 0, _len4 = _ref3.length; _m < _len4; _m++) {
+            lang = _ref3[_m];
+            modal_translations[lang] = {
+              name: $i18next(lang)
+            };
+          }
+          return reload_exhibits(null, null, q);
+        });
+      }
+    };
   });
 
 }).call(this);

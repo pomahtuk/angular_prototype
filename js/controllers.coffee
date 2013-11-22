@@ -222,7 +222,6 @@ angular.module("Museum.controllers", [])
     tmp = localStorage.getItem "grouped"
     $scope.group_exhibits_processor() if tmp is 'true'
 
-
   $scope.reload_museums = ->
     # ngProgress.complete()
     ngProgress.start()
@@ -549,72 +548,6 @@ angular.module("Museum.controllers", [])
       }
     ]
     stories: {
-      en: {
-        name: 'English'
-        language: 'en'
-        publish_state: 'all'
-        long_description:''
-        quiz: {
-          question: 'are you sure?'
-          description: 'can you tell me?'
-          state: 'published'
-          answers: [
-            {
-              title: 'yes'
-              correct: false
-              id: 0
-            }
-            {
-              title: 'may be'
-              correct: true
-              id: 1
-            }
-            {
-              title: 'who cares?'
-              correct: false
-              id: 2
-            }
-            {
-              title: 'nope'
-              correct: false
-              id: 3
-            }
-          ]
-        }
-      }
-      es: {
-        name: 'Spanish'
-        language: 'es'
-        publish_state: 'all'
-        long_description:''
-        quiz: {
-          question: 'are you sure?'
-          description: 'can you tell me?'
-          state: 'published'
-          answers: [
-            {
-              title: 'yes'
-              correct: false
-              id: 0
-            }
-            {
-              title: 'may be'
-              correct: true
-              id: 1
-            }
-            {
-              title: 'who cares?'
-              correct: false
-              id: 2
-            }
-            {
-              title: 'nope'
-              correct: false
-              id: 3
-            }
-          ]
-        }
-      }
       ru: {
         name: 'Russian'
         language: 'ru'

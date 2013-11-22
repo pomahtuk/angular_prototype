@@ -1308,10 +1308,10 @@ angular.module("Museum.directives", [])
     <div class="lightbox_area">
       <ul class="nav nav-tabs">
         <li ng-class="{'active': story_tab == 'thumb'}">
-          <a href="#" ng-click="story_tab = 'thumb'" >{{ 'Select thumbnail area' | i18next }}</a>
+          <a href="#" ng-click="update_media(active_image_index); story_tab = 'thumb'" >{{ 'Select thumbnail area' | i18next }}</a>
         </li>
         <li ng-class="{'active': story_tab == 'full'}">
-          <a href="#" ng-click="story_tab = 'full'" >{{ 'Select fullsize image area' | i18next }}</a>
+          <a href="#" ng-click="update_media(active_image_index); story_tab = 'full'" >{{ 'Select fullsize image area' | i18next }}</a>
         </li>        
       </ul>
         <button class="btn btn-warning apply_resize" type="button">{{ "Done" | i18next }}</button>
@@ -1433,24 +1433,30 @@ angular.module("Museum.directives", [])
       console.log 'updating media'
       if scope.story_tab is 'full'
         selected = selected_full
-      else
-        selected = selected_thumb
         preloader.show()
         content.hide()
+        console.log 'hiding thumb'
+      else
+        selected = selected_thumb
       scope.active_image_index = 0 unless scope.model.images[scope.active_image_index]?
       $http.put("#{scope.$parent.backend_url}/resize_thumb/#{scope.model.images[scope.active_image_index].image._id}", selected).success (data) ->
         # console.log data
+
+        console.log scope.model.images[index].image.thumbnailUrl, data.thumbnailUrl
+
         delete scope.model.images[index].image.url
         delete scope.model.images[index].image.fullUrl
         delete scope.model.images[index].image.selection
         delete scope.model.images[index].image.full_selection
         delete scope.model.images[index].image.thumbnailUrl
+        # cropper_thumb.attr('src', data.thumbnailUrl)
         angular.extend(scope.model.images[index].image, data)
         ## and now - close preloader and show data with 50ms delay
-        setTimeout ->
-          preloader.hide()
-          content.show()
-        , 200 if scope.story_tab is 'thumb'
+        # console.log selected
+        # setTimeout ->
+        #   preloader.hide()
+        #   content.show()
+        # , 200 if selected.mode is 'thumb'
         callback() if callback
         return true
       .error ->
@@ -1479,6 +1485,9 @@ angular.module("Museum.directives", [])
       true
 
     cropper_thumb.on 'load', ->
+      console.log 'thumb reloaded'
+      preloader.hide()
+      content.show()
       setTimeout (->
         imageWidth  = cropper_thumb.get(0).naturalWidth
         imageHeight = cropper_thumb.get(0).naturalHeight
@@ -1605,10 +1614,8 @@ angular.module("Museum.directives", [])
           left.css({'opacity': 0})
           scope.active_image_index = 0
 
-    scope.$watch 'story_tab', (newValue, oldValue) ->
-      if newValue? and newValue isnt oldValue
-        scope.update_media scope.active_image_index
-        console.log 'not same and present, should update cropper'
+    # scope.$watch 'story_tab', (newValue, oldValue) ->
+    #   scope.update_media scope.active_image_index
 
     scope.$watch 'active_image_index', (newValue, oldValue) ->
       scope.check_active_image()      
@@ -1696,33 +1703,6 @@ angular.module("Museum.directives", [])
 
         scope.$parent.$parent.$digest()
         event.stopPropagation()
-
-# .directive 'jsDraggableRevert', ->
-#   restrict: 'A'
-#   link: (scope, element, attrs) ->
-#     console.log 'initef revert'
-#     element  = $ element
-#     parent   = element.parents('.description')
-#     timeline = parent.find('.timline_container')
-#     sortable = parent.find('ul.images')
-#     element.draggable
-#       revert: true
-#       cursor: "pointer"
-#       scroll: false
-#       # delay: 100
-#       # handle: "li.timestamp"
-#       start: ( event, ui ) ->
-#         ui.helper.addClass('dragged')
-#         timeline.addClass('highlite')
-#       stop: ( event, ui ) ->
-#         timeline.removeClass('highlite')
-#         parent.find('ul.images').sortable( "option", "disabled", true )
-#         setTimeout ->
-#           sortable.sortable( "option", "disabled", false )
-#           sortable.sortable( "refresh" )
-#           sortable.sortable( "refreshPositions" )
-#         , 300
-#         event.stopPropagation()
 
 .directive 'droppable', ($http, errorProcessing, $i18next, imageMappingHelpers) ->
   restrict: 'A'
@@ -1902,9 +1882,6 @@ angular.module("Museum.directives", [])
   transclude: true
   template: """
     <ul class="nav nav-tabs lang_list">
-      <!-- <li ng-class="{'active': $index == '0'}" ng-repeat="story in first_display">
-        <a href="#" ng-click="current_museum.language = story.language">{{ story.language | i18next}}</a>
-      </li> -->
       <li class="active">
         <a href="#" class="dropdown-toggle">
           {{current_museum.language | i18next}}
@@ -1924,13 +1901,10 @@ angular.module("Museum.directives", [])
   """  
   link: (scope, element, attrs) ->
 
-    scope.first_display = []
-    scope.last_display  = []
-
     weight_calc = (item) ->
       weight = 0
       weight -= 100 if item.language is scope.current_museum.language
-      weight -= 50 if item.language is scope.oldLang
+      # weight -= 50 if item.language is scope.oldLang
       return weight
 
     lang_sort = (a, b) ->
@@ -1945,7 +1919,7 @@ angular.module("Museum.directives", [])
 
       scope.lang_arr = []
 
-      scope.oldLang  = oldValue
+      # scope.oldLang  = oldValue
 
       for key, value of scope.current_museum.stories
         scope.lang_arr.push value

@@ -1232,7 +1232,7 @@
       scope: {
         model: '=model'
       },
-      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"lightbox_preloader\">\n      <img src=\"/img/big_loader_2.gif\">\n    </div>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover pointer_events\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
+      template: "<div class=\"lightbox_area\">\n  <ul class=\"nav nav-tabs\">\n    <li ng-class=\"{'active': story_tab == 'thumb'}\">\n      <a href=\"#\" ng-click=\"update_media(active_image_index); story_tab = 'thumb'\" >{{ 'Select thumbnail area' | i18next }}</a>\n    </li>\n    <li ng-class=\"{'active': story_tab == 'full'}\">\n      <a href=\"#\" ng-click=\"update_media(active_image_index); story_tab = 'full'\" >{{ 'Select fullsize image area' | i18next }}</a>\n    </li>        \n  </ul>\n    <button class=\"btn btn-warning apply_resize\" type=\"button\">{{ \"Done\" | i18next }}</button>\n    <div class=\"lightbox_preloader\">\n      <img src=\"/img/big_loader_2.gif\">\n    </div>\n    <div class=\"content {{story_tab}}\">\n      <div class=\"cropping_area {{story_tab}}\">\n        {{story_tab}}\n        <img class=\"cropper_thumb\" src=\"{{model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url}}\">\n        <img class=\"cropper_full\" src=\"{{model.images[active_image_index].image.url}}\">\n      </div>\n      <div class=\"notification\" ng-switch on=\"story_tab\">\n        <span ng-switch-when=\"thumb\">\n          {{ \"Select the preview area. Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n        <span ng-switch-when=\"full\">\n          {{ \"Images won't crop. You can always return to this later on.\" | i18next }}\n        </span>\n      </div>\n      <div class=\"preview\" ng-hide=\"story_tab == 'full'\">\n        {{ \"Mobile app preview\" | i18next }}\n        <div class=\"mobile\">\n          <div class=\"image\">\n            <img src=\"{{ model.images[active_image_index].image.fullUrl || model.images[active_image_index].image.url }}\">\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"slider\">\n      <ul class=\"images_sortable\" sortable=\"model.images\" lang=\"$parent.current_museum.language\">\n        <li class=\"thumb item_{{$index}} \" ng-class=\"{'active':image.image.active, 'timestamp': image.mappings[lang].timestamp >= 0}\" ng-repeat=\"image in images\">\n          <img ng-click=\"$parent.$parent.set_index($index)\" src=\"{{image.image.thumbnailUrl}}\" />\n          <div class=\"label_timestamp\" ng-show=\"image.mappings[lang].timestamp >= 0\">\n            <span class=\"letter_label\">\n              {{ image.image.order | numstring }}\n            </span>\n            <span class=\"time\">\n              {{ image.mappings[lang].timestamp | timerepr }}\n            </span>\n          </div>\n          <a class=\"cover pointer_events\" ng-class=\"{'active':image.image.cover}\" ng-click=\"$parent.$parent.make_cover($index)\" ng-switch on=\"image.image.cover\">\n            <span ng-switch-when=\"true\"><i class=\"icon-ok\"></i> {{ \"Cover\" | i18next }}</span>\n            <span ng-switch-default><i class=\"icon-ok\"></i> {{ \"Set cover\" | i18next }}</span>\n          </a>\n        </li>\n      </ul>\n    </div>\n</div>",
       controller: function($scope, $element, $attrs) {
         $scope.set_index = function(index, tab) {
           return $scope.update_media($scope.active_image_index, function() {
@@ -1315,27 +1315,23 @@
           console.log('updating media');
           if (scope.story_tab === 'full') {
             selected = selected_full;
-          } else {
-            selected = selected_thumb;
             preloader.show();
             content.hide();
+            console.log('hiding thumb');
+          } else {
+            selected = selected_thumb;
           }
           if (scope.model.images[scope.active_image_index] == null) {
             scope.active_image_index = 0;
           }
           return $http.put("" + scope.$parent.backend_url + "/resize_thumb/" + scope.model.images[scope.active_image_index].image._id, selected).success(function(data) {
+            console.log(scope.model.images[index].image.thumbnailUrl, data.thumbnailUrl);
             delete scope.model.images[index].image.url;
             delete scope.model.images[index].image.fullUrl;
             delete scope.model.images[index].image.selection;
             delete scope.model.images[index].image.full_selection;
             delete scope.model.images[index].image.thumbnailUrl;
             angular.extend(scope.model.images[index].image, data);
-            if (scope.story_tab === 'thumb') {
-              setTimeout(function() {
-                preloader.hide();
-                return content.show();
-              }, 200);
-            }
             if (callback) {
               callback();
             }
@@ -1369,6 +1365,9 @@
           return true;
         };
         cropper_thumb.on('load', function() {
+          console.log('thumb reloaded');
+          preloader.hide();
+          content.show();
           return setTimeout((function() {
             var new_imageHeight, new_imageWidth, options, selection, thumb_jcrop;
             imageWidth = cropper_thumb.get(0).naturalWidth;
@@ -1485,12 +1484,6 @@
               });
               return scope.active_image_index = 0;
             }
-          }
-        });
-        scope.$watch('story_tab', function(newValue, oldValue) {
-          if ((newValue != null) && newValue !== oldValue) {
-            scope.update_media(scope.active_image_index);
-            return console.log('not same and present, should update cropper');
           }
         });
         scope.$watch('active_image_index', function(newValue, oldValue) {
@@ -1789,19 +1782,14 @@
       restrict: "E",
       replace: true,
       transclude: true,
-      template: "<ul class=\"nav nav-tabs lang_list\">\n  <!-- <li ng-class=\"{'active': $index == '0'}\" ng-repeat=\"story in first_display\">\n    <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n  </li> -->\n  <li class=\"active\">\n    <a href=\"#\" class=\"dropdown-toggle\">\n      {{current_museum.language | i18next}}\n      <i class=\"icon-chevron-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in lang_arr\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"lang_arr.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
+      template: "<ul class=\"nav nav-tabs lang_list\">\n  <li class=\"active\">\n    <a href=\"#\" class=\"dropdown-toggle\">\n      {{current_museum.language | i18next}}\n      <i class=\"icon-chevron-down\"></i>\n    </a>\n    <ul class=\"dropdown-menu\">\n      <li ng-repeat=\"story in lang_arr\">\n        <a href=\"#\" ng-click=\"current_museum.language = story.language\">{{ story.language | i18next}}</a>\n      </li>\n      <li class=\"divider\" ng-hide=\"lang_arr.length == 0\"></li>\n      <li>\n        <a href=\"#\" ng-click=\"new_museum_language()\"> {{ 'newLanguage' | i18next }} </a>\n      </li>\n    </ul>        \n  </li>\n</ul>",
       link: function(scope, element, attrs) {
         var lang_sort, weight_calc;
-        scope.first_display = [];
-        scope.last_display = [];
         weight_calc = function(item) {
           var weight;
           weight = 0;
           if (item.language === scope.current_museum.language) {
             weight -= 100;
-          }
-          if (item.language === scope.oldLang) {
-            weight -= 50;
           }
           return weight;
         };
@@ -1817,7 +1805,6 @@
         return scope.$watch('current_museum.language', function(newValue, oldValue) {
           var key, value, _ref;
           scope.lang_arr = [];
-          scope.oldLang = oldValue;
           _ref = scope.current_museum.stories;
           for (key in _ref) {
             value = _ref[key];
